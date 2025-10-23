@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Manager Ultra 💖</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Pacifico&display=swap');
+      
+      * {
+        font-family: 'Quicksand', sans-serif !important;
+      }
+      
+      .pacifico {
+        font-family: 'Pacifico', cursive !important;
+      }
+      
+      body {
+        overflow-x: hidden;
+      }
+      
+      .cute-shadow {
+        box-shadow: 0 10px 40px rgba(236, 72, 153, 0.3), 0 0 0 1px rgba(236, 72, 153, 0.1);
+      }
+      
+      .cute-glow {
+        box-shadow: 0 0 30px rgba(236, 72, 153, 0.5), 0 0 60px rgba(168, 85, 247, 0.3);
+      }
+      
+      .floating {
+        animation: floating 3s ease-in-out infinite;
+      }
+      
+      @keyframes floating {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+      }
+      
+      .sparkle-animation {
+        animation: sparkle 2s ease-in-out infinite;
+      }
+      
+      @keyframes sparkle {
+        0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        50% { opacity: 0.6; transform: scale(1.3) rotate(180deg); }
+      }
+      
+      .pulse-soft {
+        animation: pulse-soft 2s ease-in-out infinite;
+      }
+      
+      @keyframes pulse-soft {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+      }
+      
+      .bounce-cute {
+        animation: bounce-cute 1s ease-in-out infinite;
+      }
+      
+      @keyframes bounce-cute {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      
+      .gradient-text {
+        background: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #3b82f6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .success-ping {
+        animation: success-ping 1s ease-out;
+      }
+      
+      @keyframes success-ping {
+        0% { transform: scale(0.8); opacity: 0; }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
+      }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const Heart = ({size = 24, fill = "none", className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        );
+        
+        const Users = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+        );
+        
+        const Calculator = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+            <line x1="8" y1="6" x2="16" y2="6"></line>
+          </svg>
+        );
+        
+        const User = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        );
+        
+        const LogOut = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        );
+        
+        const Clock = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        );
+        
+        const Trash2 = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        );
+        
+        const Sparkles = ({size = 24, className = "", fill = "none"}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"></path>
+            <path d="M19 12l.75 2.25L22 15l-2.25.75L19 18l-.75-2.25L16 15l2.25-.75L19 12z"></path>
+          </svg>
+        );
+        
+        const Star = ({size = 24, className = "", fill = "none"}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} className={className} stroke="currentColor" strokeWidth="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        );
+        
+        const Bell = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        );
+        
+        const ExternalLink = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        );
+        
+        const CheckCircle = ({size = 24, className = ""}) => (
+          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        );
+
+        function RobloxManagerApp() {
+          const [isLoggedIn, setIsLoggedIn] = useState(false);
+          const [username, setUsername] = useState('');
+          const [password, setPassword] = useState('');
+          const [currentTab, setCurrentTab] = useState('accounts');
+          const [accounts, setAccounts] = useState([]);
+          const [clients, setClients] = useState([]);
+          const [serverUrl, setServerUrl] = useState('http://localhost:3000');
+          
+          const [accUsername, setAccUsername] = useState('');
+          const [accProfile, setAccProfile] = useState('');
+          const [accDuration, setAccDuration] = useState('');
+          const [accRobloxCookie, setAccRobloxCookie] = useState('');
+          
+          const [clientName, setClientName] = useState('');
+          const [clientStatus, setClientStatus] = useState('Bronze');
+          const [clientOverdue, setClientOverdue] = useState('');
+          
+          const [calcTime1, setCalcTime1] = useState('');
+          const [calcTime2, setCalcTime2] = useState('');
+          const [calcResult, setCalcResult] = useState('');
+          
+          const [showNotification, setShowNotification] = useState(false);
+          const [notificationText, setNotificationText] = useState('');
+
+          const profiles = ['KisuneUWU_RBX', 'MontiPlay_YT', 'NyawkaUWUrbx', 'Murzik14TH', 'Alex', 'Michael', 'Ronaldo', 'Brian', 'Thomas', 'Faderty'];
+
+          const showNotif = (text) => {
+            setNotificationText(text);
+            setShowNotification(true);
+            setTimeout(() => setShowNotification(false), 4000);
+          };
+
+          useEffect(() => {
+            const interval = setInterval(() => {
+              setAccounts(prev => prev.map(acc => {
+                const newRemaining = Math.max(0, acc.remaining - 1);
+                const wasActive = acc.status === 'active';
+                const newStatus = newRemaining === 0 ? 'expired' : 'active';
+                
+                if (wasActive && newStatus === 'expired') {
+                  showNotif(`⏰ Время истекло для ${acc.username}!`);
+                  
+                  if (acc.robloxCookie && serverUrl) {
+                    autoKickAccount(acc.id, acc.robloxCookie);
+                  }
+                }
+                
+                return {
+                  ...acc,
+                  remaining: newRemaining,
+                  status: newStatus
+                };
+              }));
+            }, 60000);
+            return () => clearInterval(interval);
+          }, [serverUrl]);
+
+          const autoKickAccount = async (accountId, cookie) => {
+            try {
+              const response = await fetch(`${serverUrl}/api/logout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cookie })
+              });
+              
+              const data = await response.json();
+              
+              if (data.success) {
+                setAccounts(prev => prev.map(acc => 
+                  acc.id === accountId ? { ...acc, status: 'kicked', kickedAuto: true } : acc
+                ));
+                showNotif(`✨ ${accounts.find(a => a.id === accountId)?.username} автоматически кикнут!`);
+              } else {
+                setAccounts(prev => prev.map(acc => 
+                  acc.id === accountId ? { ...acc, status: 'kick-failed' } : acc
+                ));
+                showNotif(`❌ Ошибка автокика. Нажмите кнопку вручную!`);
+              }
+            } catch (error) {
+              setAccounts(prev => prev.map(acc => 
+                acc.id === accountId ? { ...acc, status: 'expired' } : acc
+              ));
+              showNotif(`⚠️ Сервер недоступен. Используйте ручной кик!`);
+            }
+          };
+
+          const handleLogin = () => {
+            if (username === 'Azim218' && password === 'Emil210407!') {
+              setIsLoggedIn(true);
+            }
+          };
+
+          const handleLogout = () => {
+            setIsLoggedIn(false);
+            setUsername('');
+            setPassword('');
+          };
+
+          const addAccount = () => {
+            if (accUsername && accProfile && accDuration) {
+              const newAccount = {
+                id: Date.now().toString(),
+                username: accUsername,
+                profile: accProfile,
+                duration: parseInt(accDuration),
+                remaining: parseInt(accDuration),
+                startTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+                status: 'active',
+                robloxCookie: accRobloxCookie || null,
+                kickedAuto: false
+              };
+              setAccounts(prev => [...prev, newAccount]);
+              setAccUsername('');
+              setAccProfile('');
+              setAccDuration('');
+              setAccRobloxCookie('');
+              showNotif(`💖 ${accUsername} добавлен!`);
+            }
+          };
+
+          const manualKickAccount = (id) => {
+            const acc = accounts.find(a => a.id === id);
+            window.open('https://www.roblox.com/my/account#!/security', '_blank');
+            setAccounts(prev => prev.map(a => 
+              a.id === id ? { ...a, status: 'pending-kick' } : a
+            ));
+            showNotif(`🔗 Открыта страница Roblox для ${acc.username}. Нажмите Log Out!`);
+          };
+
+          const confirmKick = (id) => {
+            const acc = accounts.find(a => a.id === id);
+            setAccounts(prev => prev.map(a => 
+              a.id === id ? { ...a, status: 'kicked' } : a
+            ));
+            showNotif(`✨ ${acc.username} успешно кикнут!`);
+          };
+
+          const removeAccount = (id) => {
+            const acc = accounts.find(a => a.id === id);
+            setAccounts(prev => prev.filter(a => a.id !== id));
+            showNotif(`🗑️ ${acc.username} удалён из списка`);
+          };
+
+          const addClient = () => {
+            if (clientName) {
+              const newClient = {
+                id: Date.now().toString(),
+                name: clientName,
+                status: clientStatus,
+                overdue: clientOverdue || '0',
+                date: new Date().toLocaleDateString('ru-RU')
+              };
+              setClients(prev => [...prev, newClient]);
+              setClientName('');
+              setClientOverdue('');
+              showNotif(`👥 Клиент ${clientName} добавлен!`);
+            }
+          };
+
+          const removeClient = (id) => {
+            const client = clients.find(c => c.id === id);
+            setClients(prev => prev.filter(c => c.id !== id));
+            showNotif(`🗑️ ${client.name} удалён`);
+          };
+
+          const calculateTime = (operation) => {
+            const parseTime = (text) => {
+              if (text.includes(':')) {
+                const [h, m] = text.split(':').map(Number);
+                return h * 60 + m;
+              }
+              return parseInt(text) || 0;
+            };
+
+            const m1 = parseTime(calcTime1);
+            const m2 = parseTime(calcTime2);
+            const result = operation === 'add' ? m1 + m2 : Math.max(0, m1 - m2);
+            const hours = Math.floor(result / 60);
+            const mins = result % 60;
+            
+            setCalcResult(hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}` : `${mins}`);
+          };
+
+          if (!isLoggedIn) {
+            return (
+              <div className="min-h-screen bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 flex items-center justify-center p-4 relative overflow-hidden">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                  <div className="absolute top-10 left-10 text-pink-300 opacity-30 floating" style={{animationDelay: '0s'}}>
+                    <Heart size={100} fill="currentColor" />
+                  </div>
+                  <div className="absolute top-32 right-20 text-purple-300 opacity-30 floating" style={{animationDelay: '1s'}}>
+                    <Star size={80} fill="currentColor" />
+                  </div>
+                  <div className="absolute bottom-32 left-1/4 text-blue-300 opacity-30 floating" style={{animationDelay: '2s'}}>
+                    <Sparkles size={70} fill="currentColor" />
+                  </div>
+                  <div className="absolute bottom-20 right-1/3 text-pink-300 opacity-30 floating" style={{animationDelay: '1.5s'}}>
+                    <Heart size={60} fill="currentColor" />
+                  </div>
+                  <div className="absolute top-1/2 left-1/2 text-purple-300 opacity-20 floating" style={{animationDelay: '0.5s'}}>
+                    <Star size={90} fill="currentColor" />
+                  </div>
+                </div>
+
+                <div className="w-full max-w-md transform transition-all duration-500 hover:scale-105">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-[50px] shadow-2xl cute-glow p-12 border-4 border-pink-300 relative">
+                    <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center shadow-2xl pulse-soft">
+                      <Heart className="text-white" size={48} fill="white" />
+                    </div>
+                    
+                    <div className="text-center mb-12">
+                      <div className="mb-6 sparkle-animation">
+                        <span className="text-8xl">🌸</span>
+                      </div>
+                      <h1 className="text-6xl font-bold gradient-text mb-4 pacifico">
+                        Roblox Manager
+                      </h1>
+                      <p className="text-gray-600 text-xl font-semibold">Добро пожаловать, милашка! 💖</p>
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="relative">
+                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl">✨</div>
+                        <input
+                          type="text"
+                          placeholder="Логин"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          className="w-full pl-16 pr-8 py-6 rounded-full border-3 border-pink-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-pink-50/50 shadow-lg text-lg font-semibold"
+                        />
+                      </div>
+
+                      <div className="relative">
+                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl">🔒</div>
+                        <input
+                          type="password"
+                          placeholder="Пароль"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                          className="w-full pl-16 pr-8 py-6 rounded-full border-3 border-pink-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-pink-50/50 shadow-lg text-lg font-semibold"
+                        />
+                      </div>
+
+                      <button
+                        onClick={handleLogin}
+                        className="w-full py-6 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 cute-glow"
+                      >
+                        Войти ✨
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 p-4 md:p-8 relative overflow-hidden">
+              {showNotification && (
+                <div className="fixed top-8 right-8 z-50 success-ping">
+                  <div className="bg-gradient-to-r from-pink-400 to-purple-400 text-white px-8 py-6 rounded-full shadow-2xl cute-glow flex items-center gap-4 border-4 border-white">
+                    <Bell size={28} className="bounce-cute" />
+                    <span className="text-xl font-bold">{notificationText}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-10 right-10 text-pink-200 opacity-15 floating" style={{animationDuration: '4s'}}>
+                  <Sparkles size={140} fill="currentColor" />
+                </div>
+                <div className="absolute bottom-20 left-10 text-purple-200 opacity-15 floating" style={{animationDuration: '5s'}}>
+                  <Star size={120} fill="currentColor" />
+                </div>
+                <div className="absolute top-1/2 left-1/4 text-blue-200 opacity-15 floating" style={{animationDuration: '6s'}}>
+                  <Heart size={110} fill="currentColor" />
+                </div>
+              </div>
+
+              <div className="max-w-7xl mx-auto relative z-10">
+                <div className="bg-white/95 backdrop-blur-sm rounded-[50px] shadow-2xl cute-shadow p-8 mb-8 border-4 border-pink-300">
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="text-center md:text-left">
+                      <div className="flex items-center gap-4 justify-center md:justify-start mb-3">
+                        <Heart className="text-pink-400 pulse-soft" fill="currentColor" size={48} />
+                        <h1 className="text-5xl md:text-6xl font-bold gradient-text pacifico">
+                          Roblox Manager
+                        </h1>
+                        <Sparkles className="text-purple-400 sparkle-animation" size={40} />
+                      </div>
+                      <p className="text-gray-600 text-xl font-semibold">👑 Azim218 • Администратор</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="px-10 py-5 bg-gradient-to-r from-red-400 to-pink-400 text-white font-bold rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center gap-3 text-xl"
+                    >
+                      <LogOut size={28} />
+                      Выйти
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 mb-8 justify-center">
+                  {[
+                    { id: 'accounts', label: 'Аккаунты', Icon: Clock, emoji: '⏰' },
+                    { id: 'clients', label: 'Клиенты', Icon: Users, emoji: '👥' },
+                    { id: 'calculator', label: 'Калькулятор', Icon: Calculator, emoji: '🧮' },
+                    { id: 'profile', label: 'Профиль', Icon: User, emoji: '👤' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setCurrentTab(tab.id)}
+                      className={`px-8 py-5 rounded-full font-bold text-xl transition-all duration-300 transform hover:scale-110 flex items-center gap-3 shadow-xl ${
+                        currentTab === tab.id
+                          ? 'bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white cute-glow scale-110'
+                          : 'bg-white/95 text-gray-700 hover:bg-pink-50 border-2 border-pink-200'
+                      }`}
+                    >
+                      <span className="text-3xl">{tab.emoji}</span>
+                      <span>{tab.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {currentTab === 'accounts' && (
+                  <div className="space-y-8">
+                    <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-[50px] shadow-2xl cute-shadow p-10 border-4 border-pink-300">
+                      <h2 className="text-4xl font-bold text-purple-600 mb-10 flex items-center gap-4 pacifico">
+                        <span className="text-5xl sparkle-animation">✨</span>
+                        <span>Добавить аккаунт</span>
+                      </h2>
+                      <div className="space-y-6">
+                        <input
+                          type="text"
+                          placeholder="💕 Имя покупателя"
+                          value={accUsername}
+                          onChange={(e) => setAccUsername(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-pink-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold"
+                        />
+                        <select
+                          value={accProfile}
+                          onChange={(e) => setAccProfile(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-pink-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold"
+                        >
+                          <option value="">🎮 Выберите профиль</option>
+                          {profiles.map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                        <input
+                          type="number"
+                          placeholder="⏰ Минуты аренды"
+                          value={accDuration}
+                          onChange={(e) => setAccDuration(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-pink-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold"
+                        />
+                        <input
+                          type="text"
+                          placeholder="🍪 Roblox Cookie (опционально, для автокика)"
+                          value={accRobloxCookie}
+                          onChange={(e) => setAccRobloxCookie(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-pink-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold"
+                        />
+                        <button
+                          onClick={addAccount}
+                          className="w-full py-6 bg-gradient-to-r from-green-400 to-blue-400 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                        >
+                          ✨ Добавить аккаунт
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/95 backdrop-blur-sm rounded-[50px] shadow-2xl cute-shadow p-10 border-4 border-purple-300">
+                      <h2 className="text-4xl font-bold text-purple-600 mb-10 flex items-center gap-4 pacifico">
+                        <Heart className="text-pink-400 pulse-soft" fill="currentColor" size={40} />
+                        <span>Активные аккаунты ({accounts.length})</span>
+                      </h2>
+                      {accounts.length === 0 ? (
+                        <div className="text-center py-20">
+                          <div className="text-8xl mb-6 sparkle-animation">🌸</div>
+                          <p className="text-gray-500 text-3xl font-semibold">Нет активных аккаунтов</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {accounts.map(acc => {
+                            const getStatusInfo = () => {
+                              switch(acc.status) {
+                                case 'active':
+                                  return { 
+                                    bg: 'from-pink-100 to-purple-100', 
+                                    border: 'border-pink-300',
+                                    badge: 'bg-green-400 text-white',
+                                    badgeText: 'Активен ✨',
+                                    showKick: false
+                                  };
+                                case 'expired':
+                                  return { 
+                                    bg: 'from-orange-100 to-red-100', 
+                                    border: 'border-orange-300',
+                                    badge: 'bg-orange-400 text-white',
+                                    badgeText: 'Истёк ⏰',
+                                    showKick: true
+                                  };
+                                case 'pending-kick':
+                                  return { 
+                                    bg: 'from-yellow-100 to-orange-100', 
+                                    border: 'border-yellow-400',
+                                    badge: 'bg-yellow-400 text-white',
+                                    badgeText: 'Ожидает 🔄',
+                                    showKick: false
+                                  };
+                                case 'kicked':
+                                  return { 
+                                    bg: 'from-green-100 to-emerald-100', 
+                                    border: 'border-green-400',
+                                    badge: 'bg-green-500 text-white',
+                                    badgeText: acc.kickedAuto ? 'Авто-кикнут ✨' : 'Кикнут ✅',
+                                    showKick: false
+                                  };
+                                case 'kick-failed':
+                                  return { 
+                                    bg: 'from-red-100 to-pink-100', 
+                                    border: 'border-red-400',
+                                    badge: 'bg-red-500 text-white',
+                                    badgeText: 'Ошибка ❌',
+                                    showKick: true
+                                  };
+                                default:
+                                  return { 
+                                    bg: 'from-gray-100 to-gray-200', 
+                                    border: 'border-gray-300',
+                                    badge: 'bg-gray-400 text-white',
+                                    badgeText: 'Неизвестно',
+                                    showKick: false
+                                  };
+                              }
+                            };
+                            
+                            const statusInfo = getStatusInfo();
+                            
+                            return (
+                              <div 
+                                key={acc.id} 
+                                className={`bg-gradient-to-r ${statusInfo.bg} rounded-[40px] p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border-4 ${statusInfo.border} transform hover:scale-105`}
+                              >
+                                <div className="flex justify-between items-start mb-6">
+                                  <div>
+                                    <h3 className="text-3xl font-bold text-purple-700 mb-2">{acc.username} 💖</h3>
+                                    <p className="text-gray-600 text-xl font-semibold">{acc.profile}</p>
+                                  </div>
+                                  <span className={`px-6 py-3 rounded-full text-lg font-bold shadow-lg ${statusInfo.badge}`}>
+                                    {statusInfo.badgeText}
+                                  </span>
+                                </div>
+                                <div className="space-y-4 mb-6">
+                                  <p className={`text-xl flex items-center gap-3 font-semibold ${
+                                    acc.remaining === 0 ? 'text-red-600' : 'text-gray-700'
+                                  }`}>
+                                    <Clock size={24} className="text-purple-500" />
+                                    Осталось: {acc.remaining} мин
+                                  </p>
+                                  <p className="text-gray-700 text-xl font-semibold flex items-center gap-2">
+                                    ▶ Начало: {acc.startTime}
+                                  </p>
+                                  {acc.robloxCookie && (
+                                    <p className="text-purple-600 text-lg font-semibold flex items-center gap-2">
+                                      🤖 Автокик включён
+                                    </p>
+                                  )}
+                                </div>
+                                
+                                <div className="space-y-3">
+                                  {statusInfo.showKick && (
+                                    <button
+                                      onClick={() => manualKickAccount(acc.id)}
+                                      className="w-full py-5 bg-gradient-to-r from-orange-400 to-red-400 text-white font-bold text-xl rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
+                                    >
+                                      <ExternalLink size={24} />
+                                      Кикнуть на Roblox
+                                    </button>
+                                  )}
+                                  
+                                  {acc.status === 'pending-kick' && (
+                                    <button
+                                      onClick={() => confirmKick(acc.id)}
+                                      className="w-full py-5 bg-gradient-to-r from-green-400 to-emerald-400 text-white font-bold text-xl rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
+                                    >
+                                      <CheckCircle size={24} />
+                                      Подтвердить кик
+                                    </button>
+                                  )}
+                                  
+                                  {(acc.status === 'kicked' || acc.status === 'expired') && (
+                                    <button
+                                      onClick={() => removeAccount(acc.id)}
+                                      className="w-full py-5 bg-gradient-to-r from-red-400 to-pink-400 text-white font-bold text-xl rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
+                                    >
+                                      <Trash2 size={24} />
+                                      Удалить из списка
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {currentTab === 'clients' && (
+                  <div className="space-y-8">
+                    <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-[50px] shadow-2xl cute-shadow p-10 border-4 border-blue-300">
+                      <h2 className="text-4xl font-bold text-blue-600 mb-10 flex items-center gap-4 pacifico">
+                        <span className="text-5xl">👥</span>
+                        <span>Добавить клиента</span>
+                      </h2>
+                      <div className="space-y-6">
+                        <input
+                          type="text"
+                          placeholder="🌟 Имя клиента"
+                          value={clientName}
+                          onChange={(e) => setClientName(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-blue-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold"
+                        />
+                        <select
+                          value={clientStatus}
+                          onChange={(e) => setClientStatus(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-blue-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold"
+                        >
+                          <option value="Bronze">🥉 Bronze</option>
+                          <option value="Silver">🥈 Silver</option>
+                          <option value="Gold">🥇 Gold</option>
+                          <option value="Ultimate">👑 Ultimate</option>
+                        </select>
+                        <input
+                          type="text"
+                          placeholder="⏱️ Время просрочки"
+                          value={clientOverdue}
+                          onChange={(e) => setClientOverdue(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-blue-300 focus:border-purple-400 focus:ring-4 focus:ring-purple-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold"
+                        />
+                        <button
+                          onClick={addClient}
+                          className="w-full py-6 bg-gradient-to-r from-blue-400 to-purple-400 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                        >
+                          ✨ Добавить клиента
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/95 backdrop-blur-sm rounded-[50px] shadow-2xl cute-shadow p-10 border-4 border-purple-300">
+                      <h2 className="text-4xl font-bold text-purple-600 mb-10 flex items-center gap-4 pacifico">
+                        <Star className="text-yellow-400 sparkle-animation" fill="currentColor" size={40} />
+                        <span>Постоянные клиенты ({clients.length})</span>
+                      </h2>
+                      {clients.length === 0 ? (
+                        <div className="text-center py-20">
+                          <div className="text-8xl mb-6 sparkle-animation">🌸</div>
+                          <p className="text-gray-500 text-3xl font-semibold">Нет клиентов</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {clients.map(client => {
+                            const statusColors = {
+                              Bronze: 'from-orange-300 to-yellow-300 border-orange-400',
+                              Silver: 'from-gray-300 to-gray-400 border-gray-500',
+                              Gold: 'from-yellow-300 to-yellow-500 border-yellow-600',
+                              Ultimate: 'from-purple-400 to-pink-400 border-purple-500'
+                            };
+                            const [gradient, border] = statusColors[client.status].split(' ');
+                            return (
+                              <div key={client.id} className={`bg-gradient-to-r ${gradient} rounded-[40px] p-8 shadow-xl hover:shadow-2xl transition-all duration-300 border-4 ${border} transform hover:scale-105`}>
+                                <div className="flex justify-between items-start mb-6">
+                                  <h3 className="text-3xl font-bold text-gray-800">{client.name} 💫</h3>
+                                  <span className="px-6 py-3 bg-white/95 rounded-full text-lg font-bold shadow-lg">
+                                    {client.status}
+                                  </span>
+                                </div>
+                                <div className="space-y-3 mb-6">
+                                  <p className="text-gray-800 text-xl font-semibold">📅 Дата: {client.date}</p>
+                                  <p className="text-gray-800 text-xl font-semibold">⏱️ Просрочка: {client.overdue}</p>
+                                </div>
+                                <button
+                                  onClick={() => removeClient(client.id)}
+                                  className="w-full py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
+                                >
+                                  <Trash2 size={22} />
+                                  Удалить
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {currentTab === 'calculator' && (
+                  <div className="flex justify-center items-center min-h-[60vh]">
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-[50px] shadow-2xl cute-glow p-12 border-4 border-purple-300 w-full max-w-2xl">
+                      <h2 className="text-5xl font-bold text-purple-600 mb-12 flex items-center justify-center gap-4 pacifico">
+                        <span className="text-6xl sparkle-animation">🧮</span>
+                        <span>Калькулятор времени</span>
+                      </h2>
+                      <div className="space-y-8">
+                        <input
+                          type="text"
+                          placeholder="⏰ Время 1 (например: 2:30 или 150)"
+                          value={calcTime1}
+                          onChange={(e) => setCalcTime1(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-purple-300 focus:border-pink-400 focus:ring-4 focus:ring-pink-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold text-center"
+                        />
+                        <input
+                          type="text"
+                          placeholder="⏰ Время 2 (например: 1:45 или 105)"
+                          value={calcTime2}
+                          onChange={(e) => setCalcTime2(e.target.value)}
+                          className="w-full px-8 py-6 rounded-full border-3 border-purple-300 focus:border-pink-400 focus:ring-4 focus:ring-pink-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold text-center"
+                        />
+                        
+                        <div className="grid grid-cols-2 gap-6">
+                          <button
+                            onClick={() => calculateTime('add')}
+                            className="py-6 bg-gradient-to-r from-green-400 to-emerald-400 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                          >
+                            ➕ Сложить
+                          </button>
+                          <button
+                            onClick={() => calculateTime('subtract')}
+                            className="py-6 bg-gradient-to-r from-red-400 to-pink-400 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+                          >
+                            ➖ Вычесть
+                          </button>
+                        </div>
+
+                        {calcResult && (
+                          <div className="bg-white rounded-[40px] p-10 shadow-xl border-4 border-pink-300 text-center success-ping">
+                            <p className="text-gray-600 text-xl font-semibold mb-3">Результат:</p>
+                            <p className="text-6xl font-bold gradient-text sparkle-animation">{calcResult}</p>
+                            <p className="text-gray-500 text-lg font-medium mt-3">минут</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentTab === 'profile' && (
+                  <div className="flex justify-center items-center min-h-[60vh]">
+                    <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-[50px] shadow-2xl cute-glow p-12 border-4 border-pink-300 w-full max-w-2xl text-center">
+                      <div className="mb-10 sparkle-animation">
+                        <span className="text-9xl">👑</span>
+                      </div>
+                      <h2 className="text-5xl font-bold gradient-text mb-6 pacifico">Azim218</h2>
+                      <p className="text-3xl font-semibold text-gray-600 mb-8">Администратор</p>
+                      
+                      <div className="space-y-6 bg-white/80 rounded-[40px] p-10 shadow-xl mb-8">
+                        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full">
+                          <span className="text-2xl font-bold text-gray-700">⏰ Всего аккаунтов:</span>
+                          <span className="text-3xl font-bold gradient-text">{accounts.length}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full">
+                          <span className="text-2xl font-bold text-gray-700">👥 Всего клиентов:</span>
+                          <span className="text-3xl font-bold gradient-text">{clients.length}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-6 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
+                          <span className="text-2xl font-bold text-gray-700">✨ Активных:</span>
+                          <span className="text-3xl font-bold gradient-text">{accounts.filter(a => a.status === 'active').length}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-8">
+                        <label className="block text-2xl font-bold text-purple-600 mb-4 pacifico">⚙️ URL сервера автокика</label>
+                        <input
+                          type="text"
+                          value={serverUrl}
+                          onChange={(e) => setServerUrl(e.target.value)}
+                          placeholder="http://localhost:3000"
+                          className="w-full px-8 py-6 rounded-full border-3 border-purple-300 focus:border-pink-400 focus:ring-4 focus:ring-pink-200 outline-none transition-all duration-300 bg-white shadow-lg text-xl font-semibold text-center"
+                        />
+                        <p className="text-gray-500 text-sm mt-3 font-medium">Оставьте пустым для ручного режима</p>
+                      </div>
+                      
+                      <div className="p-8 bg-gradient-to-r from-purple-200 to-pink-200 rounded-[40px] border-4 border-purple-300">
+                        <p className="text-2xl font-bold text-purple-700 mb-4">💖 Спасибо за работу! 💖</p>
+                        <p className="text-lg font-semibold text-gray-700">Вы делаете мир лучше! ✨</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        }
+
+        ReactDOM.render(<RobloxManagerApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
