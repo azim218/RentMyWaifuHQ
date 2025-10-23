@@ -315,44 +315,50 @@
 
           // 💾 Загрузка данных при старте
           useEffect(() => {
-            const loadData = async () => {
-              try {
-                const [accountsResult, clientsResult, serverUrlResult] = await Promise.all([
-                  window.storage.get('roblox_accounts', true),
-                  window.storage.get('roblox_clients', true),
-                  window.storage.get('roblox_server_url', false)
-                ]);
-                
-                if (accountsResult?.value) {
-                  setAccounts(JSON.parse(accountsResult.value));
-                }
-                if (clientsResult?.value) {
-                  setClients(JSON.parse(clientsResult.value));
-                }
-                if (serverUrlResult?.value) {
-                  setServerUrl(serverUrlResult.value);
-                }
-              } catch (error) {
-                console.log('Первая загрузка данных');
-              }
-              setIsLoading(false);
-            };
-            loadData();
-          }, []);
+  const loadData = async () => {
+    try {
+      const accountsResult = await window.storage.get('roblox_accounts', true);
+      if (accountsResult?.value) setAccounts(JSON.parse(accountsResult.value));
+    } catch (error) {
+      console.log('Аккаунты: первая загрузка');
+    }
+    
+    try {
+      const clientsResult = await window.storage.get('roblox_clients', true);
+      if (clientsResult?.value) setClients(JSON.parse(clientsResult.value));
+    } catch (error) {
+      console.log('Клиенты: первая загрузка');
+    }
+    
+    try {
+      const serverUrlResult = await window.storage.get('roblox_server_url', false);
+      if (serverUrlResult?.value) setServerUrl(serverUrlResult.value);
+    } catch (error) {
+      console.log('URL сервера: первая загрузка');
+    }
+    
+    setIsLoading(false);
+  };
+  loadData();
+}, []);
 
           // 💾 Автосохранение аккаунтов
           useEffect(() => {
-            if (!isLoading) {
-              window.storage.set('roblox_accounts', JSON.stringify(accounts), true).catch(console.error);
-            }
-          }, [accounts, isLoading]);
+  if (!isLoading && accounts.length > 0) {
+    window.storage.set('roblox_accounts', JSON.stringify(accounts), true).catch(err => {
+      console.error('Ошибка сохранения аккаунтов:', err);
+    });
+  }
+}, [accounts, isLoading]);
 
           // 💾 Автосохранение клиентов
           useEffect(() => {
-            if (!isLoading) {
-              window.storage.set('roblox_clients', JSON.stringify(clients), true).catch(console.error);
-            }
-          }, [clients, isLoading]);
+  if (!isLoading && clients.length > 0) {
+    window.storage.set('roblox_clients', JSON.stringify(clients), true).catch(err => {
+      console.error('Ошибка сохранения клиентов:', err);
+    });
+  }
+}, [clients, isLoading]);
 
           // 💾 Сохранение URL сервера
           useEffect(() => {
@@ -1125,3 +1131,4 @@
     </script>
 </body>
 </html>
+
