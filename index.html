@@ -177,12 +177,52 @@
         );
 
         function RobloxManagerApp() {
-          const [isLoggedIn, setIsLoggedIn] = useState(false);
-          const [username, setUsername] = useState('');
-          const [password, setPassword] = useState('');
-          const [currentTab, setCurrentTab] = useState('accounts');
-          const [accounts, setAccounts] = useState([]);
-          const [clients, setClients] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [currentTab, setCurrentTab] = useState('accounts');
+
+  // 🌸 Инициализация аккаунтов и клиентов
+  const [accounts, setAccounts] = useState(() => {
+    const saved = localStorage.getItem('roblox_accounts');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const [clients, setClients] = useState(() => {
+    const saved = localStorage.getItem('roblox_clients');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // 💾 ЭФФЕКТЫ СИНХРОНИЗАЦИИ ДАННЫХ 👇
+  useEffect(() => {
+    localStorage.setItem('roblox_accounts', JSON.stringify(accounts));
+  }, [accounts]);
+
+  useEffect(() => {
+    localStorage.setItem('roblox_clients', JSON.stringify(clients));
+  }, [clients]);
+
+  useEffect(() => {
+    const syncData = (e) => {
+      if (e.key === 'roblox_accounts' && e.newValue) {
+        setAccounts(JSON.parse(e.newValue));
+      }
+      if (e.key === 'roblox_clients' && e.newValue) {
+        setClients(JSON.parse(e.newValue));
+      }
+    };
+    window.addEventListener('storage', syncData);
+    return () => window.removeEventListener('storage', syncData);
+  }, []);
+  // 💾 КОНЕЦ ЭФФЕКТОВ СИНХРОНИЗАЦИИ 👆
+  const saved = localStorage.getItem('roblox_accounts');
+  return saved ? JSON.parse(saved) : [];
+});
+
+const [clients, setClients] = useState(() => {
+  const saved = localStorage.getItem('roblox_clients');
+  return saved ? JSON.parse(saved) : [];
+});
           const [serverUrl, setServerUrl] = useState('http://localhost:3000');
           
           const [accUsername, setAccUsername] = useState('');
@@ -200,6 +240,7 @@
           
           const [showNotification, setShowNotification] = useState(false);
           const [notificationText, setNotificationText] = useState('');
+        
 
           const profiles = ['KisuneUWU_RBX', 'MontiPlay_YT', 'NyawkaUWUrbx', 'Murzik14TH', 'Alex', 'Michael', 'Ronaldo', 'Brian', 'Thomas', 'Faderty'];
 
@@ -878,3 +919,4 @@
     </script>
 </body>
 </html>
+
