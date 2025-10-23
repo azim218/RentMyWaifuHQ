@@ -326,77 +326,61 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // 💾 Загрузка и синхронизация
+// 💾 Загрузка данных при старте
 useEffect(() => {
-  const accountsRef = db.ref('accounts');
-  accountsRef.on('value', (snapshot) => {
-    if (snapshot.val()) setAccounts(snapshot.val());
+  const loadData = async () => {
+    try {
+      const accountsResult = await window.storage.get('roblox_accounts', true);
+      if (accountsResult?.value) setAccounts(JSON.parse(accountsResult.value));
+    } catch (error) {
+      console.log('Аккаунты: первая загрузка');
+    }
+    
+    try {
+      const clientsResult = await window.storage.get('roblox_clients', true);
+      if (clientsResult?.value) setClients(JSON.parse(clientsResult.value));
+    } catch (error) {
+      console.log('Клиенты: первая загрузка');
+    }
+    
+    try {
+      const serverUrlResult = await window.storage.get('roblox_server_url', false);
+      if (serverUrlResult?.value) setServerUrl(serverUrlResult.value);
+    } catch (error) {
+      console.log('URL сервера: первая загрузка');
+    }
+    
     setIsLoading(false);
-  });
-  
-  const clientsRef = db.ref('clients');
-  clientsRef.on('value', (snapshot) => {
-    if (snapshot.val()) setClients(snapshot.val());
-  });
-  
-  return () => {
-    accountsRef.off();
-    clientsRef.off();
   };
+  loadData();
 }, []);
 
-// Автосохранение
+// 💾 Автосохранение аккаунтов
 useEffect(() => {
-  if (!isLoading && accounts.length > 0) {
-    db.ref('accounts').set(accounts);
+  if (!isLoading && accounts.length >= 0) {
+    window.storage.set('roblox_accounts', JSON.stringify(accounts), true).catch(err => {
+      console.error('Ошибка сохранения аккаунтов:', err);
+    });
   }
 }, [accounts, isLoading]);
 
+// 💾 Автосохранение клиентов
 useEffect(() => {
-  if (!isLoading && clients.length > 0) {
-    db.ref('clients').set(clients);
+  if (!isLoading && clients.length >= 0) {
+    window.storage.set('roblox_clients', JSON.stringify(clients), true).catch(err => {
+      console.error('Ошибка сохранения клиентов:', err);
+    });
   }
 }, [clients, isLoading]);
 
-          const autoKickAccount = async (accountId, cookie) => {
-            try {
-              const response = await fetch(`${serverUrl}/api/logout`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cookie })
-              });
-              
-              const data = await response.json();
-              
-              if (data.success) {
-                setAccounts(prev => prev.map(acc => 
-                  acc.id === accountId ? { ...acc, status: 'kicked', kickedAuto: true } : acc
-                ));
-                showNotif(`✨ ${accounts.find(a => a.id === accountId)?.username} автоматически кикнут!`);
-              } else {
-                setAccounts(prev => prev.map(acc => 
-                  acc.id === accountId ? { ...acc, status: 'kick-failed' } : acc
-                ));
-                showNotif(`❌ Ошибка автокика. Нажмите кнопку вручную!`);
-              }
-            } catch (error) {
-              setAccounts(prev => prev.map(acc => 
-                acc.id === accountId ? { ...acc, status: 'expired' } : acc
-              ));
-              showNotif(`⚠️ Сервер недоступен. Используйте ручной кик!`);
-            }
-          };
-
-          const handleLogin = () => {
-            if (username === 'Azim218' && password === 'Emil210407!') {
-              setIsLoggedIn(true);
-            }
-          };
-
-          const handleLogout = () => {
-            setIsLoggedIn(false);
-            setUsername('');
-            setPassword('');
-          };
+// 💾 Сохранение URL сервера
+useEffect(() => {
+  if (!isLoading && serverUrl) {
+    window.storage.set('roblox_server_url', serverUrl, false).catch(err => {
+      console.error('Ошибка сохранения URL:', err);
+    });
+  }
+}, [serverUrl, isLoading]);
 
           const addAccount = () => {
             if (accUsername && accProfile && accDuration) {
@@ -1072,5 +1056,6 @@ useEffect(() => {
     </script>
 </body>
 </html>
+
 
 
