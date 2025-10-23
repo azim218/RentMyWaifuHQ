@@ -314,107 +314,48 @@
           const [serverUrl, setServerUrl] = useState('http://localhost:3000');
 
           // 💾 Загрузка данных при старте
-          useEffect(() => {
-  const loadData = async () => {
-    try {
-      const accountsResult = await window.storage.get('roblox_accounts', true);
-      if (accountsResult?.value) setAccounts(JSON.parse(accountsResult.value));
-    } catch (error) {
-      console.log('Аккаунты: первая загрузка');
-    }
-    
-    try {
-      const clientsResult = await window.storage.get('roblox_clients', true);
-      if (clientsResult?.value) setClients(JSON.parse(clientsResult.value));
-    } catch (error) {
-      console.log('Клиенты: первая загрузка');
-    }
-    
-    try {
-      const serverUrlResult = await window.storage.get('roblox_server_url', false);
-      if (serverUrlResult?.value) setServerUrl(serverUrlResult.value);
-    } catch (error) {
-      console.log('URL сервера: первая загрузка');
-    }
-    
+          // Инициализация Firebase
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+  projectId: "YOUR_PROJECT"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// 💾 Загрузка и синхронизация
+useEffect(() => {
+  const accountsRef = db.ref('accounts');
+  accountsRef.on('value', (snapshot) => {
+    if (snapshot.val()) setAccounts(snapshot.val());
     setIsLoading(false);
+  });
+  
+  const clientsRef = db.ref('clients');
+  clientsRef.on('value', (snapshot) => {
+    if (snapshot.val()) setClients(snapshot.val());
+  });
+  
+  return () => {
+    accountsRef.off();
+    clientsRef.off();
   };
-  loadData();
 }, []);
 
-          // 💾 Автосохранение аккаунтов
-          useEffect(() => {
+// Автосохранение
+useEffect(() => {
   if (!isLoading && accounts.length > 0) {
-    window.storage.set('roblox_accounts', JSON.stringify(accounts), true).catch(err => {
-      console.error('Ошибка сохранения аккаунтов:', err);
-    });
+    db.ref('accounts').set(accounts);
   }
 }, [accounts, isLoading]);
 
-          // 💾 Автосохранение клиентов
-          useEffect(() => {
+useEffect(() => {
   if (!isLoading && clients.length > 0) {
-    window.storage.set('roblox_clients', JSON.stringify(clients), true).catch(err => {
-      console.error('Ошибка сохранения клиентов:', err);
-    });
+    db.ref('clients').set(clients);
   }
 }, [clients, isLoading]);
-
-          // 💾 Сохранение URL сервера
-          useEffect(() => {
-            if (serverUrl && !isLoading) {
-              window.storage.set('roblox_server_url', serverUrl, false).catch(console.error);
-            }
-          }, [serverUrl, isLoading]);
-          
-          const [accUsername, setAccUsername] = useState('');
-          const [accProfile, setAccProfile] = useState('');
-          const [accDuration, setAccDuration] = useState('');
-          const [accRobloxCookie, setAccRobloxCookie] = useState('');
-          
-          const [clientName, setClientName] = useState('');
-          const [clientStatus, setClientStatus] = useState('Bronze');
-          const [clientOverdue, setClientOverdue] = useState('');
-          
-          const [calcTime1, setCalcTime1] = useState('');
-          const [calcTime2, setCalcTime2] = useState('');
-          const [calcResult, setCalcResult] = useState('');
-          
-          const [showNotification, setShowNotification] = useState(false);
-          const [notificationText, setNotificationText] = useState('');
-
-          const profiles = ['KisuneUWU_RBX', 'MontiPlay_YT', 'NyawkaUWUrbx', 'Murzik14TH', 'Alex', 'Michael', 'Ronaldo', 'Brian', 'Thomas', 'Faderty'];
-
-          const showNotif = (text) => {
-            setNotificationText(text);
-            setShowNotification(true);
-            setTimeout(() => setShowNotification(false), 5000);
-          };
-
-          useEffect(() => {
-            const interval = setInterval(() => {
-              setAccounts(prev => prev.map(acc => {
-                const newRemaining = Math.max(0, acc.remaining - 1);
-                const wasActive = acc.status === 'active';
-                const newStatus = newRemaining === 0 ? 'expired' : 'active';
-                
-                if (wasActive && newStatus === 'expired') {
-                  showNotif(`⏰ Время истекло для ${acc.username}!`);
-                  
-                  if (acc.robloxCookie && serverUrl) {
-                    autoKickAccount(acc.id, acc.robloxCookie);
-                  }
-                }
-                
-                return {
-                  ...acc,
-                  remaining: newRemaining,
-                  status: newStatus
-                };
-              }));
-            }, 60000);
-            return () => clearInterval(interval);
-          }, [serverUrl]);
 
           const autoKickAccount = async (accountId, cookie) => {
             try {
@@ -1131,4 +1072,5 @@
     </script>
 </body>
 </html>
+
 
