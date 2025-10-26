@@ -255,15 +255,21 @@
         </div>
 
         <div class="setup-notice">
-            <h3>🔧 Настройка синхронизации Firebase</h3>
-            <p>Для синхронизации данных между устройствами нужно настроить Firebase:</p>
+            <h3>✅ Firebase настроен!</h3>
+            <p><strong>Теперь важно:</strong> Настрой правила базы данных для работы приложения:</p>
             <ol>
-                <li>Создай проект на <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
-                <li>Добавь веб-приложение и скопируй конфигурацию</li>
-                <li>Включи Realtime Database в разделе "Build"</li>
-                <li>Вставь свою конфигурацию Firebase в код ниже (строка 320)</li>
+                <li>Перейди в <a href="https://console.firebase.google.com/u/0/project/rentmywaifu-c200a/database/rentmywaifu-c200a-default-rtdb/rules" target="_blank">Realtime Database → Rules</a></li>
+                <li>Замени правила на:
+                    <pre style="background: #f0f0f0; padding: 10px; border-radius: 8px; margin-top: 8px;">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}</pre>
+                </li>
+                <li>Нажми "Опубликовать"</li>
             </ol>
-            <p style="margin-top: 10px;"><strong>Без настройки Firebase данные сохраняются только локально!</strong></p>
+            <p style="margin-top: 10px; color: #e74c3c;"><strong>⚠️ Без этого приложение не сможет сохранять данные!</strong></p>
         </div>
 
         <!-- Секция 1: Добавление заказа -->
@@ -271,7 +277,7 @@
             <h2>💝 Новый Заказ</h2>
             <div class="form-group">
                 <label>Имя аккаунта</label>
-                <input type="text" id="accountName" placeholder="Введите имя аккаунта">
+                <input type="text" id="accountName" placeholder="Введите имя аккаунта (необязательно)">
             </div>
             <div class="form-group">
                 <label>Номер заказа</label>
@@ -279,15 +285,15 @@
             </div>
             <div class="form-group">
                 <label>Имя покупателя</label>
-                <input type="text" id="customerName" placeholder="Введите имя покупателя">
+                <input type="text" id="customerName" placeholder="Введите имя покупателя (необязательно)">
             </div>
             <div class="form-group">
                 <label>Время заказа</label>
-                <input type="datetime-local" id="orderTime">
+                <input type="text" id="orderTime" placeholder="Например: 15:30, 26.10.2025, или любой текст">
             </div>
             <div class="form-group">
                 <label>Дата и время окончания заказа</label>
-                <input type="datetime-local" id="orderEndTime">
+                <input type="text" id="orderEndTime" placeholder="Например: 18:00, завтра, или любой текст">
             </div>
             <button onclick="addOrder()">Добавить заказ</button>
 
@@ -338,7 +344,8 @@
                 <textarea id="statusMessage" placeholder="Напишите статус..."></textarea>
             </div>
             <button onclick="saveStatus()">Сохранить статус</button>
-            <div class="status-preview" id="statusPreview"></div>
+            
+            <div id="statusesList" style="margin-top: 20px;"></div>
         </div>
     </div>
 
@@ -365,31 +372,37 @@
         let isFirebaseEnabled = false;
 
         try {
-            if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-                firebase.initializeApp(firebaseConfig);
-                database = firebase.database();
-                ordersRef = database.ref('orders');
-                isFirebaseEnabled = true;
-                console.log('Firebase подключен успешно!');
-            } else {
-                console.log('Firebase не настроен, используется localStorage');
-            }
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            ordersRef = database.ref('orders');
+            isFirebaseEnabled = true;
+            console.log('✅ Firebase подключен успешно! Данные синхронизируются.');
         } catch (error) {
             console.error('Ошибка инициализации Firebase:', error);
+            console.log('Используется localStorage');
         }
 
         // Инициализация
         let orders = [];
+        let statuses = [];
 
         // Загрузка данных
         function loadData() {
             if (isFirebaseEnabled) {
-                // Загрузка из Firebase с реал-тайм обновлениями
+                // Загрузка заказов из Firebase с реал-тайм обновлениями
                 ordersRef.on('value', (snapshot) => {
                     const data = snapshot.val();
                     orders = data ? Object.values(data) : [];
                     renderOrders();
                     console.log('Данные загружены из Firebase');
+                });
+
+                // Загрузка статусов из Firebase
+                database.ref('statuses').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    statuses = data ? Object.values(data) : [];
+                    renderStatuses();
+                    console.log('Статусы загружены из Firebase');
                 });
             } else {
                 // Загрузка из localStorage
@@ -398,6 +411,12 @@
                     if (savedOrders) {
                         orders = JSON.parse(savedOrders);
                         renderOrders();
+                    }
+
+                    const savedStatuses = localStorage.getItem('statuses-data');
+                    if (savedStatuses) {
+                        statuses = JSON.parse(savedStatuses);
+                        renderStatuses();
                     }
                 } catch (error) {
                     console.error('Ошибка загрузки данных:', error);
@@ -428,18 +447,18 @@
             const orderTime = document.getElementById('orderTime').value;
             const orderEndTime = document.getElementById('orderEndTime').value;
 
-            if (!accountName || !orderNumber || !customerName || !orderTime || !orderEndTime) {
-                alert('Пожалуйста, заполните все поля!');
+            if (!orderNumber) {
+                alert('Пожалуйста, укажите хотя бы номер заказа!');
                 return;
             }
 
             const order = {
                 id: Date.now(),
-                accountName,
+                accountName: accountName || '-',
                 orderNumber,
-                customerName,
-                orderTime,
-                orderEndTime
+                customerName: customerName || '-',
+                orderTime: orderTime || '-',
+                orderEndTime: orderEndTime || '-'
             };
 
             orders.push(order);
@@ -468,10 +487,10 @@
             ordersList.innerHTML = orders.map(order => `
                 <div class="order-item">
                     <h3>🛍️ Заказ #${order.orderNumber}</h3>
-                    <p><strong>Аккаунт:</strong> ${order.accountName}</p>
-                    <p><strong>Покупатель:</strong> ${order.customerName}</p>
-                    <p><strong>Начало:</strong> ${new Date(order.orderTime).toLocaleString('ru-RU')}</p>
-                    <p><strong>Окончание:</strong> ${new Date(order.orderEndTime).toLocaleString('ru-RU')}</p>
+                    ${order.accountName && order.accountName !== '-' ? `<p><strong>Аккаунт:</strong> ${order.accountName}</p>` : ''}
+                    ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
+                    ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
+                    ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
                     <button onclick="deleteOrder(${order.id})">Удалить</button>
                 </div>
             `).join('');
@@ -546,20 +565,64 @@
                 return;
             }
 
-            const statusText = `Покупатель: ${customerName}\n\nСтатус:\n${statusMessage}\n\nДата: ${new Date().toLocaleString('ru-RU')}`;
-            
-            document.getElementById('statusPreview').textContent = statusText;
-
             const statusData = {
+                id: Date.now(),
                 customerName,
                 statusMessage,
                 timestamp: new Date().toISOString()
             };
 
+            statuses.push(statusData);
+
             if (isFirebaseEnabled) {
-                database.ref('statuses/' + Date.now()).set(statusData);
+                // Сохранение в Firebase
+                const statusesObj = {};
+                statuses.forEach(status => {
+                    statusesObj[status.id] = status;
+                });
+                database.ref('statuses').set(statusesObj);
             } else {
-                localStorage.setItem('customer-status', JSON.stringify(statusData));
+                // Сохранение в localStorage
+                localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                renderStatuses();
+            }
+
+            // Очистка формы
+            document.getElementById('statusCustomerName').value = '';
+            document.getElementById('statusMessage').value = '';
+        }
+
+        // Отображение статусов
+        function renderStatuses() {
+            const statusesList = document.getElementById('statusesList');
+            if (statuses.length === 0) {
+                statusesList.innerHTML = '';
+                return;
+            }
+
+            statusesList.innerHTML = statuses.map(status => `
+                <div class="status-preview">
+                    <strong>Покупатель:</strong> ${status.customerName}<br>
+                    <strong>Статус:</strong> ${status.statusMessage}<br>
+                    <strong>Дата:</strong> ${new Date(status.timestamp).toLocaleString('ru-RU')}<br>
+                    <button onclick="deleteStatus(${status.id})" style="margin-top: 10px; padding: 6px 15px; font-size: 0.85rem;">Удалить</button>
+                </div>
+            `).join('');
+        }
+
+        // Удаление статуса
+        function deleteStatus(id) {
+            statuses = statuses.filter(status => status.id !== id);
+
+            if (isFirebaseEnabled) {
+                const statusesObj = {};
+                statuses.forEach(status => {
+                    statusesObj[status.id] = status;
+                });
+                database.ref('statuses').set(statusesObj);
+            } else {
+                localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                renderStatuses();
             }
         }
 
