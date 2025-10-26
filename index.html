@@ -252,28 +252,43 @@
             <h2>⏰ Калькулятор Времени</h2>
             <div class="calculator">
                 <div class="form-group">
-                    <label>Начальное время</label>
-                    <input type="datetime-local" id="startTime">
+                    <label>Время 1</label>
+                    <input type="datetime-local" id="time1">
                 </div>
                 <div class="form-group">
-                    <label>Конечное время</label>
-                    <input type="datetime-local" id="endTime">
+                    <label>Время 2</label>
+                    <input type="datetime-local" id="time2">
+                </div>
+                <div class="form-group">
+                    <label>Дополнительные дни</label>
+                    <input type="number" id="addDays" placeholder="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Дополнительные часы</label>
+                    <input type="number" id="addHours" placeholder="0" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Дополнительные минуты</label>
+                    <input type="number" id="addMinutes" placeholder="0" value="0">
                 </div>
             </div>
-            <button onclick="calculateTime()">Рассчитать разницу</button>
-            <div class="calc-result" id="calcResult">Выберите время для расчета</div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="calculateDifference()">Разница времени</button>
+                <button onclick="calculateSum()">Сложить время</button>
+            </div>
+            <div class="calc-result" id="calcResult">Выберите операцию для расчета</div>
         </div>
 
         <!-- Секция 3: Статус покупателя -->
         <div class="card status-section">
-            <h2>📨 Статус Заказа</h2>
+            <h2>📨 Статус Покупателя</h2>
             <div class="form-group">
                 <label>Имя покупателя</label>
                 <input type="text" id="statusCustomerName" placeholder="Введите имя покупателя">
             </div>
             <div class="form-group">
-                <label>Сообщение о статусе</label>
-                <textarea id="statusMessage" placeholder="Напишите статус заказа..."></textarea>
+                <label>Статус покупателя</label>
+                <textarea id="statusMessage" placeholder="Напишите статус..."></textarea>
             </div>
             <button onclick="saveStatus()">Сохранить статус</button>
             <div class="status-preview" id="statusPreview"></div>
@@ -283,17 +298,25 @@
     <script>
         // Инициализация
         let orders = [];
+        let isLoading = false;
 
         // Загрузка данных при старте
         async function loadData() {
+            if (isLoading) return;
+            isLoading = true;
+            
             try {
-                const ordersData = await window.storage.get('orders', true);
-                if (ordersData) {
+                const ordersData = await window.storage.get('orders-data', true);
+                if (ordersData && ordersData.value) {
                     orders = JSON.parse(ordersData.value);
+                    console.log('Загружено заказов:', orders.length);
                     renderOrders();
                 }
             } catch (error) {
-                console.log('Загрузка заказов: данные еще не сохранены');
+                console.log('Загрузка заказов: данные еще не сохранены', error);
+                orders = [];
+            } finally {
+                isLoading = false;
             }
         }
 
@@ -303,8 +326,9 @@
             const orderNumber = document.getElementById('orderNumber').value;
             const customerName = document.getElementById('customerName').value;
             const orderTime = document.getElementById('orderTime').value;
+            const orderEndTime = document.getElementById('orderEndTime').value;
 
-            if (!accountName || !orderNumber || !customerName || !orderTime) {
+            if (!accountName || !orderNumber || !customerName || !orderTime || !orderEndTime) {
                 alert('Пожалуйста, заполните все поля!');
                 return;
             }
@@ -314,7 +338,8 @@
                 accountName,
                 orderNumber,
                 customerName,
-                orderTime
+                orderTime,
+                orderEndTime
             };
 
             orders.push(order);
@@ -326,14 +351,22 @@
             document.getElementById('orderNumber').value = '';
             document.getElementById('customerName').value = '';
             document.getElementById('orderTime').value = '';
+            document.getElementById('orderEndTime').value = '';
         }
 
         // Сохранение заказов
         async function saveOrders() {
             try {
-                await window.storage.set('orders', JSON.stringify(orders), true);
+                const result = await window.storage.set('orders-data', JSON.stringify(orders), true);
+                if (result) {
+                    console.log('Заказы успешно сохранены:', orders.length);
+                } else {
+                    console.error('Ошибка сохранения заказов');
+                    alert('Ошибка при сохранении данных. Попробуйте еще раз.');
+                }
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
+                alert('Ошибка при сохранении данных: ' + error.message);
             }
         }
 
@@ -350,7 +383,8 @@
                     <h3>🛍️ Заказ #${order.orderNumber}</h3>
                     <p><strong>Аккаунт:</strong> ${order.accountName}</p>
                     <p><strong>Покупатель:</strong> ${order.customerName}</p>
-                    <p><strong>Время:</strong> ${new Date(order.orderTime).toLocaleString('ru-RU')}</p>
+                    <p><strong>Начало:</strong> ${new Date(order.orderTime).toLocaleString('ru-RU')}</p>
+                    <p><strong>Окончание:</strong> ${new Date(order.orderEndTime).toLocaleString('ru-RU')}</p>
                     <button onclick="deleteOrder(${order.id})">Удалить</button>
                 </div>
             `).join('');
@@ -363,18 +397,18 @@
             renderOrders();
         }
 
-        // Калькулятор времени
-        function calculateTime() {
-            const startTime = document.getElementById('startTime').value;
-            const endTime = document.getElementById('endTime').value;
+        // Калькулятор времени - разница
+        function calculateDifference() {
+            const time1 = document.getElementById('time1').value;
+            const time2 = document.getElementById('time2').value;
 
-            if (!startTime || !endTime) {
+            if (!time1 || !time2) {
                 document.getElementById('calcResult').textContent = 'Пожалуйста, выберите оба времени!';
                 return;
             }
 
-            const start = new Date(startTime);
-            const end = new Date(endTime);
+            const start = new Date(time1);
+            const end = new Date(time2);
             const diff = Math.abs(end - start);
 
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -389,6 +423,29 @@
             document.getElementById('calcResult').textContent = result;
         }
 
+        // Калькулятор времени - сложение
+        function calculateSum() {
+            const time1 = document.getElementById('time1').value;
+            const addDays = parseInt(document.getElementById('addDays').value) || 0;
+            const addHours = parseInt(document.getElementById('addHours').value) || 0;
+            const addMinutes = parseInt(document.getElementById('addMinutes').value) || 0;
+
+            if (!time1) {
+                document.getElementById('calcResult').textContent = 'Пожалуйста, выберите начальное время (Время 1)!';
+                return;
+            }
+
+            const start = new Date(time1);
+            
+            // Добавляем время
+            start.setDate(start.getDate() + addDays);
+            start.setHours(start.getHours() + addHours);
+            start.setMinutes(start.getMinutes() + addMinutes);
+
+            const result = `✨ Результат: ${start.toLocaleString('ru-RU')}`;
+            document.getElementById('calcResult').textContent = result;
+        }
+
         // Сохранение статуса
         async function saveStatus() {
             const customerName = document.getElementById('statusCustomerName').value;
@@ -399,23 +456,31 @@
                 return;
             }
 
-            const statusText = `Уважаемый(ая) ${customerName},\n\n${statusMessage}\n\nС уважением,\nВаша команда ✨`;
+            const statusText = `Покупатель: ${customerName}\n\nСтатус:\n${statusMessage}\n\nДата: ${new Date().toLocaleString('ru-RU')}`;
             
             document.getElementById('statusPreview').textContent = statusText;
 
             try {
-                await window.storage.set('last-status', JSON.stringify({
+                const result = await window.storage.set('customer-status', JSON.stringify({
                     customerName,
                     statusMessage,
                     timestamp: new Date().toISOString()
                 }), true);
+                
+                if (result) {
+                    console.log('Статус успешно сохранен');
+                } else {
+                    console.error('Ошибка сохранения статуса');
+                }
             } catch (error) {
                 console.error('Ошибка сохранения статуса:', error);
             }
         }
 
-        // Загрузка при старте
-        loadData();
+        // Загрузка при старте страницы
+        window.addEventListener('load', function() {
+            loadData();
+        });
     </script>
 </body>
 </html>
