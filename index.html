@@ -41,6 +41,41 @@
             opacity: 0.9;
         }
 
+        .setup-notice {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .setup-notice h3 {
+            color: #764ba2;
+            margin-bottom: 15px;
+        }
+
+        .setup-notice code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .setup-notice ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .setup-notice a {
+            color: #764ba2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .setup-notice a:hover {
+            text-decoration: underline;
+        }
+
         .card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -219,6 +254,18 @@
             <p>Управляй своими заказами легко и красиво</p>
         </div>
 
+        <div class="setup-notice">
+            <h3>🔧 Настройка синхронизации Firebase</h3>
+            <p>Для синхронизации данных между устройствами нужно настроить Firebase:</p>
+            <ol>
+                <li>Создай проект на <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+                <li>Добавь веб-приложение и скопируй конфигурацию</li>
+                <li>Включи Realtime Database в разделе "Build"</li>
+                <li>Вставь свою конфигурацию Firebase в код ниже (строка 320)</li>
+            </ol>
+            <p style="margin-top: 10px;"><strong>Без настройки Firebase данные сохраняются только локально!</strong></p>
+        </div>
+
         <!-- Секция 1: Добавление заказа -->
         <div class="card">
             <h2>💝 Новый Заказ</h2>
@@ -295,33 +342,86 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script>
+        // Firebase конфигурация
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfyX2uuTG77bQCFhWDtU5ZVOQI2l4Nfa4",
+            authDomain: "rentmywaifu-c200a.firebaseapp.com",
+            databaseURL: "https://rentmywaifu-c200a-default-rtdb.firebaseio.com",
+            projectId: "rentmywaifu-c200a",
+            storageBucket: "rentmywaifu-c200a.firebasestorage.app",
+            messagingSenderId: "935453652895",
+            appId: "1:935453652895:web:99283b78c06cd39da52faa",
+            measurementId: "G-YX501SS5KG"
+        };
+
+        // Инициализация Firebase
+        let database = null;
+        let ordersRef = null;
+        let isFirebaseEnabled = false;
+
+        try {
+            if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+                ordersRef = database.ref('orders');
+                isFirebaseEnabled = true;
+                console.log('Firebase подключен успешно!');
+            } else {
+                console.log('Firebase не настроен, используется localStorage');
+            }
+        } catch (error) {
+            console.error('Ошибка инициализации Firebase:', error);
+        }
+
         // Инициализация
         let orders = [];
-        let isLoading = false;
 
-        // Загрузка данных при старте
-        async function loadData() {
-            if (isLoading) return;
-            isLoading = true;
-            
-            try {
-                const ordersData = await window.storage.get('orders-data', true);
-                if (ordersData && ordersData.value) {
-                    orders = JSON.parse(ordersData.value);
-                    console.log('Загружено заказов:', orders.length);
+        // Загрузка данных
+        function loadData() {
+            if (isFirebaseEnabled) {
+                // Загрузка из Firebase с реал-тайм обновлениями
+                ordersRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    orders = data ? Object.values(data) : [];
                     renderOrders();
+                    console.log('Данные загружены из Firebase');
+                });
+            } else {
+                // Загрузка из localStorage
+                try {
+                    const savedOrders = localStorage.getItem('orders-data');
+                    if (savedOrders) {
+                        orders = JSON.parse(savedOrders);
+                        renderOrders();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки данных:', error);
                 }
-            } catch (error) {
-                console.log('Загрузка заказов: данные еще не сохранены', error);
-                orders = [];
-            } finally {
-                isLoading = false;
+            }
+        }
+
+        // Сохранение заказов
+        function saveOrders() {
+            if (isFirebaseEnabled) {
+                // Сохранение в Firebase
+                const ordersObj = {};
+                orders.forEach(order => {
+                    ordersObj[order.id] = order;
+                });
+                ordersRef.set(ordersObj);
+            } else {
+                // Сохранение в localStorage
+                localStorage.setItem('orders-data', JSON.stringify(orders));
             }
         }
 
         // Добавление заказа
-        async function addOrder() {
+        function addOrder() {
             const accountName = document.getElementById('accountName').value;
             const orderNumber = document.getElementById('orderNumber').value;
             const customerName = document.getElementById('customerName').value;
@@ -343,8 +443,11 @@
             };
 
             orders.push(order);
-            await saveOrders();
-            renderOrders();
+            saveOrders();
+            
+            if (!isFirebaseEnabled) {
+                renderOrders();
+            }
 
             // Очистка формы
             document.getElementById('accountName').value = '';
@@ -352,22 +455,6 @@
             document.getElementById('customerName').value = '';
             document.getElementById('orderTime').value = '';
             document.getElementById('orderEndTime').value = '';
-        }
-
-        // Сохранение заказов
-        async function saveOrders() {
-            try {
-                const result = await window.storage.set('orders-data', JSON.stringify(orders), true);
-                if (result) {
-                    console.log('Заказы успешно сохранены:', orders.length);
-                } else {
-                    console.error('Ошибка сохранения заказов');
-                    alert('Ошибка при сохранении данных. Попробуйте еще раз.');
-                }
-            } catch (error) {
-                console.error('Ошибка сохранения:', error);
-                alert('Ошибка при сохранении данных: ' + error.message);
-            }
         }
 
         // Отображение заказов
@@ -391,10 +478,13 @@
         }
 
         // Удаление заказа
-        async function deleteOrder(id) {
+        function deleteOrder(id) {
             orders = orders.filter(order => order.id !== id);
-            await saveOrders();
-            renderOrders();
+            saveOrders();
+            
+            if (!isFirebaseEnabled) {
+                renderOrders();
+            }
         }
 
         // Калькулятор времени - разница
@@ -447,7 +537,7 @@
         }
 
         // Сохранение статуса
-        async function saveStatus() {
+        function saveStatus() {
             const customerName = document.getElementById('statusCustomerName').value;
             const statusMessage = document.getElementById('statusMessage').value;
 
@@ -460,20 +550,16 @@
             
             document.getElementById('statusPreview').textContent = statusText;
 
-            try {
-                const result = await window.storage.set('customer-status', JSON.stringify({
-                    customerName,
-                    statusMessage,
-                    timestamp: new Date().toISOString()
-                }), true);
-                
-                if (result) {
-                    console.log('Статус успешно сохранен');
-                } else {
-                    console.error('Ошибка сохранения статуса');
-                }
-            } catch (error) {
-                console.error('Ошибка сохранения статуса:', error);
+            const statusData = {
+                customerName,
+                statusMessage,
+                timestamp: new Date().toISOString()
+            };
+
+            if (isFirebaseEnabled) {
+                database.ref('statuses/' + Date.now()).set(statusData);
+            } else {
+                localStorage.setItem('customer-status', JSON.stringify(statusData));
             }
         }
 
