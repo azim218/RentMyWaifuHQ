@@ -1,1150 +1,421 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox Manager Ultra 💖✨</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Трекер Заказов ✨</title>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Pacifico&family=Baloo+2:wght@400;600;700&display=swap');
-      
-      * {
-        font-family: 'Baloo 2', 'Quicksand', cursive, sans-serif !important;
-      }
-      
-      .pacifico {
-        font-family: 'Pacifico', cursive !important;
-      }
-      
-      body {
-        overflow-x: hidden;
-        background: linear-gradient(135deg, #ffeef8 0%, #ffe5f5 25%, #f3e5ff 50%, #e5f0ff 75%, #fff0f5 100%);
-        background-attachment: fixed;
-      }
-      
-      .cute-shadow {
-        box-shadow: 0 20px 60px rgba(236, 72, 153, 0.35), 0 0 0 3px rgba(236, 72, 153, 0.15),
-                    inset 0 2px 0 rgba(255, 255, 255, 0.9);
-      }
-      
-      .cute-glow {
-        box-shadow: 0 0 50px rgba(236, 72, 153, 0.7), 0 0 100px rgba(168, 85, 247, 0.5),
-                    0 0 150px rgba(147, 51, 234, 0.3);
-        animation: glow-pulse 2s ease-in-out infinite;
-      }
-      
-      @keyframes glow-pulse {
-        0%, 100% { 
-          box-shadow: 0 0 50px rgba(236, 72, 153, 0.7), 0 0 100px rgba(168, 85, 247, 0.5);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        50% { 
-          box-shadow: 0 0 70px rgba(236, 72, 153, 0.9), 0 0 130px rgba(168, 85, 247, 0.7);
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
         }
-      }
-      
-      .kawaii-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 240, 250, 0.98) 100%);
-        border: 5px solid transparent;
-        background-clip: padding-box;
-        position: relative;
-      }
-      
-      .kawaii-card::before {
-        content: '';
-        position: absolute;
-        inset: -5px;
-        border-radius: inherit;
-        padding: 5px;
-        background: linear-gradient(135deg, #ff6b9d, #c06cff, #6bb6ff, #ff6b9d);
-        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        animation: border-flow 3s linear infinite;
-        background-size: 200% 200%;
-      }
-      
-      @keyframes border-flow {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-      }
-      
-      .floating {
-        animation: floating 4s ease-in-out infinite;
-      }
-      
-      @keyframes floating {
-        0%, 100% { transform: translateY(0px) rotate(-5deg); }
-        25% { transform: translateY(-20px) rotate(5deg); }
-        50% { transform: translateY(-10px) rotate(-3deg); }
-        75% { transform: translateY(-25px) rotate(3deg); }
-      }
-      
-      .sparkle-animation {
-        animation: sparkle 2.5s ease-in-out infinite;
-      }
-      
-      @keyframes sparkle {
-        0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); filter: brightness(1); }
-        25% { opacity: 0.7; transform: scale(1.5) rotate(90deg); filter: brightness(1.3); }
-        50% { opacity: 0.5; transform: scale(1.2) rotate(180deg); filter: brightness(1.5); }
-        75% { opacity: 0.8; transform: scale(1.4) rotate(270deg); filter: brightness(1.2); }
-      }
-      
-      .wiggle {
-        animation: wiggle 3s ease-in-out infinite;
-      }
-      
-      @keyframes wiggle {
-        0%, 100% { transform: rotate(-5deg) scale(1); }
-        25% { transform: rotate(5deg) scale(1.05); }
-        50% { transform: rotate(-3deg) scale(1.02); }
-        75% { transform: rotate(3deg) scale(1.05); }
-      }
-      
-      .pulse-soft {
-        animation: pulse-soft 2.5s ease-in-out infinite;
-      }
-      
-      @keyframes pulse-soft {
-        0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1); }
-        50% { opacity: 0.85; transform: scale(1.08); filter: brightness(1.2); }
-      }
-      
-      .bounce-cute {
-        animation: bounce-cute 1.5s ease-in-out infinite;
-      }
-      
-      @keyframes bounce-cute {
-        0%, 100% { transform: translateY(0) scale(1); }
-        25% { transform: translateY(-15px) scale(1.1); }
-        50% { transform: translateY(-5px) scale(0.95); }
-        75% { transform: translateY(-12px) scale(1.05); }
-      }
-      
-      .gradient-text {
-        background: linear-gradient(135deg, #ff1493 0%, #ff69b4 25%, #ba55d3 50%, #9370db 75%, #4169e1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: gradient-shift 3s ease infinite;
-        background-size: 200% 200%;
-      }
-      
-      @keyframes gradient-shift {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-      }
-      
-      .rainbow-text {
-        background: linear-gradient(90deg, #ff6b9d, #c06cff, #6bb6ff, #6bffc0, #ffd66b, #ff6b9d);
-        background-size: 300% 300%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: rainbow 4s ease infinite;
-      }
-      
-      @keyframes rainbow {
-        0%, 100% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-      }
-      
-      .success-ping {
-        animation: success-ping 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-      }
-      
-      @keyframes success-ping {
-        0% { transform: scale(0.7) rotate(-10deg); opacity: 0; }
-        50% { transform: scale(1.15) rotate(5deg); }
-        100% { transform: scale(1) rotate(0deg); opacity: 1; }
-      }
-      
-      .heart-beat {
-        animation: heart-beat 1.5s ease-in-out infinite;
-      }
-      
-      @keyframes heart-beat {
-        0%, 100% { transform: scale(1); }
-        10%, 30% { transform: scale(1.1); }
-        20%, 40% { transform: scale(0.95); }
-      }
-      
-      .shimmer {
-        position: relative;
-        overflow: hidden;
-      }
-      
-      .shimmer::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-        animation: shimmer 3s infinite;
-      }
-      
-      @keyframes shimmer {
-        0% { left: -100%; }
-        100% { left: 100%; }
-      }
-      
-      .confetti-bg {
-        background-image: 
-          radial-gradient(circle at 20% 30%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, rgba(221, 160, 221, 0.3) 0%, transparent 50%),
-          radial-gradient(circle at 40% 70%, rgba(173, 216, 230, 0.3) 0%, transparent 50%),
-          radial-gradient(circle at 90% 80%, rgba(255, 192, 203, 0.3) 0%, transparent 50%);
-        animation: confetti-move 15s ease-in-out infinite;
-      }
-      
-      @keyframes confetti-move {
-        0%, 100% { transform: translate(0, 0); }
-        25% { transform: translate(20px, -20px); }
-        50% { transform: translate(-20px, 20px); }
-        75% { transform: translate(20px, 10px); }
-      }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .card h2 {
+            color: #764ba2;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="datetime-local"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .orders-list {
+            margin-top: 20px;
+        }
+
+        .order-item {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .order-item h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .order-item p {
+            margin: 5px 0;
+            opacity: 0.95;
+        }
+
+        .order-item button {
+            background: rgba(255,255,255,0.3);
+            margin-top: 10px;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+        }
+
+        .order-item button:hover {
+            background: rgba(255,255,255,0.4);
+        }
+
+        .calculator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .calc-result {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #555;
+            margin-top: 15px;
+        }
+
+        .status-section textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .status-preview {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            color: #555;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .calculator {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        
-        const Heart = ({size = 24, fill = "none", className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-        );
-        
-        const Users = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        );
-        
-        const Calculator = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <rect x="4" y="2" width="16" height="20" rx="2"></rect>
-            <line x1="8" y1="6" x2="16" y2="6"></line>
-          </svg>
-        );
-        
-        const User = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        );
-        
-        const LogOut = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-        );
-        
-        const Clock = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        );
-        
-        const Trash2 = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-        );
-        
-        const Sparkles = ({size = 24, className = "", fill = "none"}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"></path>
-            <path d="M19 12l.75 2.25L22 15l-2.25.75L19 18l-.75-2.25L16 15l2.25-.75L19 12z"></path>
-          </svg>
-        );
-        
-        const Star = ({size = 24, className = "", fill = "none"}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} className={className} stroke="currentColor" strokeWidth="2">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
-        );
-        
-        const Bell = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-        );
-        
-        const ExternalLink = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-            <polyline points="15 3 21 3 21 9"></polyline>
-            <line x1="10" y1="14" x2="21" y2="3"></line>
-          </svg>
-        );
-        
-        const CheckCircle = ({size = 24, className = ""}) => (
-          <svg width={size} height={size} viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-        );
+    <div class="container">
+        <div class="header">
+            <h1>✨ Трекер Заказов ✨</h1>
+            <p>Управляй своими заказами легко и красиво</p>
+        </div>
 
-        function RobloxManagerApp() {
-          const [isLoggedIn, setIsLoggedIn] = useState(false);
-          const [username, setUsername] = useState('');
-          const [password, setPassword] = useState('');
-          const [currentTab, setCurrentTab] = useState('accounts');
-          
-          const [accounts, setAccounts] = useState([]);
-          const [clients, setClients] = useState([]);
-          const [isLoading, setIsLoading] = useState(true);
-          const [serverUrl, setServerUrl] = useState('http://localhost:3000');
+        <!-- Секция 1: Добавление заказа -->
+        <div class="card">
+            <h2>💝 Новый Заказ</h2>
+            <div class="form-group">
+                <label>Имя аккаунта</label>
+                <input type="text" id="accountName" placeholder="Введите имя аккаунта">
+            </div>
+            <div class="form-group">
+                <label>Номер заказа</label>
+                <input type="text" id="orderNumber" placeholder="Введите номер заказа">
+            </div>
+            <div class="form-group">
+                <label>Имя покупателя</label>
+                <input type="text" id="customerName" placeholder="Введите имя покупателя">
+            </div>
+            <div class="form-group">
+                <label>Время заказа</label>
+                <input type="datetime-local" id="orderTime">
+            </div>
+            <div class="form-group">
+                <label>Дата и время окончания заказа</label>
+                <input type="datetime-local" id="orderEndTime">
+            </div>
+            <button onclick="addOrder()">Добавить заказ</button>
 
-          const [accUsername, setAccUsername] = useState('');
-const [accProfile, setAccProfile] = useState('');
-const [accDuration, setAccDuration] = useState('');
-const [accRobloxCookie, setAccRobloxCookie] = useState('');
+            <div class="orders-list" id="ordersList"></div>
+        </div>
 
-const [clientName, setClientName] = useState('');
-const [clientStatus, setClientStatus] = useState('Bronze');
-const [clientOverdue, setClientOverdue] = useState('');
+        <!-- Секция 2: Калькулятор времени -->
+        <div class="card">
+            <h2>⏰ Калькулятор Времени</h2>
+            <div class="calculator">
+                <div class="form-group">
+                    <label>Начальное время</label>
+                    <input type="datetime-local" id="startTime">
+                </div>
+                <div class="form-group">
+                    <label>Конечное время</label>
+                    <input type="datetime-local" id="endTime">
+                </div>
+            </div>
+            <button onclick="calculateTime()">Рассчитать разницу</button>
+            <div class="calc-result" id="calcResult">Выберите время для расчета</div>
+        </div>
 
-const [calcTime1, setCalcTime1] = useState('');
-const [calcTime2, setCalcTime2] = useState('');
-const [calcResult, setCalcResult] = useState('');
+        <!-- Секция 3: Статус покупателя -->
+        <div class="card status-section">
+            <h2>📨 Статус Заказа</h2>
+            <div class="form-group">
+                <label>Имя покупателя</label>
+                <input type="text" id="statusCustomerName" placeholder="Введите имя покупателя">
+            </div>
+            <div class="form-group">
+                <label>Сообщение о статусе</label>
+                <textarea id="statusMessage" placeholder="Напишите статус заказа..."></textarea>
+            </div>
+            <button onclick="saveStatus()">Сохранить статус</button>
+            <div class="status-preview" id="statusPreview"></div>
+        </div>
+    </div>
 
-const [showNotification, setShowNotification] = useState(false);
-const [notificationText, setNotificationText] = useState('');
+    <script>
+        // Инициализация
+        let orders = [];
 
-const profiles = ['KisuneUWU_RBX', 'MontiPlay_YT', 'NyawkaUWUrbx', 'Murzik14TH', 'Alex', 'Michael', 'Ronaldo', 'Brian', 'Thomas', 'Faderty'];
-
-const showNotif = (text) => {
-  setNotificationText(text);
-  setShowNotification(true);
-  setTimeout(() => setShowNotification(false), 5000);
-};
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    setAccounts(prev => prev.map(acc => {
-      const newRemaining = Math.max(0, acc.remaining - 1);
-      const wasActive = acc.status === 'active';
-      const newStatus = newRemaining === 0 ? 'expired' : 'active';
-      
-      if (wasActive && newStatus === 'expired') {
-        showNotif(`⏰ Время истекло для ${acc.username}!`);
-        
-        if (acc.robloxCookie && serverUrl) {
-          autoKickAccount(acc.id, acc.robloxCookie);
+        // Загрузка данных при старте
+        async function loadData() {
+            try {
+                const ordersData = await window.storage.get('orders', true);
+                if (ordersData) {
+                    orders = JSON.parse(ordersData.value);
+                    renderOrders();
+                }
+            } catch (error) {
+                console.log('Загрузка заказов: данные еще не сохранены');
+            }
         }
-      }
-      
-      return {
-        ...acc,
-        remaining: newRemaining,
-        status: newStatus
-      };
-    }));
-  }, 60000);
-  return () => clearInterval(interval);
-}, [serverUrl]);
 
-const autoKickAccount = async (accountId, cookie) => {
-  try {
-    const response = await fetch(`${serverUrl}/api/logout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cookie })
-    });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      setAccounts(prev => prev.map(acc => 
-        acc.id === accountId ? { ...acc, status: 'kicked', kickedAuto: true } : acc
-      ));
-      showNotif(`✨ ${accounts.find(a => a.id === accountId)?.username} автоматически кикнут!`);
-    } else {
-      setAccounts(prev => prev.map(acc => 
-        acc.id === accountId ? { ...acc, status: 'kick-failed' } : acc
-      ));
-      showNotif(`❌ Ошибка автокика. Нажмите кнопку вручную!`);
-    }
-  } catch (error) {
-    setAccounts(prev => prev.map(acc => 
-      acc.id === accountId ? { ...acc, status: 'expired' } : acc
-    ));
-    showNotif(`⚠️ Сервер недоступен. Используйте ручной кик!`);
-  }
-};
+        // Добавление заказа
+        async function addOrder() {
+            const accountName = document.getElementById('accountName').value;
+            const orderNumber = document.getElementById('orderNumber').value;
+            const customerName = document.getElementById('customerName').value;
+            const orderTime = document.getElementById('orderTime').value;
 
-const handleLogin = () => {
-  if (username === 'Azim218' && password === 'Emil210407!') {
-    setIsLoggedIn(true);
-  }
-};
-
-const handleLogout = () => {
-  setIsLoggedIn(false);
-  setUsername('');
-  setPassword('');
-};
-
-          // 💾 Загрузка данных при старте
-          // Инициализация Firebase
-
-
-// 💾 Загрузка и синхронизация
-// 💾 Загрузка данных при старте
-// Инициализация Firebase
-
-
-// 💾 Загрузка и синхронизация
-// 💾 Загрузка данных при старте
-useEffect(() => {
-  const loadData = async () => {
-    try {
-      const accountsResult = await window.storage.get('roblox_accounts', true);
-      if (accountsResult?.value) setAccounts(JSON.parse(accountsResult.value));
-    } catch (error) {
-      console.log('Аккаунты: первая загрузка');
-    }
-    
-    try {
-      const clientsResult = await window.storage.get('roblox_clients', true);
-      if (clientsResult?.value) setClients(JSON.parse(clientsResult.value));
-    } catch (error) {
-      console.log('Клиенты: первая загрузка');
-    }
-    
-    try {
-      const serverUrlResult = await window.storage.get('roblox_server_url', false);
-      if (serverUrlResult?.value) setServerUrl(serverUrlResult.value);
-    } catch (error) {
-      console.log('URL сервера: первая загрузка');
-    }
-    
-    setIsLoading(false);
-  };
-  loadData();
-}, []);
-
-// 💾 Автосохранение аккаунтов
-useEffect(() => {
-  if (!isLoading && accounts.length >= 0) {
-    window.storage.set('roblox_accounts', JSON.stringify(accounts), true).catch(err => {
-      console.error('Ошибка сохранения аккаунтов:', err);
-    });
-  }
-}, [accounts, isLoading]);
-
-// 💾 Автосохранение клиентов
-useEffect(() => {
-  if (!isLoading && clients.length >= 0) {
-    window.storage.set('roblox_clients', JSON.stringify(clients), true).catch(err => {
-      console.error('Ошибка сохранения клиентов:', err);
-    });
-  }
-}, [clients, isLoading]);
-
-// 💾 Сохранение URL сервера
-useEffect(() => {
-  if (!isLoading && serverUrl) {
-    window.storage.set('roblox_server_url', serverUrl, false).catch(err => {
-      console.error('Ошибка сохранения URL:', err);
-    });
-  }
-}, [serverUrl, isLoading]);
-          const addAccount = () => {
-            if (accUsername && accProfile && accDuration) {
-              const newAccount = {
-                id: Date.now().toString(),
-                username: accUsername,
-                profile: accProfile,
-                duration: parseInt(accDuration),
-                remaining: parseInt(accDuration),
-                startTime: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-                status: 'active',
-                robloxCookie: accRobloxCookie || null,
-                kickedAuto: false
-              };
-              setAccounts(prev => [...prev, newAccount]);
-              setAccUsername('');
-              setAccProfile('');
-              setAccDuration('');
-              setAccRobloxCookie('');
-              showNotif(`💖 ${accUsername} добавлен!`);
+            if (!accountName || !orderNumber || !customerName || !orderTime) {
+                alert('Пожалуйста, заполните все поля!');
+                return;
             }
-          };
 
-          const manualKickAccount = (id) => {
-            const acc = accounts.find(a => a.id === id);
-            window.open('https://www.roblox.com/my/account#!/security', '_blank');
-            setAccounts(prev => prev.map(a => 
-              a.id === id ? { ...a, status: 'pending-kick' } : a
-            ));
-            showNotif(`🔗 Открыта страница Roblox для ${acc.username}. Нажмите Log Out!`);
-          };
-
-          const confirmKick = (id) => {
-            const acc = accounts.find(a => a.id === id);
-            setAccounts(prev => prev.map(a => 
-              a.id === id ? { ...a, status: 'kicked' } : a
-            ));
-            showNotif(`✨ ${acc.username} успешно кикнут!`);
-          };
-
-          const removeAccount = (id) => {
-            const acc = accounts.find(a => a.id === id);
-            setAccounts(prev => prev.filter(a => a.id !== id));
-            showNotif(`🗑️ ${acc.username} удалён из списка`);
-          };
-
-          const addClient = () => {
-            if (clientName) {
-              const newClient = {
-                id: Date.now().toString(),
-                name: clientName,
-                status: clientStatus,
-                overdue: clientOverdue || '0',
-                date: new Date().toLocaleDateString('ru-RU')
-              };
-              setClients(prev => [...prev, newClient]);
-              setClientName('');
-              setClientOverdue('');
-              showNotif(`👥 Клиент ${clientName} добавлен!`);
-            }
-          };
-
-          const removeClient = (id) => {
-            const client = clients.find(c => c.id === id);
-            setClients(prev => prev.filter(c => c.id !== id));
-            showNotif(`🗑️ ${client.name} удалён`);
-          };
-
-          const calculateTime = (operation) => {
-            const parseTime = (text) => {
-              if (text.includes(':')) {
-                const [h, m] = text.split(':').map(Number);
-                return h * 60 + m;
-              }
-              return parseInt(text) || 0;
+            const order = {
+                id: Date.now(),
+                accountName,
+                orderNumber,
+                customerName,
+                orderTime
             };
 
-            const m1 = parseTime(calcTime1);
-            const m2 = parseTime(calcTime2);
-            const result = operation === 'add' ? m1 + m2 : Math.max(0, m1 - m2);
-            const hours = Math.floor(result / 60);
-            const mins = result % 60;
-            
-            setCalcResult(hours > 0 ? `${hours}:${mins.toString().padStart(2, '0')}` : `${mins}`);
-          };
+            orders.push(order);
+            await saveOrders();
+            renderOrders();
 
-          if (isLoading) {
-            return (
-              <div className="min-h-screen bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-9xl mb-8 sparkle-animation">✨</div>
-                  <p className="text-4xl font-bold gradient-text">Загрузка...</p>
-                </div>
-              </div>
-            );
-          }
-
-          if (!isLoggedIn) {
-            return (
-              <div className="min-h-screen confetti-bg flex items-center justify-center p-4 relative overflow-hidden">
-                <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                  <div className="absolute top-10 left-10 text-pink-300 opacity-25 floating wiggle" style={{animationDelay: '0s'}}>
-                    <Heart size={120} fill="currentColor" />
-                  </div>
-                  <div className="absolute top-32 right-20 text-purple-300 opacity-25 floating" style={{animationDelay: '1s'}}>
-                    <Star size={100} fill="currentColor" />
-                  </div>
-                  <div className="absolute bottom-32 left-1/4 text-blue-300 opacity-25 floating wiggle" style={{animationDelay: '2s'}}>
-                    <Sparkles size={90} fill="currentColor" />
-                  </div>
-                  <div className="absolute bottom-20 right-1/3 text-pink-300 opacity-25 floating" style={{animationDelay: '1.5s'}}>
-                    <Heart size={80} fill="currentColor" />
-                  </div>
-                  <div className="absolute top-1/2 left-1/2 text-purple-300 opacity-20 floating wiggle" style={{animationDelay: '0.5s'}}>
-                    <Star size={110} fill="currentColor" />
-                  </div>
-                  <div className="absolute top-20 right-1/4 text-pink-400 opacity-20 floating" style={{animationDelay: '2.5s'}}>
-                    <Sparkles size={70} fill="currentColor" />
-                  </div>
-                </div>
-
-                <div className="w-full max-w-md transform transition-all duration-500 hover:scale-105">
-                  <div className="kawaii-card rounded-[60px] shadow-2xl cute-glow p-14 relative shimmer">
-                    <div className="absolute -top-8 -right-8 w-28 h-28 bg-gradient-to-br from-pink-400 via-purple-400 to-pink-500 rounded-full flex items-center justify-center shadow-2xl pulse-soft heart-beat">
-                      <Heart className="text-white" size={56} fill="white" />
-                    </div>
-                    
-                    <div className="text-center mb-14">
-                      <div className="mb-8 sparkle-animation wiggle">
-                        <span className="text-9xl">🌸✨</span>
-                      </div>
-                      <h1 className="text-7xl font-bold rainbow-text mb-6 pacifico">
-                        Roblox Manager
-                      </h1>
-                      <p className="text-pink-600 text-2xl font-bold">Добро пожаловать, милашка! 💖✨</p>
-                      <p className="text-purple-500 text-lg font-semibold mt-2">Синхронизация между устройствами ☁️</p>
-                    </div>
-
-                    <div className="space-y-8">
-                      <div className="relative">
-                        <div className="absolute left-7 top-1/2 -translate-y-1/2 text-3xl sparkle-animation">✨</div>
-                        <input
-                          type="text"
-                          placeholder="Логин"
-                          value={username}
-                          onChange={(e) => setUsername(e.target.value)}
-                          className="w-full pl-20 pr-10 py-7 rounded-full border-4 border-pink-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-pink-50 to-purple-50 shadow-xl text-xl font-bold"
-                        />
-                      </div>
-
-                      <div className="relative">
-                        <div className="absolute left-7 top-1/2 -translate-y-1/2 text-3xl sparkle-animation" style={{animationDelay: '0.5s'}}>🔒</div>
-                        <input
-                          type="password"
-                          placeholder="Пароль"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                          className="w-full pl-20 pr-10 py-7 rounded-full border-4 border-pink-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-pink-50 to-purple-50 shadow-xl text-xl font-bold"
-                        />
-                      </div>
-
-                      <button
-                        onClick={handleLogin}
-                        className="w-full py-7 bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white font-bold text-3xl rounded-full shadow-2xl hover:shadow-pink-400/50 transform hover:scale-105 transition-all duration-300 cute-glow shimmer"
-                      >
-                        Войти ✨💖
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          }
-
-          return (
-            <div className="min-h-screen confetti-bg p-4 md:p-8 relative overflow-hidden">
-              {showNotification && (
-                <div className="fixed top-8 right-8 z-50 success-ping">
-                  <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 text-white px-10 py-8 rounded-full shadow-2xl cute-glow flex items-center gap-5 border-5 border-white shimmer">
-                    <Bell size={32} className="bounce-cute" />
-                    <span className="text-2xl font-bold">{notificationText}</span>
-                  </div>
-                </div>
-              )}
-
-              <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-10 right-10 text-pink-200 opacity-12 floating wiggle" style={{animationDuration: '5s'}}>
-                  <Sparkles size={160} fill="currentColor" />
-                </div>
-                <div className="absolute bottom-20 left-10 text-purple-200 opacity-12 floating" style={{animationDuration: '6s'}}>
-                  <Star size={140} fill="currentColor" />
-                </div>
-                <div className="absolute top-1/2 left-1/4 text-blue-200 opacity-12 floating wiggle" style={{animationDuration: '7s'}}>
-                  <Heart size={130} fill="currentColor" />
-                </div>
-              </div>
-
-              <div className="max-w-7xl mx-auto relative z-10">
-                <div className="kawaii-card rounded-[60px] shadow-2xl cute-shadow p-10 mb-10 shimmer">
-                  <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-                    <div className="text-center md:text-left">
-                      <div className="flex items-center gap-5 justify-center md:justify-start mb-4">
-                        <Heart className="text-pink-400 pulse-soft heart-beat" fill="currentColor" size={56} />
-                        <h1 className="text-6xl md:text-7xl font-bold rainbow-text pacifico">
-                          Roblox Manager
-                        </h1>
-                        <Sparkles className="text-purple-400 sparkle-animation" size={48} />
-                      </div>
-                      <p className="text-gray-700 text-2xl font-bold flex items-center gap-3 justify-center md:justify-start">
-                        <span className="text-3xl">👑</span>
-                        Azim218 • Администратор
-                        <span className="text-2xl">☁️</span>
-                      </p>
-                    </div>
-                    <button
-                      onClick={handleLogout}
-                      className="px-12 py-6 bg-gradient-to-r from-red-400 via-pink-400 to-red-500 text-white font-bold rounded-full shadow-2xl hover:shadow-red-400/50 transform hover:scale-110 transition-all duration-300 flex items-center gap-4 text-2xl shimmer"
-                    >
-                      <LogOut size={32} />
-                      Выйти
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-5 mb-10 justify-center">
-                  {[
-                    { id: 'accounts', label: 'Аккаунты', Icon: Clock, emoji: '⏰' },
-                    { id: 'clients', label: 'Клиенты', Icon: Users, emoji: '👥' },
-                    { id: 'calculator', label: 'Калькулятор', Icon: Calculator, emoji: '🧮' },
-                    { id: 'profile', label: 'Профиль', Icon: User, emoji: '👤' }
-                  ].map(tab => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setCurrentTab(tab.id)}
-                      className={`px-10 py-6 rounded-full font-bold text-2xl transition-all duration-300 transform hover:scale-110 flex items-center gap-4 shadow-2xl shimmer ${
-                        currentTab === tab.id
-                          ? 'bg-gradient-to-r from-pink-400 via-purple-400 to-blue-400 text-white cute-glow scale-110'
-                          : 'kawaii-card text-gray-800 hover:bg-pink-50 border-3 border-pink-300'
-                      }`}
-                    >
-                      <span className="text-4xl sparkle-animation">{tab.emoji}</span>
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
-                </div>
-
-                {currentTab === 'accounts' && (
-                  <div className="space-y-10">
-                    <div className="kawaii-card rounded-[60px] shadow-2xl cute-shadow p-12 shimmer">
-                      <h2 className="text-5xl font-bold text-purple-600 mb-12 flex items-center gap-5 pacifico">
-                        <span className="text-6xl sparkle-animation">✨</span>
-                        <span className="gradient-text">Добавить аккаунт</span>
-                        <span className="text-6xl wiggle">💖</span>
-                      </h2>
-                      <div className="space-y-7">
-                        <input
-                          type="text"
-                          placeholder="💕 Имя покупателя"
-                          value={accUsername}
-                          onChange={(e) => setAccUsername(e.target.value)}
-                          className="w-full px-10 py-7 rounded-full border-4 border-pink-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-pink-50 shadow-xl text-2xl font-bold"
-                        />
-                        <select
-                          value={accProfile}
-                          onChange={(e) => setAccProfile(e.target.value)}
-                          className="w-full px-10 py-7 rounded-full border-4 border-pink-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-purple-50 shadow-xl text-2xl font-bold"
-                        >
-                          <option value="">🎮 Выберите профиль</option>
-                          {profiles.map(p => <option key={p} value={p}>{p}</option>)}
-                        </select>
-                        <input
-                          type="number"
-                          placeholder="⏰ Минуты аренды"
-                          value={accDuration}
-                          onChange={(e) => setAccDuration(e.target.value)}
-                          className="w-full px-10 py-7 rounded-full border-4 border-pink-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-blue-50 shadow-xl text-2xl font-bold"
-                        />
-                        <input
-                          type="text"
-                          placeholder="🍪 Roblox Cookie (опционально, для автокика)"
-                          value={accRobloxCookie}
-                          onChange={(e) => setAccRobloxCookie(e.target.value)}
-                          className="w-full px-10 py-7 rounded-full border-4 border-pink-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-green-50 shadow-xl text-2xl font-bold"
-                        />
-                        <button
-                          onClick={addAccount}
-                          className="w-full py-8 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 text-white font-bold text-3xl rounded-full shadow-2xl hover:shadow-green-400/50 transform hover:scale-105 transition-all duration-300 shimmer"
-                        >
-                          ✨💖 Добавить аккаунт 💖✨
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="kawaii-card rounded-[60px] shadow-2xl cute-shadow p-12 shimmer">
-                      <h2 className="text-5xl font-bold text-purple-600 mb-12 flex items-center gap-5 pacifico">
-                        <Heart className="text-pink-400 pulse-soft heart-beat" fill="currentColor" size={48} />
-                        <span className="gradient-text">Активные аккаунты ({accounts.length})</span>
-                        <Sparkles className="text-purple-400 sparkle-animation" fill="currentColor" size={44} />
-                      </h2>
-                      {accounts.length === 0 ? (
-                        <div className="text-center py-24">
-                          <div className="text-9xl mb-8 sparkle-animation wiggle">🌸✨💖</div>
-                          <p className="text-gray-600 text-4xl font-bold gradient-text">Нет активных аккаунтов</p>
-                          <p className="text-gray-500 text-xl font-semibold mt-4">Добавьте первый аккаунт выше! ☁️</p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                          {accounts.map(acc => {
-                            const getStatusInfo = () => {
-                              switch(acc.status) {
-                                case 'active':
-                                  return { 
-                                    bg: 'from-pink-100 via-purple-100 to-pink-100', 
-                                    border: 'border-pink-400',
-                                    badge: 'bg-gradient-to-r from-green-400 to-emerald-500 text-white',
-                                    badgeText: 'Активен ✨',
-                                    showKick: false,
-                                    emoji: '💖'
-                                  };
-                                case 'expired':
-                                  return { 
-                                    bg: 'from-orange-100 via-red-100 to-orange-100', 
-                                    border: 'border-orange-400',
-                                    badge: 'bg-gradient-to-r from-orange-400 to-red-500 text-white',
-                                    badgeText: 'Истёк ⏰',
-                                    showKick: true,
-                                    emoji: '⏰'
-                                  };
-                                case 'pending-kick':
-                                  return { 
-                                    bg: 'from-yellow-100 via-orange-100 to-yellow-100', 
-                                    border: 'border-yellow-500',
-                                    badge: 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white',
-                                    badgeText: 'Ожидает 🔄',
-                                    showKick: false,
-                                    emoji: '🔄'
-                                  };
-                                case 'kicked':
-                                  return { 
-                                    bg: 'from-green-100 via-emerald-100 to-green-100', 
-                                    border: 'border-green-500',
-                                    badge: 'bg-gradient-to-r from-green-500 to-emerald-600 text-white',
-                                    badgeText: acc.kickedAuto ? 'Авто-кикнут ✨' : 'Кикнут ✅',
-                                    showKick: false,
-                                    emoji: '✅'
-                                  };
-                                case 'kick-failed':
-                                  return { 
-                                    bg: 'from-red-100 via-pink-100 to-red-100', 
-                                    border: 'border-red-500',
-                                    badge: 'bg-gradient-to-r from-red-500 to-pink-600 text-white',
-                                    badgeText: 'Ошибка ❌',
-                                    showKick: true,
-                                    emoji: '❌'
-                                  };
-                                default:
-                                  return { 
-                                    bg: 'from-gray-100 to-gray-200', 
-                                    border: 'border-gray-400',
-                                    badge: 'bg-gray-400 text-white',
-                                    badgeText: 'Неизвестно',
-                                    showKick: false,
-                                    emoji: '❓'
-                                  };
-                              }
-                            };
-                            
-                            const statusInfo = getStatusInfo();
-                            
-                            return (
-                              <div 
-                                key={acc.id} 
-                                className={`bg-gradient-to-br ${statusInfo.bg} rounded-[50px] p-10 shadow-2xl hover:shadow-pink-400/30 transition-all duration-300 border-5 ${statusInfo.border} transform hover:scale-105 shimmer`}
-                              >
-                                <div className="flex justify-between items-start mb-8">
-                                  <div>
-                                    <h3 className="text-4xl font-bold text-purple-700 mb-3 flex items-center gap-3">
-                                      {acc.username} 
-                                      <span className="wiggle">{statusInfo.emoji}</span>
-                                    </h3>
-                                    <p className="text-gray-700 text-2xl font-bold">{acc.profile}</p>
-                                  </div>
-                                  <span className={`px-7 py-4 rounded-full text-xl font-bold shadow-xl ${statusInfo.badge} pulse-soft`}>
-                                    {statusInfo.badgeText}
-                                  </span>
-                                </div>
-                                <div className="space-y-5 mb-8">
-                                  <p className={`text-2xl flex items-center gap-4 font-bold ${
-                                    acc.remaining === 0 ? 'text-red-600' : 'text-gray-800'
-                                  }`}>
-                                    <Clock size={28} className="text-purple-500 bounce-cute" />
-                                    Осталось: {acc.remaining} мин
-                                  </p>
-                                  <p className="text-gray-800 text-2xl font-bold flex items-center gap-3">
-                                    <span className="text-2xl">▶</span>
-                                    Начало: {acc.startTime}
-                                  </p>
-                                  {acc.robloxCookie && (
-                                    <p className="text-purple-600 text-xl font-bold flex items-center gap-3 sparkle-animation">
-                                      🤖 Автокик включён
-                                    </p>
-                                  )}
-                                </div>
-                                
-                                <div className="space-y-4">
-                                  {statusInfo.showKick && (
-                                    <button
-                                      onClick={() => manualKickAccount(acc.id)}
-                                      className="w-full py-6 bg-gradient-to-r from-orange-400 via-red-400 to-orange-500 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-orange-400/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-4 shimmer"
-                                    >
-                                      <ExternalLink size={28} />
-                                      Кикнуть на Roblox
-                                    </button>
-                                  )}
-                                  
-                                  {acc.status === 'pending-kick' && (
-                                    <button
-                                      onClick={() => confirmKick(acc.id)}
-                                      className="w-full py-6 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-green-400/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-4 shimmer"
-                                    >
-                                      <CheckCircle size={28} />
-                                      Подтвердить кик
-                                    </button>
-                                  )}
-                                  
-                                  {(acc.status === 'kicked' || acc.status === 'expired') && (
-                                    <button
-                                      onClick={() => removeAccount(acc.id)}
-                                      className="w-full py-6 bg-gradient-to-r from-red-400 via-pink-400 to-red-500 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-red-400/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-4 shimmer"
-                                    >
-                                      <Trash2 size={28} />
-                                      Удалить из списка
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {currentTab === 'clients' && (
-                  <div className="space-y-10">
-                    <div className="kawaii-card rounded-[60px] shadow-2xl cute-shadow p-12 shimmer">
-                      <h2 className="text-5xl font-bold text-blue-600 mb-12 flex items-center gap-5 pacifico">
-                        <span className="text-6xl sparkle-animation">👥</span>
-                        <span className="gradient-text">Добавить клиента</span>
-                        <span className="text-6xl wiggle">✨</span>
-                      </h2>
-                      <div className="space-y-7">
-                        <input
-                          type="text"
-                          placeholder="🌟 Имя клиента"
-                          value={clientName}
-                          onChange={(e) => setClientName(e.target.value)}
-                          className="w-full px-10 py-7 rounded-full border-4 border-blue-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-blue-50 shadow-xl text-2xl font-bold"
-                        />
-                        <select
-                          value={clientStatus}
-                          onChange={(e) => setClientStatus(e.target.value)}
-                          className="w-full px-10 py-7 rounded-full border-4 border-blue-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-purple-50 shadow-xl text-2xl font-bold"
-                        >
-                          <option value="Bronze">🥉 Bronze</option>
-                          <option value="Silver">🥈 Silver</option>
-                          <option value="Gold">🥇 Gold</option>
-                          <option value="Ultimate">👑 Ultimate</option>
-                        </select>
-                        <input
-                          type="text"
-                          placeholder="⏱️ Время просрочки"
-                          value={clientOverdue}
-                          onChange={(e) => setClientOverdue(e.target.value)}
-                          className="w-full px-10 py-7 rounded-full border-4 border-blue-400 focus:border-purple-500 focus:ring-6 focus:ring-purple-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-pink-50 shadow-xl text-2xl font-bold"
-                        />
-                        <button
-                          onClick={addClient}
-                          className="w-full py-8 bg-gradient-to-r from-blue-400 via-purple-400 to-blue-500 text-white font-bold text-3xl rounded-full shadow-2xl hover:shadow-blue-400/50 transform hover:scale-105 transition-all duration-300 shimmer"
-                        >
-                          ✨👥 Добавить клиента 👥✨
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="kawaii-card rounded-[60px] shadow-2xl cute-shadow p-12 shimmer">
-                      <h2 className="text-5xl font-bold text-purple-600 mb-12 flex items-center gap-5 pacifico">
-                        <Star className="text-yellow-400 sparkle-animation" fill="currentColor" size={48} />
-                        <span className="gradient-text">Постоянные клиенты ({clients.length})</span>
-                        <Heart className="text-pink-400 pulse-soft heart-beat" fill="currentColor" size={44} />
-                      </h2>
-                      {clients.length === 0 ? (
-                        <div className="text-center py-24">
-                          <div className="text-9xl mb-8 sparkle-animation wiggle">🌸✨👥</div>
-                          <p className="text-gray-600 text-4xl font-bold gradient-text">Нет клиентов</p>
-                          <p className="text-gray-500 text-xl font-semibold mt-4">Добавьте первого клиента! ☁️</p>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                          {clients.map(client => {
-                            const statusColors = {
-                              Bronze: { gradient: 'from-orange-300 via-yellow-300 to-orange-300', border: 'border-orange-500', emoji: '🥉' },
-                              Silver: { gradient: 'from-gray-300 via-gray-400 to-gray-300', border: 'border-gray-600', emoji: '🥈' },
-                              Gold: { gradient: 'from-yellow-300 via-yellow-500 to-yellow-300', border: 'border-yellow-600', emoji: '🥇' },
-                              Ultimate: { gradient: 'from-purple-400 via-pink-400 to-purple-400', border: 'border-purple-600', emoji: '👑' }
-                            };
-                            const info = statusColors[client.status];
-                            return (
-                              <div key={client.id} className={`bg-gradient-to-br ${info.gradient} rounded-[50px] p-10 shadow-2xl hover:shadow-yellow-400/30 transition-all duration-300 border-5 ${info.border} transform hover:scale-105 shimmer`}>
-                                <div className="flex justify-between items-start mb-8">
-                                  <h3 className="text-4xl font-bold text-gray-900 flex items-center gap-3">
-                                    {client.name} 
-                                    <span className="wiggle">{info.emoji}</span>
-                                  </h3>
-                                  <span className="px-7 py-4 bg-white/95 rounded-full text-xl font-bold shadow-xl pulse-soft">
-                                    {info.emoji} {client.status}
-                                  </span>
-                                </div>
-                                <div className="space-y-4 mb-8">
-                                  <p className="text-gray-900 text-2xl font-bold flex items-center gap-3">
-                                    <span className="text-3xl">📅</span>
-                                    Дата: {client.date}
-                                  </p>
-                                  <p className="text-gray-900 text-2xl font-bold flex items-center gap-3">
-                                    <span className="text-3xl">⏱️</span>
-                                    Просрочка: {client.overdue}
-                                  </p>
-                                </div>
-                                <button
-                                  onClick={() => removeClient(client.id)}
-                                  className="w-full py-6 bg-gradient-to-r from-red-500 via-pink-500 to-red-600 text-white font-bold text-2xl rounded-full shadow-xl hover:shadow-red-400/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3 shimmer"
-                                >
-                                  <Trash2 size={26} />
-                                  Удалить
-                                </button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {currentTab === 'calculator' && (
-                  <div className="flex justify-center items-center min-h-[60vh]">
-                    <div className="kawaii-card rounded-[60px] shadow-2xl cute-glow p-14 w-full max-w-2xl shimmer">
-                      <h2 className="text-6xl font-bold text-purple-600 mb-14 flex items-center justify-center gap-5 pacifico">
-                        <span className="text-7xl sparkle-animation wiggle">🧮</span>
-                        <span className="gradient-text">Калькулятор времени</span>
-                        <span className="text-7xl sparkle-animation wiggle" style={{animationDelay: '1s'}}>✨</span>
-                      </h2>
-                      <div className="space-y-10">
-                        <input
-                          type="text"
-                          placeholder="⏰ Время 1 (например: 2:30 или 150)"
-                          value={calcTime1}
-                          onChange={(e) => setCalcTime1(e.target.value)}
-                          className="w-full px-10 py-8 rounded-full border-4 border-purple-400 focus:border-pink-500 focus:ring-6 focus:ring-pink-300 outline-none transition-all duration-300 bg-gradient-to-r from-purple-50 to-pink-50 shadow-xl text-2xl font-bold text-center"
-                        />
-                        <input
-                          type="text"
-                          placeholder="⏰ Время 2 (например: 1:45 или 105)"
-                          value={calcTime2}
-                          onChange={(e) => setCalcTime2(e.target.value)}
-                          className="w-full px-10 py-8 rounded-full border-4 border-purple-400 focus:border-pink-500 focus:ring-6 focus:ring-pink-300 outline-none transition-all duration-300 bg-gradient-to-r from-purple-50 to-pink-50 shadow-xl text-2xl font-bold text-center"
-                        />
-                        
-                        <div className="grid grid-cols-2 gap-8">
-                          <button
-                            onClick={() => calculateTime('add')}
-                            className="py-8 bg-gradient-to-r from-green-400 via-emerald-400 to-green-500 text-white font-bold text-3xl rounded-full shadow-2xl hover:shadow-green-400/50 transform hover:scale-105 transition-all duration-300 shimmer"
-                          >
-                            ➕ Сложить
-                          </button>
-                          <button
-                            onClick={() => calculateTime('subtract')}
-                            className="py-8 bg-gradient-to-r from-red-400 via-pink-400 to-red-500 text-white font-bold text-3xl rounded-full shadow-2xl hover:shadow-red-400/50 transform hover:scale-105 transition-all duration-300 shimmer"
-                          >
-                            ➖ Вычесть
-                          </button>
-                        </div>
-
-                        {calcResult && (
-                          <div className="bg-white rounded-[50px] p-12 shadow-2xl border-5 border-pink-400 text-center success-ping">
-                            <p className="text-gray-600 text-2xl font-bold mb-4">Результат:</p>
-                            <p className="text-8xl font-bold rainbow-text sparkle-animation mb-4">{calcResult}</p>
-                            <p className="text-gray-600 text-2xl font-bold mt-4">минут ✨</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {currentTab === 'profile' && (
-                  <div className="flex justify-center items-center min-h-[60vh]">
-                    <div className="kawaii-card rounded-[60px] shadow-2xl cute-glow p-14 w-full max-w-2xl text-center shimmer">
-                      <div className="mb-12 sparkle-animation wiggle">
-                        <span className="text-9xl">👑✨💖</span>
-                      </div>
-                      <h2 className="text-7xl font-bold rainbow-text mb-8 pacifico">Azim218</h2>
-                      <p className="text-4xl font-bold text-gray-700 mb-4">Администратор</p>
-                      <p className="text-2xl font-semibold text-purple-600 mb-10 flex items-center gap-3 justify-center">
-                        <span className="text-3xl bounce-cute">☁️</span>
-                        Синхронизировано между устройствами
-                        <span className="text-3xl bounce-cute" style={{animationDelay: '0.5s'}}>✨</span>
-                      </p>
-                      
-                      <div className="space-y-7 bg-gradient-to-br from-white/90 to-pink-50/90 rounded-[50px] p-12 shadow-2xl mb-10">
-                        <div className="flex items-center justify-between p-7 bg-gradient-to-r from-pink-100 via-purple-100 to-pink-100 rounded-full border-3 border-pink-300 shimmer">
-                          <span className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-                            <span className="text-4xl bounce-cute">⏰</span>
-                            Всего аккаунтов:
-                          </span>
-                          <span className="text-5xl font-bold gradient-text">{accounts.length}</span>
-                        </div>
-                        <div className="flex items-center justify-between p-7 bg-gradient-to-r from-blue-100 via-purple-100 to-blue-100 rounded-full border-3 border-blue-300 shimmer">
-                          <span className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-                            <span className="text-4xl bounce-cute" style={{animationDelay: '0.3s'}}>👥</span>
-                            Всего клиентов:
-                          </span>
-                          <span className="text-5xl font-bold gradient-text">{clients.length}</span>
-                        </div>
-                        <div className="flex items-center justify-between p-7 bg-gradient-to-r from-purple-100 via-pink-100 to-purple-100 rounded-full border-3 border-purple-300 shimmer">
-                          <span className="text-3xl font-bold text-gray-800 flex items-center gap-3">
-                            <span className="text-4xl sparkle-animation">✨</span>
-                            Активных:
-                          </span>
-                          <span className="text-5xl font-bold gradient-text">{accounts.filter(a => a.status === 'active').length}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="mb-10">
-                        <label className="block text-3xl font-bold text-purple-600 mb-5 pacifico flex items-center justify-center gap-3">
-                          <span className="text-4xl wiggle">⚙️</span>
-                          URL сервера автокика
-                          <span className="text-4xl wiggle" style={{animationDelay: '1s'}}>🔧</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={serverUrl}
-                          onChange={(e) => setServerUrl(e.target.value)}
-                          placeholder="http://localhost:3000"
-                          className="w-full px-10 py-8 rounded-full border-4 border-purple-400 focus:border-pink-500 focus:ring-6 focus:ring-pink-300 outline-none transition-all duration-300 bg-gradient-to-r from-white to-purple-50 shadow-xl text-2xl font-bold text-center"
-                        />
-                        <p className="text-gray-600 text-lg mt-4 font-semibold">Оставьте пустым для ручного режима ✨</p>
-                      </div>
-                      
-                      <div className="p-10 bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 rounded-[50px] border-5 border-purple-400 shimmer">
-                        <p className="text-3xl font-bold text-purple-700 mb-5 flex items-center justify-center gap-3">
-                          <Heart className="text-pink-500 heart-beat" fill="currentColor" size={36} />
-                          Спасибо за работу!
-                          <Heart className="text-pink-500 heart-beat" fill="currentColor" size={36} style={{animationDelay: '0.5s'}} />
-                        </p>
-                        <p className="text-2xl font-bold text-gray-700 flex items-center justify-center gap-3">
-                          <span className="text-3xl sparkle-animation">✨</span>
-                          Вы делаете мир лучше!
-                          <span className="text-3xl sparkle-animation" style={{animationDelay: '1s'}}>💖</span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
+            // Очистка формы
+            document.getElementById('accountName').value = '';
+            document.getElementById('orderNumber').value = '';
+            document.getElementById('customerName').value = '';
+            document.getElementById('orderTime').value = '';
         }
 
-        ReactDOM.render(<RobloxManagerApp />, document.getElementById('root'));
+        // Сохранение заказов
+        async function saveOrders() {
+            try {
+                await window.storage.set('orders', JSON.stringify(orders), true);
+            } catch (error) {
+                console.error('Ошибка сохранения:', error);
+            }
+        }
+
+        // Отображение заказов
+        function renderOrders() {
+            const ordersList = document.getElementById('ordersList');
+            if (orders.length === 0) {
+                ordersList.innerHTML = '';
+                return;
+            }
+
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-item">
+                    <h3>🛍️ Заказ #${order.orderNumber}</h3>
+                    <p><strong>Аккаунт:</strong> ${order.accountName}</p>
+                    <p><strong>Покупатель:</strong> ${order.customerName}</p>
+                    <p><strong>Время:</strong> ${new Date(order.orderTime).toLocaleString('ru-RU')}</p>
+                    <button onclick="deleteOrder(${order.id})">Удалить</button>
+                </div>
+            `).join('');
+        }
+
+        // Удаление заказа
+        async function deleteOrder(id) {
+            orders = orders.filter(order => order.id !== id);
+            await saveOrders();
+            renderOrders();
+        }
+
+        // Калькулятор времени
+        function calculateTime() {
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            if (!startTime || !endTime) {
+                document.getElementById('calcResult').textContent = 'Пожалуйста, выберите оба времени!';
+                return;
+            }
+
+            const start = new Date(startTime);
+            const end = new Date(endTime);
+            const diff = Math.abs(end - start);
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            let result = '⏱️ Разница: ';
+            if (days > 0) result += `${days} дн. `;
+            if (hours > 0) result += `${hours} ч. `;
+            result += `${minutes} мин.`;
+
+            document.getElementById('calcResult').textContent = result;
+        }
+
+        // Сохранение статуса
+        async function saveStatus() {
+            const customerName = document.getElementById('statusCustomerName').value;
+            const statusMessage = document.getElementById('statusMessage').value;
+
+            if (!customerName || !statusMessage) {
+                alert('Пожалуйста, заполните оба поля!');
+                return;
+            }
+
+            const statusText = `Уважаемый(ая) ${customerName},\n\n${statusMessage}\n\nС уважением,\nВаша команда ✨`;
+            
+            document.getElementById('statusPreview').textContent = statusText;
+
+            try {
+                await window.storage.set('last-status', JSON.stringify({
+                    customerName,
+                    statusMessage,
+                    timestamp: new Date().toISOString()
+                }), true);
+            } catch (error) {
+                console.error('Ошибка сохранения статуса:', error);
+            }
+        }
+
+        // Загрузка при старте
+        loadData();
     </script>
 </body>
 </html>
-
-
-
-
-
-
