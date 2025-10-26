@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Трекер Заказов ✨</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -12,10 +14,18 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            font-family: 'Comfortaa', cursive;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 25%, #ff9a9e 50%, #fecfef 75%, #feada6 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             padding: 20px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
@@ -25,39 +35,54 @@
 
         .header {
             text-align: center;
-            color: white;
+            color: #fff;
             margin-bottom: 30px;
             animation: fadeIn 0.8s ease-in;
+            text-shadow: 3px 3px 6px rgba(255, 105, 180, 0.3);
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-size: 3rem;
             margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
         }
 
         .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .sparkles {
+            display: inline-block;
+            animation: sparkle 1.5s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
         }
 
         .setup-notice {
             background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 25px;
+            padding: 25px;
             margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
+            border: 3px solid rgba(255, 182, 193, 0.5);
         }
 
         .setup-notice h3 {
-            color: #764ba2;
+            color: #ff69b4;
             margin-bottom: 15px;
+            font-size: 1.3rem;
         }
 
         .setup-notice code {
-            background: #f0f0f0;
+            background: #ffe4e9;
             padding: 2px 6px;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 0.9rem;
         }
 
@@ -67,7 +92,7 @@
         }
 
         .setup-notice a {
-            color: #764ba2;
+            color: #ff69b4;
             text-decoration: none;
             font-weight: 600;
         }
@@ -77,22 +102,47 @@
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 50px rgba(255, 105, 180, 0.25);
             animation: slideUp 0.6s ease-out;
+            border: 3px solid rgba(255, 182, 193, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,182,193,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .card h2 {
-            color: #764ba2;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
+            color: #ff69b4;
+            margin-bottom: 25px;
+            font-size: 2rem;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-weight: 700;
         }
 
         .form-group {
@@ -101,87 +151,108 @@
 
         label {
             display: block;
-            color: #555;
+            color: #ff69b4;
             font-weight: 600;
             margin-bottom: 8px;
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
 
         input[type="text"],
-        input[type="datetime-local"],
         input[type="number"],
         textarea {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            padding: 14px 18px;
+            border: 3px solid #ffb6c1;
+            border-radius: 20px;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: white;
+            background: #fff;
+            font-family: 'Comfortaa', cursive;
         }
 
         input:focus,
         textarea:focus {
             outline: none;
-            border-color: #764ba2;
-            box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15);
+            transform: translateY(-2px);
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ff9a9e 100%);
+            background-size: 200% 200%;
             color: white;
-            padding: 12px 30px;
+            padding: 14px 35px;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 25px;
+            font-size: 1.05rem;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
+            font-family: 'Comfortaa', cursive;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
 
         button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.5);
+            background-position: 100% 0;
         }
 
         button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
 
-        .orders-list {
-            margin-top: 20px;
+        .orders-list, #statusesList {
+            margin-top: 25px;
         }
 
-        .order-item {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        .order-item, .status-item {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #8b4513;
+            padding: 25px;
+            border-radius: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.2);
             animation: fadeIn 0.5s ease-in;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            position: relative;
         }
 
-        .order-item h3 {
-            margin-bottom: 10px;
-            font-size: 1.3rem;
+        .order-item h3, .status-item h3 {
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: #ff69b4;
+            font-weight: 700;
         }
 
-        .order-item p {
-            margin: 5px 0;
+        .order-item p, .status-item p {
+            margin: 8px 0;
             opacity: 0.95;
+            font-weight: 500;
         }
 
-        .order-item button {
-            background: rgba(255,255,255,0.3);
-            margin-top: 10px;
-            padding: 8px 20px;
-            font-size: 0.9rem;
+        .order-item .button-group, .status-item .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        .order-item button:hover {
-            background: rgba(255,255,255,0.4);
+        .order-item button, .status-item button {
+            flex: 1;
+            padding: 10px 20px;
+            font-size: 0.95rem;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            background-size: 200% 200%;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            background-size: 200% 200%;
         }
 
         .calculator {
@@ -192,37 +263,72 @@
 
         .calc-result {
             grid-column: 1 / -1;
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            padding: 20px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 25px;
+            border-radius: 20px;
             text-align: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #555;
-            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #ff69b4;
+            margin-top: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.2);
         }
 
         .status-section textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
         }
 
-        .status-preview {
-            background: #f0f4ff;
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 15px;
-            white-space: pre-wrap;
-            color: #555;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 105, 180, 0.4);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #fff 0%, #ffe4e9 100%);
+            margin: 5% auto;
+            padding: 35px;
+            border: 3px solid #ffb6c1;
+            border-radius: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.4);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .modal h2 {
+            color: #ff69b4;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .close {
+            color: #ff69b4;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            color: #ff1493;
+            transform: rotate(90deg);
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @keyframes slideUp {
@@ -238,11 +344,15 @@
 
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
             
             .calculator {
                 grid-template-columns: 1fr;
+            }
+
+            .order-item .button-group, .status-item .button-group {
+                flex-direction: column;
             }
         }
     </style>
@@ -250,8 +360,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>✨ Трекер Заказов ✨</h1>
-            <p>Управляй своими заказами легко и красиво</p>
+            <h1><span class="sparkles">✨</span> Трекер Заказов <span class="sparkles">✨</span></h1>
+            <p>💕 Управляй своими заказами легко и красиво 💕</p>
         </div>
 
         <div class="setup-notice">
@@ -260,7 +370,7 @@
             <ol>
                 <li>Перейди в <a href="https://console.firebase.google.com/u/0/project/rentmywaifu-c200a/database/rentmywaifu-c200a-default-rtdb/rules" target="_blank">Realtime Database → Rules</a></li>
                 <li>Замени правила на:
-                    <pre style="background: #f0f0f0; padding: 10px; border-radius: 8px; margin-top: 8px;">{
+                    <pre style="background: #ffe4e9; padding: 10px; border-radius: 8px; margin-top: 8px;">{
   "rules": {
     ".read": true,
     ".write": true
@@ -269,18 +379,18 @@
                 </li>
                 <li>Нажми "Опубликовать"</li>
             </ol>
-            <p style="margin-top: 10px; color: #e74c3c;"><strong>⚠️ Без этого приложение не сможет сохранять данные!</strong></p>
+            <p style="margin-top: 10px; color: #e74c3c;"><strong>⚠ Без этого приложение не сможет сохранять данные!</strong></p>
         </div>
 
         <!-- Секция 1: Добавление заказа -->
         <div class="card">
             <h2>💝 Новый Заказ</h2>
             <div class="form-group">
-                <label>Имя аккаунта</label>
-                <input type="text" id="accountName" placeholder="Введите имя аккаунта (необязательно)">
+                <label>Имя аккаунта *</label>
+                <input type="text" id="accountName" placeholder="Введите имя аккаунта">
             </div>
             <div class="form-group">
-                <label>Номер заказа</label>
+                <label>Номер заказа *</label>
                 <input type="text" id="orderNumber" placeholder="Введите номер заказа">
             </div>
             <div class="form-group">
@@ -295,7 +405,7 @@
                 <label>Дата и время окончания заказа</label>
                 <input type="text" id="orderEndTime" placeholder="Например: 18:00, завтра, или любой текст">
             </div>
-            <button onclick="addOrder()">Добавить заказ</button>
+            <button onclick="addOrder()">💖 Добавить заказ</button>
 
             <div class="orders-list" id="ordersList"></div>
         </div>
@@ -326,10 +436,10 @@
                 </div>
             </div>
             <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="calculateDifference()">Разница времени</button>
-                <button onclick="calculateSum()">Сложить время</button>
+                <button onclick="calculateDifference()">⏱ Разница времени</button>
+                <button onclick="calculateSum()">➕ Сложить время</button>
             </div>
-            <div class="calc-result" id="calcResult">Выберите операцию для расчета</div>
+            <div class="calc-result" id="calcResult">Выберите операцию для расчета 💕</div>
         </div>
 
         <!-- Секция 3: Статус покупателя -->
@@ -343,9 +453,57 @@
                 <label>Статус покупателя</label>
                 <textarea id="statusMessage" placeholder="Напишите статус..."></textarea>
             </div>
-            <button onclick="saveStatus()">Сохранить статус</button>
+            <button onclick="saveStatus()">💌 Сохранить статус</button>
             
-            <div id="statusesList" style="margin-top: 20px;"></div>
+            <div id="statusesList"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования заказа -->
+    <div id="editOrderModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditOrderModal()">&times;</span>
+            <h2>✏ Редактировать Заказ</h2>
+            <input type="hidden" id="editOrderId">
+            <div class="form-group">
+                <label>Имя аккаунта *</label>
+                <input type="text" id="editAccountName">
+            </div>
+            <div class="form-group">
+                <label>Номер заказа *</label>
+                <input type="text" id="editOrderNumber">
+            </div>
+            <div class="form-group">
+                <label>Имя покупателя</label>
+                <input type="text" id="editCustomerName">
+            </div>
+            <div class="form-group">
+                <label>Время заказа</label>
+                <input type="text" id="editOrderTime">
+            </div>
+            <div class="form-group">
+                <label>Дата и время окончания</label>
+                <input type="text" id="editOrderEndTime">
+            </div>
+            <button onclick="updateOrder()">💾 Сохранить изменения</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования статуса -->
+    <div id="editStatusModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditStatusModal()">&times;</span>
+            <h2>✏ Редактировать Статус</h2>
+            <input type="hidden" id="editStatusId">
+            <div class="form-group">
+                <label>Имя покупателя</label>
+                <input type="text" id="editStatusCustomerName">
+            </div>
+            <div class="form-group">
+                <label>Статус покупателя</label>
+                <textarea id="editStatusMessage"></textarea>
+            </div>
+            <button onclick="updateStatus()">💾 Сохранить изменения</button>
         </div>
     </div>
 
@@ -445,191 +603,4 @@
             const orderNumber = document.getElementById('orderNumber').value;
             const customerName = document.getElementById('customerName').value;
             const orderTime = document.getElementById('orderTime').value;
-            const orderEndTime = document.getElementById('orderEndTime').value;
-
-            if (!orderNumber) {
-                alert('Пожалуйста, укажите хотя бы номер заказа!');
-                return;
-            }
-
-            const order = {
-                id: Date.now(),
-                accountName: accountName || '-',
-                orderNumber,
-                customerName: customerName || '-',
-                orderTime: orderTime || '-',
-                orderEndTime: orderEndTime || '-'
-            };
-
-            orders.push(order);
-            saveOrders();
-            
-            if (!isFirebaseEnabled) {
-                renderOrders();
-            }
-
-            // Очистка формы
-            document.getElementById('accountName').value = '';
-            document.getElementById('orderNumber').value = '';
-            document.getElementById('customerName').value = '';
-            document.getElementById('orderTime').value = '';
-            document.getElementById('orderEndTime').value = '';
-        }
-
-        // Отображение заказов
-        function renderOrders() {
-            const ordersList = document.getElementById('ordersList');
-            if (orders.length === 0) {
-                ordersList.innerHTML = '';
-                return;
-            }
-
-            ordersList.innerHTML = orders.map(order => `
-                <div class="order-item">
-                    <h3>🛍️ Заказ #${order.orderNumber}</h3>
-                    ${order.accountName && order.accountName !== '-' ? `<p><strong>Аккаунт:</strong> ${order.accountName}</p>` : ''}
-                    ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
-                    ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
-                    ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
-                    <button onclick="deleteOrder(${order.id})">Удалить</button>
-                </div>
-            `).join('');
-        }
-
-        // Удаление заказа
-        function deleteOrder(id) {
-            orders = orders.filter(order => order.id !== id);
-            saveOrders();
-            
-            if (!isFirebaseEnabled) {
-                renderOrders();
-            }
-        }
-
-        // Калькулятор времени - разница
-        function calculateDifference() {
-            const time1 = document.getElementById('time1').value;
-            const time2 = document.getElementById('time2').value;
-
-            if (!time1 || !time2) {
-                document.getElementById('calcResult').textContent = 'Пожалуйста, выберите оба времени!';
-                return;
-            }
-
-            const start = new Date(time1);
-            const end = new Date(time2);
-            const diff = Math.abs(end - start);
-
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-            let result = '⏱️ Разница: ';
-            if (days > 0) result += `${days} дн. `;
-            if (hours > 0) result += `${hours} ч. `;
-            result += `${minutes} мин.`;
-
-            document.getElementById('calcResult').textContent = result;
-        }
-
-        // Калькулятор времени - сложение
-        function calculateSum() {
-            const time1 = document.getElementById('time1').value;
-            const addDays = parseInt(document.getElementById('addDays').value) || 0;
-            const addHours = parseInt(document.getElementById('addHours').value) || 0;
-            const addMinutes = parseInt(document.getElementById('addMinutes').value) || 0;
-
-            if (!time1) {
-                document.getElementById('calcResult').textContent = 'Пожалуйста, выберите начальное время (Время 1)!';
-                return;
-            }
-
-            const start = new Date(time1);
-            
-            // Добавляем время
-            start.setDate(start.getDate() + addDays);
-            start.setHours(start.getHours() + addHours);
-            start.setMinutes(start.getMinutes() + addMinutes);
-
-            const result = `✨ Результат: ${start.toLocaleString('ru-RU')}`;
-            document.getElementById('calcResult').textContent = result;
-        }
-
-        // Сохранение статуса
-        function saveStatus() {
-            const customerName = document.getElementById('statusCustomerName').value;
-            const statusMessage = document.getElementById('statusMessage').value;
-
-            if (!customerName || !statusMessage) {
-                alert('Пожалуйста, заполните оба поля!');
-                return;
-            }
-
-            const statusData = {
-                id: Date.now(),
-                customerName,
-                statusMessage,
-                timestamp: new Date().toISOString()
-            };
-
-            statuses.push(statusData);
-
-            if (isFirebaseEnabled) {
-                // Сохранение в Firebase
-                const statusesObj = {};
-                statuses.forEach(status => {
-                    statusesObj[status.id] = status;
-                });
-                database.ref('statuses').set(statusesObj);
-            } else {
-                // Сохранение в localStorage
-                localStorage.setItem('statuses-data', JSON.stringify(statuses));
-                renderStatuses();
-            }
-
-            // Очистка формы
-            document.getElementById('statusCustomerName').value = '';
-            document.getElementById('statusMessage').value = '';
-        }
-
-        // Отображение статусов
-        function renderStatuses() {
-            const statusesList = document.getElementById('statusesList');
-            if (statuses.length === 0) {
-                statusesList.innerHTML = '';
-                return;
-            }
-
-            statusesList.innerHTML = statuses.map(status => `
-                <div class="status-preview">
-                    <strong>Покупатель:</strong> ${status.customerName}<br>
-                    <strong>Статус:</strong> ${status.statusMessage}<br>
-                    <strong>Дата:</strong> ${new Date(status.timestamp).toLocaleString('ru-RU')}<br>
-                    <button onclick="deleteStatus(${status.id})" style="margin-top: 10px; padding: 6px 15px; font-size: 0.85rem;">Удалить</button>
-                </div>
-            `).join('');
-        }
-
-        // Удаление статуса
-        function deleteStatus(id) {
-            statuses = statuses.filter(status => status.id !== id);
-
-            if (isFirebaseEnabled) {
-                const statusesObj = {};
-                statuses.forEach(status => {
-                    statusesObj[status.id] = status;
-                });
-                database.ref('statuses').set(statusesObj);
-            } else {
-                localStorage.setItem('statuses-data', JSON.stringify(statuses));
-                renderStatuses();
-            }
-        }
-
-        // Загрузка при старте страницы
-        window.addEventListener('load', function() {
-            loadData();
-        });
-    </script>
-</body>
-</html>
+            const orderEndTime = document.getElementById('orderEndTime').value
