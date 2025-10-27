@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Трекер Заказов ✨</title>
+    <title>✨ Трекер Заказов ✨</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@300;400;500;600;700&display=swap');
 
         * {
             margin: 0;
@@ -14,102 +14,147 @@
         }
 
         body {
-            font-family: 'Comfortaa', cursive;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 25%, #ff9a9e 50%, #fecfef 75%, #feada6 100%);
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 25%, #ffecd2 50%, #fcb69f 75%, #ff9a9e 100%);
             background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            animation: gradientWave 20s ease infinite;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
+        /* Плавающие сердечки на фоне */
+        body::before,
+        body::after {
+            content: '💕';
+            position: fixed;
+            font-size: 3rem;
+            opacity: 0.15;
+            animation: float 15s infinite ease-in-out;
+            z-index: 0;
+        }
+
+        body::before {
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        body::after {
+            content: '🌸';
+            top: 60%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+
+        @keyframes gradientWave {
+            0%, 100% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
         }
 
         .container {
-            max-width: 900px;
+            max-width: 950px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .header {
             text-align: center;
             color: #fff;
-            margin-bottom: 30px;
-            animation: fadeIn 0.8s ease-in;
-            text-shadow: 3px 3px 6px rgba(255, 105, 180, 0.3);
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-in;
+            text-shadow: 4px 4px 8px rgba(255, 105, 180, 0.4);
         }
 
         .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-            letter-spacing: 2px;
+            font-family: 'Pacifico', cursive;
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::before,
+        .header h1::after {
+            content: '✨';
+            position: absolute;
+            font-size: 2rem;
+            animation: twinkle 2s infinite;
+        }
+
+        .header h1::before {
+            left: -50px;
+            animation-delay: 0s;
+        }
+
+        .header h1::after {
+            right: -50px;
+            animation-delay: 1s;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
         }
 
         .header p {
-            font-size: 1.2rem;
-            opacity: 0.95;
-            font-weight: 300;
-        }
-
-        .sparkles {
-            display: inline-block;
-            animation: sparkle 1.5s infinite;
-        }
-
-        @keyframes sparkle {
-            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
-            50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+            font-size: 1.3rem;
+            font-weight: 500;
         }
 
         .setup-notice {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 25px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 40px rgba(255, 105, 180, 0.2);
-            border: 3px solid rgba(255, 182, 193, 0.5);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 240, 245, 0.98) 100%);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 15px 50px rgba(255, 105, 180, 0.3), 0 0 0 4px rgba(255, 182, 193, 0.3);
+            border: 4px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+
+        .setup-notice::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef, #ffecd2, #fcb69f);
+            border-radius: 30px;
+            z-index: -1;
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
         }
 
         .setup-notice h3 {
-            color: #ff69b4;
+            color: #ff1493;
             margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .setup-notice code {
-            background: #ffe4e9;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        .setup-notice ol {
-            margin-left: 20px;
-            line-height: 1.8;
-        }
-
-        .setup-notice a {
-            color: #ff69b4;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .setup-notice a:hover {
-            text-decoration: underline;
+            font-size: 1.5rem;
+            font-weight: 700;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 35px;
-            margin-bottom: 30px;
-            box-shadow: 0 15px 50px rgba(255, 105, 180, 0.25);
-            animation: slideUp 0.6s ease-out;
-            border: 3px solid rgba(255, 182, 193, 0.4);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 245, 250, 0.98) 100%);
+            backdrop-filter: blur(15px);
+            border-radius: 35px;
+            padding: 40px;
+            margin-bottom: 35px;
+            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
+            animation: slideUp 0.8s ease-out;
+            border: 5px solid rgba(255, 192, 203, 0.5);
             position: relative;
             overflow: hidden;
         }
@@ -117,12 +162,12 @@
         .card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,182,193,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(255,182,193,0.15) 0%, transparent 50%);
+            animation: rotate 25s linear infinite;
         }
 
         @keyframes rotate {
@@ -136,113 +181,136 @@
         }
 
         .card h2 {
-            color: #ff69b4;
-            margin-bottom: 25px;
-            font-size: 2rem;
+            color: #ff1493;
+            margin-bottom: 30px;
+            font-size: 2.3rem;
+            font-family: 'Pacifico', cursive;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 700;
+            gap: 15px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         label {
             display: block;
-            color: #ff69b4;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 1rem;
+            color: #ff1493;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 2px rgba(255, 182, 193, 0.3);
         }
 
         input[type="text"],
         input[type="number"],
+        input[type="time"],
         textarea {
             width: 100%;
-            padding: 14px 18px;
-            border: 3px solid #ffb6c1;
-            border-radius: 20px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #fff;
-            font-family: 'Comfortaa', cursive;
+            padding: 16px 22px;
+            border: 4px solid #ffb6c1;
+            border-radius: 25px;
+            font-size: 1.05rem;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, #fff 0%, #fff5fa 100%);
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 500;
+            box-shadow: inset 0 2px 8px rgba(255, 105, 180, 0.1);
         }
 
         input:focus,
         textarea:focus {
             outline: none;
-            border-color: #ff69b4;
-            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.15);
-            transform: translateY(-2px);
+            border-color: #ff1493;
+            box-shadow: 0 0 0 5px rgba(255, 20, 147, 0.2), inset 0 2px 8px rgba(255, 105, 180, 0.15);
+            transform: translateY(-3px) scale(1.01);
         }
 
         button {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #ff9a9e 100%);
+            background: linear-gradient(135deg, #ff6b9d 0%, #fec5e5 50%, #ff6b9d 100%);
             background-size: 200% 200%;
             color: white;
-            padding: 14px 35px;
+            padding: 16px 40px;
             border: none;
-            border-radius: 25px;
-            font-size: 1.05rem;
+            border-radius: 30px;
+            font-size: 1.15rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(255, 105, 180, 0.4);
-            font-family: 'Comfortaa', cursive;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.5);
+            font-family: 'Quicksand', sans-serif;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            border: 3px solid rgba(255, 255, 255, 0.5);
         }
 
         button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.5);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 105, 180, 0.6);
             background-position: 100% 0;
+            border-color: rgba(255, 255, 255, 0.8);
         }
 
         button:active {
-            transform: translateY(-1px);
+            transform: translateY(-2px) scale(1.02);
         }
 
         .orders-list, #statusesList {
-            margin-top: 25px;
+            margin-top: 30px;
         }
 
         .order-item, .status-item {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            color: #8b4513;
-            padding: 25px;
-            border-radius: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.2);
-            animation: fadeIn 0.5s ease-in;
-            border: 3px solid rgba(255, 255, 255, 0.6);
+            background: linear-gradient(135deg, #ffe4e9 0%, #ffd4e5 100%);
+            color: #8b3a62;
+            padding: 30px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.25);
+            animation: fadeIn 0.6s ease-in;
+            border: 4px solid rgba(255, 255, 255, 0.7);
             position: relative;
+            overflow: hidden;
+        }
+
+        .order-item::before, .status-item::before {
+            content: '💖';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 3rem;
+            opacity: 0.15;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
         .order-item h3, .status-item h3 {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            color: #ff69b4;
+            margin-bottom: 18px;
+            font-size: 1.7rem;
+            color: #ff1493;
             font-weight: 700;
+            font-family: 'Pacifico', cursive;
         }
 
         .order-item p, .status-item p {
-            margin: 8px 0;
-            opacity: 0.95;
-            font-weight: 500;
+            margin: 10px 0;
+            font-weight: 600;
+            font-size: 1.05rem;
         }
 
         .order-item .button-group, .status-item .button-group {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .order-item button, .status-item button {
             flex: 1;
-            padding: 10px 20px;
-            font-size: 0.95rem;
+            padding: 12px 25px;
+            font-size: 1rem;
         }
 
         .edit-btn {
@@ -258,25 +326,42 @@
         .calculator {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 20px;
+        }
+
+        .time-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .time-input-group input {
+            flex: 1;
+        }
+
+        .time-separator {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff69b4;
         }
 
         .calc-result {
             grid-column: 1 / -1;
             background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 25px;
-            border-radius: 20px;
+            padding: 30px;
+            border-radius: 25px;
             text-align: center;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #ff69b4;
-            margin-top: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 5px 20px rgba(255, 105, 180, 0.2);
+            color: #ff1493;
+            margin-top: 25px;
+            border: 4px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.25);
+            font-family: 'Pacifico', cursive;
         }
 
         .status-section textarea {
-            min-height: 120px;
+            min-height: 140px;
             resize: vertical;
         }
 
@@ -288,42 +373,53 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 105, 180, 0.4);
-            backdrop-filter: blur(5px);
+            background: rgba(255, 105, 180, 0.5);
+            backdrop-filter: blur(8px);
             animation: fadeIn 0.3s ease;
         }
 
         .modal-content {
             background: linear-gradient(135deg, #fff 0%, #ffe4e9 100%);
             margin: 5% auto;
-            padding: 35px;
-            border: 3px solid #ffb6c1;
-            border-radius: 30px;
+            padding: 45px;
+            border: 5px solid #ffb6c1;
+            border-radius: 40px;
             width: 90%;
-            max-width: 600px;
-            box-shadow: 0 20px 60px rgba(255, 105, 180, 0.4);
-            animation: slideUp 0.4s ease-out;
+            max-width: 650px;
+            box-shadow: 0 25px 70px rgba(255, 105, 180, 0.5);
+            animation: slideUp 0.5s ease-out;
+            position: relative;
+        }
+
+        .modal-content::before {
+            content: '🌸';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 2.5rem;
+            opacity: 0.2;
         }
 
         .modal h2 {
-            color: #ff69b4;
-            margin-bottom: 25px;
-            font-size: 1.8rem;
-            font-weight: 700;
+            color: #ff1493;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-family: 'Pacifico', cursive;
         }
 
         .close {
-            color: #ff69b4;
+            color: #ff1493;
             float: right;
-            font-size: 32px;
+            font-size: 40px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
+            line-height: 1;
         }
 
         .close:hover {
-            color: #ff1493;
-            transform: rotate(90deg);
+            color: #ff69b4;
+            transform: rotate(90deg) scale(1.2);
         }
 
         @keyframes fadeIn {
@@ -331,10 +427,21 @@
             to { opacity: 1; }
         }
 
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                transform: translateY(50px);
             }
             to {
                 opacity: 1;
@@ -344,7 +451,7 @@
 
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2.2rem;
+                font-size: 2.5rem;
             }
             
             .calculator {
@@ -360,15 +467,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><span class="sparkles">✨</span> Трекер Заказов <span class="sparkles">✨</span></h1>
+            <h1>Трекер Заказов</h1>
             <p>💕 Управляй своими заказами легко и красиво 💕</p>
         </div>
 
         <div class="setup-notice">
             <h3>✅ Firebase настроен!</h3>
-            <p><strong>Теперь важно:</strong> Настрой правила базы данных для работы приложения:</p>
-            <ol>
-                <li>Перейди в <a href="https://console.firebase.google.com/u/0/project/rentmywaifu-c200a/database/rentmywaifu-c200a-default-rtdb/rules" target="_blank">Realtime Database → Rules</a></li>
+            <p><strong>Важно:</strong> Настрой правила базы данных для работы приложения:</p>
+            <ol style="margin-left: 20px; line-height: 1.8;">
+                <li>Перейди в <a href="https://console.firebase.google.com/u/0/project/rentmywaifu-c200a/database/rentmywaifu-c200a-default-rtdb/rules" target="_blank" style="color: #ff1493; font-weight: 600;">Realtime Database → Rules</a></li>
                 <li>Замени правила на:
                     <pre style="background: #ffe4e9; padding: 10px; border-radius: 8px; margin-top: 8px;">{
   "rules": {
@@ -379,7 +486,7 @@
                 </li>
                 <li>Нажми "Опубликовать"</li>
             </ol>
-            <p style="margin-top: 10px; color: #e74c3c;"><strong>⚠ Без этого приложение не сможет сохранять данные!</strong></p>
+            <p style="margin-top: 10px; color: #e74c3c;"><strong>⚠️ Без этого приложение не сможет сохранять данные!</strong></p>
         </div>
 
         <!-- Секция 1: Добавление заказа -->
@@ -416,27 +523,23 @@
             <div class="calculator">
                 <div class="form-group">
                     <label>Время 1</label>
-                    <input type="datetime-local" id="time1">
+                    <div class="time-input-group">
+                        <input type="number" id="hours1" placeholder="Часы" min="0">
+                        <span class="time-separator">:</span>
+                        <input type="number" id="minutes1" placeholder="Минуты" min="0" max="59">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>Время 2</label>
-                    <input type="datetime-local" id="time2">
-                </div>
-                <div class="form-group">
-                    <label>Дополнительные дни</label>
-                    <input type="number" id="addDays" placeholder="0" value="0">
-                </div>
-                <div class="form-group">
-                    <label>Дополнительные часы</label>
-                    <input type="number" id="addHours" placeholder="0" value="0">
-                </div>
-                <div class="form-group">
-                    <label>Дополнительные минуты</label>
-                    <input type="number" id="addMinutes" placeholder="0" value="0">
+                    <div class="time-input-group">
+                        <input type="number" id="hours2" placeholder="Часы" min="0">
+                        <span class="time-separator">:</span>
+                        <input type="number" id="minutes2" placeholder="Минуты" min="0" max="59">
+                    </div>
                 </div>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button onclick="calculateDifference()">⏱ Разница времени</button>
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button onclick="calculateDifference()">⏱️ Разница времени</button>
                 <button onclick="calculateSum()">➕ Сложить время</button>
             </div>
             <div class="calc-result" id="calcResult">Выберите операцию для расчета 💕</div>
@@ -463,7 +566,7 @@
     <div id="editOrderModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditOrderModal()">&times;</span>
-            <h2>✏ Редактировать Заказ</h2>
+            <h2>✏️ Редактировать Заказ</h2>
             <input type="hidden" id="editOrderId">
             <div class="form-group">
                 <label>Имя аккаунта *</label>
@@ -493,7 +596,7 @@
     <div id="editStatusModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditStatusModal()">&times;</span>
-            <h2>✏ Редактировать Статус</h2>
+            <h2>✏️ Редактировать Статус</h2>
             <input type="hidden" id="editStatusId">
             <div class="form-group">
                 <label>Имя покупателя</label>
@@ -552,7 +655,7 @@
                     const data = snapshot.val();
                     orders = data ? Object.values(data) : [];
                     renderOrders();
-                    console.log('Данные загружены из Firebase');
+                    console.log('Данные загружены из Firebase:', orders.length, 'заказов');
                 });
 
                 // Загрузка статусов из Firebase
@@ -560,7 +663,7 @@
                     const data = snapshot.val();
                     statuses = data ? Object.values(data) : [];
                     renderStatuses();
-                    console.log('Статусы загружены из Firebase');
+                    console.log('Статусы загружены из Firebase:', statuses.length);
                 });
             } else {
                 // Загрузка из localStorage
@@ -603,4 +706,302 @@
             const orderNumber = document.getElementById('orderNumber').value;
             const customerName = document.getElementById('customerName').value;
             const orderTime = document.getElementById('orderTime').value;
-            const orderEndTime = document.getElementById('orderEndTime').value
+            const orderEndTime = document.getElementById('orderEndTime').value;
+
+            if (!accountName || !orderNumber) {
+                alert('Пожалуйста, заполните обязательные поля: Имя аккаунта и Номер заказа!');
+                return;
+            }
+
+            const order = {
+                id: Date.now(),
+                accountName,
+                orderNumber,
+                customerName: customerName || '-',
+                orderTime: orderTime || '-',
+                orderEndTime: orderEndTime || '-'
+            };
+
+            orders.push(order);
+            saveOrders();
+            
+            if (!isFirebaseEnabled) {
+                renderOrders();
+            }
+
+            // Очистка формы
+            document.getElementById('accountName').value = '';
+            document.getElementById('orderNumber').value = '';
+            document.getElementById('customerName').value = '';
+            document.getElementById('orderTime').value = '';
+            document.getElementById('orderEndTime').value = '';
+        }
+
+        // Отображение заказов
+        function renderOrders() {
+            const ordersList = document.getElementById('ordersList');
+            if (orders.length === 0) {
+                ordersList.innerHTML = '';
+                return;
+            }
+
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-item">
+                    <h3>🛍️ Заказ #${order.orderNumber}</h3>
+                    <p><strong>Аккаунт:</strong> ${order.accountName}</p>
+                    ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
+                    ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
+                    ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
+                    <div class="button-group">
+                        <button class="edit-btn" onclick="openEditOrderModal(${order.id})">✏️ Редактировать</button>
+                        <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Открыть модальное окно редактирования заказа
+        function openEditOrderModal(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+
+            document.getElementById('editOrderId').value = order.id;
+            document.getElementById('editAccountName').value = order.accountName;
+            document.getElementById('editOrderNumber').value = order.orderNumber;
+            document.getElementById('editCustomerName').value = order.customerName === '-' ? '' : order.customerName;
+            document.getElementById('editOrderTime').value = order.orderTime === '-' ? '' : order.orderTime;
+            document.getElementById('editOrderEndTime').value = order.orderEndTime === '-' ? '' : order.orderEndTime;
+
+            document.getElementById('editOrderModal').style.display = 'block';
+        }
+
+        // Закрыть модальное окно редактирования заказа
+        function closeEditOrderModal() {
+            document.getElementById('editOrderModal').style.display = 'none';
+        }
+
+        // Обновить заказ
+        function updateOrder() {
+            const id = parseInt(document.getElementById('editOrderId').value);
+            const accountName = document.getElementById('editAccountName').value;
+            const orderNumber = document.getElementById('editOrderNumber').value;
+            const customerName = document.getElementById('editCustomerName').value;
+            const orderTime = document.getElementById('editOrderTime').value;
+            const orderEndTime = document.getElementById('editOrderEndTime').value;
+
+            if (!accountName || !orderNumber) {
+                alert('Пожалуйста, заполните обязательные поля: Имя аккаунта и Номер заказа!');
+                return;
+            }
+
+            const orderIndex = orders.findIndex(o => o.id === id);
+            if (orderIndex !== -1) {
+                orders[orderIndex] = {
+                    id,
+                    accountName,
+                    orderNumber,
+                    customerName: customerName || '-',
+                    orderTime: orderTime || '-',
+                    orderEndTime: orderEndTime || '-'
+                };
+
+                saveOrders();
+                
+                if (!isFirebaseEnabled) {
+                    renderOrders();
+                }
+
+                closeEditOrderModal();
+            }
+        }
+
+        // Удаление заказа
+        function deleteOrder(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот заказ?')) return;
+
+            orders = orders.filter(order => order.id !== id);
+            saveOrders();
+            
+            if (!isFirebaseEnabled) {
+                renderOrders();
+            }
+        }
+
+        // Калькулятор времени - разница
+        function calculateDifference() {
+            const hours1 = parseInt(document.getElementById('hours1').value) || 0;
+            const minutes1 = parseInt(document.getElementById('minutes1').value) || 0;
+            const hours2 = parseInt(document.getElementById('hours2').value) || 0;
+            const minutes2 = parseInt(document.getElementById('minutes2').value) || 0;
+
+            const totalMinutes1 = hours1 * 60 + minutes1;
+            const totalMinutes2 = hours2 * 60 + minutes2;
+            const diff = Math.abs(totalMinutes2 - totalMinutes1);
+
+            const resultHours = Math.floor(diff / 60);
+            const resultMinutes = diff % 60;
+
+            document.getElementById('calcResult').textContent = `⏱️ Разница: ${resultHours} ч. ${resultMinutes} мин. 💕`;
+        }
+
+        // Калькулятор времени - сложение
+        function calculateSum() {
+            const hours1 = parseInt(document.getElementById('hours1').value) || 0;
+            const minutes1 = parseInt(document.getElementById('minutes1').value) || 0;
+            const hours2 = parseInt(document.getElementById('hours2').value) || 0;
+            const minutes2 = parseInt(document.getElementById('minutes2').value) || 0;
+
+            const totalMinutes = (hours1 * 60 + minutes1) + (hours2 * 60 + minutes2);
+            const resultHours = Math.floor(totalMinutes / 60);
+            const resultMinutes = totalMinutes % 60;
+
+            document.getElementById('calcResult').textContent = `✨ Результат: ${resultHours} ч. ${resultMinutes} мин. 💕`;
+        }
+
+        // Сохранение статуса
+        function saveStatus() {
+            const customerName = document.getElementById('statusCustomerName').value;
+            const statusMessage = document.getElementById('statusMessage').value;
+
+            if (!customerName || !statusMessage) {
+                alert('Пожалуйста, заполните оба поля!');
+                return;
+            }
+
+            const statusData = {
+                id: Date.now(),
+                customerName,
+                statusMessage,
+                timestamp: new Date().toISOString()
+            };
+
+            statuses.push(statusData);
+
+            if (isFirebaseEnabled) {
+                // Сохранение в Firebase
+                const statusesObj = {};
+                statuses.forEach(status => {
+                    statusesObj[status.id] = status;
+                });
+                database.ref('statuses').set(statusesObj);
+            } else {
+                // Сохранение в localStorage
+                localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                renderStatuses();
+            }
+
+            // Очистка формы
+            document.getElementById('statusCustomerName').value = '';
+            document.getElementById('statusMessage').value = '';
+        }
+
+        // Отображение статусов
+        function renderStatuses() {
+            const statusesList = document.getElementById('statusesList');
+            if (statuses.length === 0) {
+                statusesList.innerHTML = '';
+                return;
+            }
+
+            statusesList.innerHTML = statuses.map(status => `
+                <div class="status-item">
+                    <h3>💌 ${status.customerName}</h3>
+                    <p><strong>Статус:</strong> ${status.statusMessage}</p>
+                    <p><strong>Дата:</strong> ${new Date(status.timestamp).toLocaleString('ru-RU')}</p>
+                    <div class="button-group">
+                        <button class="edit-btn" onclick="openEditStatusModal(${status.id})">✏️ Редактировать</button>
+                        <button class="delete-btn" onclick="deleteStatus(${status.id})">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Открыть модальное окно редактирования статуса
+        function openEditStatusModal(id) {
+            const status = statuses.find(s => s.id === id);
+            if (!status) return;
+
+            document.getElementById('editStatusId').value = status.id;
+            document.getElementById('editStatusCustomerName').value = status.customerName;
+            document.getElementById('editStatusMessage').value = status.statusMessage;
+
+            document.getElementById('editStatusModal').style.display = 'block';
+        }
+
+        // Закрыть модальное окно редактирования статуса
+        function closeEditStatusModal() {
+            document.getElementById('editStatusModal').style.display = 'none';
+        }
+
+        // Обновить статус
+        function updateStatus() {
+            const id = parseInt(document.getElementById('editStatusId').value);
+            const customerName = document.getElementById('editStatusCustomerName').value;
+            const statusMessage = document.getElementById('editStatusMessage').value;
+
+            if (!customerName || !statusMessage) {
+                alert('Пожалуйста, заполните оба поля!');
+                return;
+            }
+
+            const statusIndex = statuses.findIndex(s => s.id === id);
+            if (statusIndex !== -1) {
+                statuses[statusIndex] = {
+                    id,
+                    customerName,
+                    statusMessage,
+                    timestamp: statuses[statusIndex].timestamp
+                };
+
+                if (isFirebaseEnabled) {
+                    const statusesObj = {};
+                    statuses.forEach(status => {
+                        statusesObj[status.id] = status;
+                    });
+                    database.ref('statuses').set(statusesObj);
+                } else {
+                    localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                    renderStatuses();
+                }
+
+                closeEditStatusModal();
+            }
+        }
+
+        // Удаление статуса
+        function deleteStatus(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот статус?')) return;
+
+            statuses = statuses.filter(status => status.id !== id);
+
+            if (isFirebaseEnabled) {
+                const statusesObj = {};
+                statuses.forEach(status => {
+                    statusesObj[status.id] = status;
+                });
+                database.ref('statuses').set(statusesObj);
+            } else {
+                localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                renderStatuses();
+            }
+        }
+
+        // Закрытие модальных окон при клике вне их
+        window.onclick = function(event) {
+            const orderModal = document.getElementById('editOrderModal');
+            const statusModal = document.getElementById('editStatusModal');
+            if (event.target == orderModal) {
+                closeEditOrderModal();
+            }
+            if (event.target == statusModal) {
+                closeEditStatusModal();
+            }
+        }
+
+        // Загрузка при старте страницы
+        window.addEventListener('load', function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>
