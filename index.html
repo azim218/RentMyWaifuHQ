@@ -33,6 +33,7 @@
             opacity: 0.15;
             animation: float 15s infinite ease-in-out;
             z-index: 0;
+            pointer-events: none;
         }
 
         body::before {
@@ -88,10 +89,10 @@
         }
 
         .container {
-            max-width: 100%;
+            max-width: 1400px;
             width: 100%;
-            margin: 0;
-            padding: 15px;
+            margin: 0 auto;
+            padding: 20px;
             position: relative;
             z-index: 1;
             box-sizing: border-box;
@@ -105,32 +106,33 @@
         .header {
             text-align: center;
             color: #fff;
-            margin-bottom: 25px;
-            padding: 20px 10px;
+            margin-bottom: 30px;
+            padding: 25px 20px;
             animation: fadeInDown 1s ease-in;
             text-shadow: 4px 4px 8px rgba(255, 105, 180, 0.4);
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
-            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .header-center {
-            flex: 1;
             text-align: center;
         }
 
         .logout-btn {
             background: linear-gradient(135deg, #ff6b9d 0%, #fec5e5 100%);
             color: white;
-            padding: 10px 25px;
+            padding: 12px 30px;
             border: none;
-            border-radius: 20px;
-            font-size: 0.95rem;
+            border-radius: 25px;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             font-family: 'Quicksand', sans-serif;
             box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .logout-btn:hover {
@@ -143,6 +145,7 @@
             font-weight: 600;
             font-size: 1.1rem;
             text-shadow: 2px 2px 4px rgba(255, 105, 180, 0.3);
+            white-space: nowrap;
         }
 
         .header h1 {
@@ -150,55 +153,20 @@
             font-size: 2.8rem;
             margin-bottom: 10px;
             letter-spacing: 2px;
-            position: relative;
-            display: inline-block;
-        }
-
-        .header h1::before,
-        .header h1::after {
-            content: '✨';
-            position: absolute;
-            font-size: 2rem;
-            animation: twinkle 2s infinite;
-        }
-
-        .header h1::before {
-            left: -50px;
-            animation-delay: 0s;
-        }
-
-        .header h1::after {
-            right: -50px;
-            animation-delay: 1s;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.3); }
         }
 
         .header p {
             font-size: 1.1rem;
             font-weight: 500;
-        }
-
-        .setup-notice {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 240, 245, 0.98) 100%);
-            border-radius: 30px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 15px 50px rgba(255, 105, 180, 0.3), 0 0 0 4px rgba(255, 182, 193, 0.3);
-            border: 4px solid transparent;
-            background-clip: padding-box;
-            position: relative;
+            margin-top: 5px;
         }
 
         .card {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 245, 250, 0.98) 100%);
             backdrop-filter: blur(15px);
-            border-radius: 25px;
-            padding: 25px;
-            margin-bottom: 20px;
+            border-radius: 30px;
+            padding: 35px;
+            margin-bottom: 30px;
             box-shadow: 0 20px 60px rgba(255, 105, 180, 0.3);
             animation: slideUp 0.8s ease-out;
             border: 5px solid rgba(255, 192, 203, 0.5);
@@ -215,6 +183,7 @@
             height: 300%;
             background: radial-gradient(circle, rgba(255,182,193,0.15) 0%, transparent 50%);
             animation: rotate 25s linear infinite;
+            pointer-events: none;
         }
 
         @keyframes rotate {
@@ -229,8 +198,8 @@
 
         .card h2 {
             color: #ff1493;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
+            margin-bottom: 30px;
+            font-size: 1.9rem;
             font-family: 'Pacifico', cursive;
             display: flex;
             align-items: center;
@@ -246,7 +215,7 @@
             display: block;
             color: #ff1493;
             font-weight: 700;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-size: 1.1rem;
             text-shadow: 1px 1px 2px rgba(255, 182, 193, 0.3);
         }
@@ -272,7 +241,7 @@
             outline: none;
             border-color: #ff1493;
             box-shadow: 0 0 0 5px rgba(255, 20, 147, 0.2), inset 0 2px 8px rgba(255, 105, 180, 0.15);
-            transform: translateY(-3px) scale(1.01);
+            transform: translateY(-2px);
         }
 
         button {
@@ -294,18 +263,18 @@
         }
 
         button:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(255, 105, 180, 0.6);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 35px rgba(255, 105, 180, 0.6);
             background-position: 100% 0;
             border-color: rgba(255, 255, 255, 0.8);
         }
 
         button:active {
-            transform: translateY(-2px) scale(1.02);
+            transform: translateY(-1px) scale(1.01);
         }
 
         .orders-list, #statusesList, #compensationsList {
-            margin-top: 30px;
+            margin-top: 40px;
         }
 
         .order-item, .status-item, .compensation-item {
@@ -324,11 +293,12 @@
         .order-item::before, .status-item::before, .compensation-item::before {
             content: '💖';
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             font-size: 3rem;
             opacity: 0.15;
             animation: pulse 2s infinite;
+            pointer-events: none;
         }
 
         @keyframes pulse {
@@ -337,7 +307,7 @@
         }
 
         .order-item h3, .status-item h3, .compensation-item h3 {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             font-size: 1.7rem;
             color: #ff1493;
             font-weight: 700;
@@ -345,32 +315,33 @@
         }
 
         .order-item p, .status-item p, .compensation-item p {
-            margin: 10px 0;
+            margin: 12px 0;
             font-weight: 600;
             font-size: 1.05rem;
+            line-height: 1.6;
         }
 
         .responsible-tag {
             display: inline-block;
             background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
             color: #8b3a62;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 20px;
             font-weight: 700;
             font-size: 0.95rem;
-            margin-top: 10px;
+            margin-top: 15px;
             box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
         }
 
         .order-item .button-group, .status-item .button-group, .compensation-item .button-group {
             display: flex;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 25px;
         }
 
         .order-item button, .status-item button, .compensation-item button {
             flex: 1;
-            padding: 12px 25px;
+            padding: 14px 25px;
             font-size: 1rem;
             width: auto;
         }
@@ -388,7 +359,7 @@
         .calculator {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 25px;
         }
 
         .time-input-group {
@@ -422,7 +393,7 @@
             font-family: 'Pacifico', cursive;
         }
 
-        .status-section textarea {
+        .status-section textarea, .compensation-section textarea {
             min-height: 140px;
             resize: vertical;
         }
@@ -442,7 +413,7 @@
 
         .modal-content {
             background: linear-gradient(135deg, #fff 0%, #ffe4e9 100%);
-            margin: 5% auto;
+            margin: 3% auto;
             padding: 45px;
             border: 5px solid #ffb6c1;
             border-radius: 40px;
@@ -462,6 +433,7 @@
             left: 20px;
             font-size: 2.5rem;
             opacity: 0.2;
+            pointer-events: none;
         }
 
         .modal h2 {
@@ -513,21 +485,30 @@
             }
         }
 
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            .card {
+                padding: 30px;
+            }
+        }
+
         @media (max-width: 768px) {
             .header {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 gap: 15px;
+                padding: 20px 15px;
+            }
+
+            .user-info, .logout-btn {
+                justify-self: center;
             }
 
             .header h1 {
-                font-size: 2rem;
-            }
-
-            .header h1::before,
-            .header h1::after {
-                font-size: 1.5rem;
-                left: -30px;
-                right: -30px;
+                font-size: 2.2rem;
             }
 
             .header p {
@@ -536,46 +517,128 @@
             
             .calculator {
                 grid-template-columns: 1fr;
+                gap: 20px;
             }
 
             .order-item .button-group, .status-item .button-group, .compensation-item .button-group {
                 flex-direction: column;
+                gap: 12px;
             }
 
             .card {
-                padding: 20px;
-                border-radius: 20px;
+                padding: 25px;
+                border-radius: 25px;
+                margin-bottom: 25px;
             }
 
             .card h2 {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
+                margin-bottom: 25px;
             }
 
             button {
-                padding: 14px 30px;
-                font-size: 1rem;
+                padding: 14px 35px;
+                font-size: 1.05rem;
             }
 
             .modal-content {
                 width: 95%;
-                padding: 30px 20px;
-                margin: 10% auto;
+                padding: 35px 25px;
+                margin: 5% auto;
             }
 
             .modal h2 {
-                font-size: 1.6rem;
+                font-size: 1.7rem;
             }
 
             input[type="text"],
             input[type="password"],
             input[type="number"],
             textarea {
-                padding: 14px 18px;
+                padding: 14px 20px;
                 font-size: 1rem;
             }
 
             label {
+                font-size: 1.05rem;
+            }
+
+            .order-item, .status-item, .compensation-item {
+                padding: 25px;
+            }
+
+            .order-item h3, .status-item h3, .compensation-item h3 {
+                font-size: 1.5rem;
+            }
+
+            .order-item p, .status-item p, .compensation-item p {
                 font-size: 1rem;
+            }
+
+            .calc-result {
+                font-size: 1.3rem;
+                padding: 25px;
+            }
+
+            .login-box {
+                padding: 40px 30px;
+            }
+
+            .login-box h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .card {
+                padding: 20px;
+                margin-bottom: 20px;
+                border-radius: 20px;
+            }
+
+            .card h2 {
+                font-size: 1.4rem;
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+
+            button {
+                padding: 13px 30px;
+                font-size: 1rem;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            input[type="text"],
+            input[type="password"],
+            input[type="number"],
+            textarea {
+                padding: 13px 18px;
+                font-size: 0.95rem;
+            }
+
+            label {
+                font-size: 1rem;
+                margin-bottom: 10px;
             }
 
             .order-item, .status-item, .compensation-item {
@@ -583,11 +646,22 @@
             }
 
             .order-item h3, .status-item h3, .compensation-item h3 {
-                font-size: 1.4rem;
+                font-size: 1.3rem;
+                margin-bottom: 15px;
             }
 
             .order-item p, .status-item p, .compensation-item p {
                 font-size: 0.95rem;
+                margin: 10px 0;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+                border-radius: 30px;
+            }
+
+            .close {
+                font-size: 35px;
             }
 
             .calc-result {
@@ -595,13 +669,9 @@
                 padding: 20px;
             }
 
-            .time-input-group input {
-                padding: 12px 15px;
-            }
-
-            .setup-notice {
-                padding: 20px;
-                font-size: 0.95rem;
+            .responsible-tag {
+                font-size: 0.9rem;
+                padding: 8px 16px;
             }
 
             .login-box {
@@ -613,82 +683,26 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.6rem;
-                letter-spacing: 1px;
-            }
-
-            .header h1::before,
-            .header h1::after {
-                display: none;
-            }
-
-            .header p {
-                font-size: 0.9rem;
-            }
-
-            .card {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-
-            .card h2 {
-                font-size: 1.3rem;
-                gap: 8px;
-            }
-
-            button {
-                padding: 12px 25px;
-                font-size: 0.95rem;
-            }
-
-            .form-group {
-                margin-bottom: 18px;
-            }
-
-            input[type="text"],
-            input[type="password"],
-            input[type="number"],
-            textarea {
-                padding: 12px 16px;
-                font-size: 0.95rem;
-            }
-
-            .order-item, .status-item, .compensation-item {
-                padding: 18px;
-            }
-
-            .order-item h3, .status-item h3, .compensation-item h3 {
-                font-size: 1.2rem;
-            }
-
-            .modal-content {
-                padding: 25px 15px;
-                border-radius: 25px;
-            }
-
-            .close {
-                font-size: 35px;
-            }
-        }
-
         @media (max-width: 360px) {
             .container {
                 padding: 10px;
             }
 
             .header h1 {
-                font-size: 1.4rem;
+                font-size: 1.6rem;
+            }
+
+            .card {
+                padding: 18px;
             }
 
             .card h2 {
-                font-size: 1.2rem;
+                font-size: 1.3rem;
             }
 
             button {
-                padding: 10px 20px;
-                font-size: 0.9rem;
+                padding: 12px 25px;
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -770,9 +784,9 @@
                     </div>
                 </div>
             </div>
-            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                <button onclick="calculateDifference()">⏱️ Разница времени</button>
-                <button onclick="calculateSum()">➕ Сложить время</button>
+            <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+                <button onclick="calculateDifference()" style="flex: 1; min-width: 200px;">⏱️ Разница времени</button>
+                <button onclick="calculateSum()" style="flex: 1; min-width: 200px;">➕ Сложить время</button>
             </div>
             <div class="calc-result" id="calcResult">Выберите операцию для расчета 💕</div>
         </div>
@@ -781,11 +795,11 @@
         <div class="card status-section">
             <h2>📨 Статус Покупателя</h2>
             <div class="form-group">
-                <label>Имя покупателя</label>
+                <label>Имя покупателя *</label>
                 <input type="text" id="statusCustomerName" placeholder="Введите имя покупателя">
             </div>
             <div class="form-group">
-                <label>Статус покупателя</label>
+                <label>Статус покупателя *</label>
                 <textarea id="statusMessage" placeholder="Напишите статус..."></textarea>
             </div>
             <button onclick="saveStatus()">💌 Сохранить статус</button>
@@ -794,7 +808,7 @@
         </div>
 
         <!-- Секция 4: Компенсации -->
-        <div class="card">
+        <div class="card compensation-section">
             <h2>💰 Компенсации</h2>
             <div class="form-group">
                 <label>Номер заказа *</label>
@@ -802,596 +816,7 @@
             </div>
             <div class="form-group">
                 <label>Примечание *</label>
-                <textarea id="editCompensationNote"></textarea>
-            </div>
-            <button onclick="updateCompensation()">💾 Сохранить изменения</button>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-    <script>
-        // Firebase конфигурация
-        const firebaseConfig = {
-            apiKey: "AIzaSyAfyX2uuTG77bQCFhWDtU5ZVOQI2l4Nfa4",
-            authDomain: "rentmywaifu-c200a.firebaseapp.com",
-            databaseURL: "https://rentmywaifu-c200a-default-rtdb.firebaseio.com",
-            projectId: "rentmywaifu-c200a",
-            storageBucket: "rentmywaifu-c200a.firebasestorage.app",
-            messagingSenderId: "935453652895",
-            appId: "1:935453652895:web:99283b78c06cd39da52faa",
-            measurementId: "G-YX501SS5KG"
-        };
-
-        // Пользователи
-        const users = {
-            'Azim218': 'Emil210407!',
-            'Tiger': '123'
-        };
-
-        // Инициализация Firebase
-        let database = null;
-        let ordersRef = null;
-        let isFirebaseEnabled = false;
-
-        try {
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            ordersRef = database.ref('orders');
-            isFirebaseEnabled = true;
-            console.log('✅ Firebase подключен успешно!');
-        } catch (error) {
-            console.error('Ошибка инициализации Firebase:', error);
-        }
-
-        // Глобальные переменные
-        let currentUser = null;
-        let orders = [];
-        let statuses = [];
-        let compensations = [];
-
-        // Проверка авторизации при загрузке
-        window.addEventListener('load', function() {
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = savedUser;
-                showMainApp();
-                loadData();
-            }
-        });
-
-        // Вход
-        function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-
-            if (!username || !password) {
-                alert('Пожалуйста, введите логин и пароль!');
-                return;
-            }
-
-            if (users[username] && users[username] === password) {
-                currentUser = username;
-                localStorage.setItem('currentUser', username);
-                showMainApp();
-                loadData();
-            } else {
-                alert('Неверный логин или пароль! 😢');
-            }
-        }
-
-        // Выход
-        function logout() {
-            currentUser = null;
-            localStorage.removeItem('currentUser');
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('mainApp').classList.remove('active');
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-        }
-
-        // Показать основное приложение
-        function showMainApp() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainApp').classList.add('active');
-            document.getElementById('userInfo').textContent = '👤 ' + currentUser;
-        }
-
-        // Загрузка данных
-        function loadData() {
-            if (isFirebaseEnabled) {
-                // Загрузка заказов
-                ordersRef.on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    orders = data ? Object.values(data) : [];
-                    renderOrders();
-                });
-
-                // Загрузка статусов
-                database.ref('statuses').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    statuses = data ? Object.values(data) : [];
-                    renderStatuses();
-                });
-
-                // Загрузка компенсаций
-                database.ref('compensations').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    compensations = data ? Object.values(data) : [];
-                    renderCompensations();
-                });
-            } else {
-                try {
-                    const savedOrders = localStorage.getItem('orders-data');
-                    if (savedOrders) {
-                        orders = JSON.parse(savedOrders);
-                        renderOrders();
-                    }
-
-                    const savedStatuses = localStorage.getItem('statuses-data');
-                    if (savedStatuses) {
-                        statuses = JSON.parse(savedStatuses);
-                        renderStatuses();
-                    }
-
-                    const savedCompensations = localStorage.getItem('compensations-data');
-                    if (savedCompensations) {
-                        compensations = JSON.parse(savedCompensations);
-                        renderCompensations();
-                    }
-                } catch (error) {
-                    console.error('Ошибка загрузки данных:', error);
-                }
-            }
-        }
-
-        // Сохранение заказов
-        function saveOrders() {
-            if (isFirebaseEnabled) {
-                const ordersObj = {};
-                orders.forEach(order => {
-                    ordersObj[order.id] = order;
-                });
-                ordersRef.set(ordersObj);
-            } else {
-                localStorage.setItem('orders-data', JSON.stringify(orders));
-            }
-        }
-
-        // Добавление заказа
-        function addOrder() {
-            const accountName = document.getElementById('accountName').value;
-            const orderNumber = document.getElementById('orderNumber').value;
-            const customerName = document.getElementById('customerName').value;
-            const orderTime = document.getElementById('orderTime').value;
-            const orderEndTime = document.getElementById('orderEndTime').value;
-
-            if (!accountName || !orderNumber) {
-                alert('Пожалуйста, заполните обязательные поля: Имя аккаунта и Номер заказа!');
-                return;
-            }
-
-            const order = {
-                id: Date.now(),
-                accountName,
-                orderNumber,
-                customerName: customerName || '-',
-                orderTime: orderTime || '-',
-                orderEndTime: orderEndTime || '-',
-                responsible: currentUser,
-                createdAt: new Date().toISOString()
-            };
-
-            orders.push(order);
-            saveOrders();
-            
-            if (!isFirebaseEnabled) {
-                renderOrders();
-            }
-
-            // Очистка формы
-            document.getElementById('accountName').value = '';
-            document.getElementById('orderNumber').value = '';
-            document.getElementById('customerName').value = '';
-            document.getElementById('orderTime').value = '';
-            document.getElementById('orderEndTime').value = '';
-        }
-
-        // Отображение заказов
-        function renderOrders() {
-            const ordersList = document.getElementById('ordersList');
-            if (orders.length === 0) {
-                ordersList.innerHTML = '';
-                return;
-            }
-
-            ordersList.innerHTML = orders.map(order => `
-                <div class="order-item">
-                    <h3>🛍️ Заказ #${order.orderNumber}</h3>
-                    <p><strong>Аккаунт:</strong> ${order.accountName}</p>
-                    ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
-                    ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
-                    ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
-                    <div class="responsible-tag">👤 Ответственный: ${order.responsible}</div>
-                    <div class="button-group">
-                        <button class="edit-btn" onclick="openEditOrderModal(${order.id})">✏️ Редактировать</button>
-                        <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️ Удалить</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Открыть модальное окно редактирования заказа
-        function openEditOrderModal(id) {
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
-
-            document.getElementById('editOrderId').value = order.id;
-            document.getElementById('editAccountName').value = order.accountName;
-            document.getElementById('editOrderNumber').value = order.orderNumber;
-            document.getElementById('editCustomerName').value = order.customerName === '-' ? '' : order.customerName;
-            document.getElementById('editOrderTime').value = order.orderTime === '-' ? '' : order.orderTime;
-            document.getElementById('editOrderEndTime').value = order.orderEndTime === '-' ? '' : order.orderEndTime;
-
-            document.getElementById('editOrderModal').style.display = 'block';
-        }
-
-        // Закрыть модальное окно редактирования заказа
-        function closeEditOrderModal() {
-            document.getElementById('editOrderModal').style.display = 'none';
-        }
-
-        // Обновить заказ
-        function updateOrder() {
-            const id = parseInt(document.getElementById('editOrderId').value);
-            const accountName = document.getElementById('editAccountName').value;
-            const orderNumber = document.getElementById('editOrderNumber').value;
-            const customerName = document.getElementById('editCustomerName').value;
-            const orderTime = document.getElementById('editOrderTime').value;
-            const orderEndTime = document.getElementById('editOrderEndTime').value;
-
-            if (!accountName || !orderNumber) {
-                alert('Пожалуйста, заполните обязательные поля!');
-                return;
-            }
-
-            const orderIndex = orders.findIndex(o => o.id === id);
-            if (orderIndex !== -1) {
-                orders[orderIndex] = {
-                    ...orders[orderIndex],
-                    accountName,
-                    orderNumber,
-                    customerName: customerName || '-',
-                    orderTime: orderTime || '-',
-                    orderEndTime: orderEndTime || '-'
-                };
-
-                saveOrders();
-                
-                if (!isFirebaseEnabled) {
-                    renderOrders();
-                }
-
-                closeEditOrderModal();
-            }
-        }
-
-        // Удаление заказа
-        function deleteOrder(id) {
-            if (!confirm('Вы уверены, что хотите удалить этот заказ?')) return;
-
-            orders = orders.filter(order => order.id !== id);
-            saveOrders();
-            
-            if (!isFirebaseEnabled) {
-                renderOrders();
-            }
-        }
-
-        // Калькулятор времени - разница
-        function calculateDifference() {
-            const hours1 = parseInt(document.getElementById('hours1').value) || 0;
-            const minutes1 = parseInt(document.getElementById('minutes1').value) || 0;
-            const hours2 = parseInt(document.getElementById('hours2').value) || 0;
-            const minutes2 = parseInt(document.getElementById('minutes2').value) || 0;
-
-            const totalMinutes1 = hours1 * 60 + minutes1;
-            const totalMinutes2 = hours2 * 60 + minutes2;
-            const diff = Math.abs(totalMinutes2 - totalMinutes1);
-
-            const resultHours = Math.floor(diff / 60);
-            const resultMinutes = diff % 60;
-
-            document.getElementById('calcResult').textContent = `⏱️ Разница: ${resultHours} ч. ${resultMinutes} мин. 💕`;
-        }
-
-        // Калькулятор времени - сложение
-        function calculateSum() {
-            const hours1 = parseInt(document.getElementById('hours1').value) || 0;
-            const minutes1 = parseInt(document.getElementById('minutes1').value) || 0;
-            const hours2 = parseInt(document.getElementById('hours2').value) || 0;
-            const minutes2 = parseInt(document.getElementById('minutes2').value) || 0;
-
-            const totalMinutes = (hours1 * 60 + minutes1) + (hours2 * 60 + minutes2);
-            const resultHours = Math.floor(totalMinutes / 60);
-            const resultMinutes = totalMinutes % 60;
-
-            document.getElementById('calcResult').textContent = `✨ Результат: ${resultHours} ч. ${resultMinutes} мин. 💕`;
-        }
-
-        // Сохранение статуса
-        function saveStatus() {
-            const customerName = document.getElementById('statusCustomerName').value;
-            const statusMessage = document.getElementById('statusMessage').value;
-
-            if (!customerName || !statusMessage) {
-                alert('Пожалуйста, заполните оба поля!');
-                return;
-            }
-
-            const statusData = {
-                id: Date.now(),
-                customerName,
-                statusMessage,
-                responsible: currentUser,
-                timestamp: new Date().toISOString()
-            };
-
-            statuses.push(statusData);
-
-            if (isFirebaseEnabled) {
-                const statusesObj = {};
-                statuses.forEach(status => {
-                    statusesObj[status.id] = status;
-                });
-                database.ref('statuses').set(statusesObj);
-            } else {
-                localStorage.setItem('statuses-data', JSON.stringify(statuses));
-                renderStatuses();
-            }
-
-            document.getElementById('statusCustomerName').value = '';
-            document.getElementById('statusMessage').value = '';
-        }
-
-        // Отображение статусов
-        function renderStatuses() {
-            const statusesList = document.getElementById('statusesList');
-            if (statuses.length === 0) {
-                statusesList.innerHTML = '';
-                return;
-            }
-
-            statusesList.innerHTML = statuses.map(status => `
-                <div class="status-item">
-                    <h3>💌 ${status.customerName}</h3>
-                    <p><strong>Статус:</strong> ${status.statusMessage}</p>
-                    <p><strong>Дата:</strong> ${new Date(status.timestamp).toLocaleString('ru-RU')}</p>
-                    <div class="responsible-tag">👤 Ответственный: ${status.responsible}</div>
-                    <div class="button-group">
-                        <button class="edit-btn" onclick="openEditStatusModal(${status.id})">✏️ Редактировать</button>
-                        <button class="delete-btn" onclick="deleteStatus(${status.id})">🗑️ Удалить</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Открыть модальное окно редактирования статуса
-        function openEditStatusModal(id) {
-            const status = statuses.find(s => s.id === id);
-            if (!status) return;
-
-            document.getElementById('editStatusId').value = status.id;
-            document.getElementById('editStatusCustomerName').value = status.customerName;
-            document.getElementById('editStatusMessage').value = status.statusMessage;
-
-            document.getElementById('editStatusModal').style.display = 'block';
-        }
-
-        // Закрыть модальное окно редактирования статуса
-        function closeEditStatusModal() {
-            document.getElementById('editStatusModal').style.display = 'none';
-        }
-
-        // Обновить статус
-        function updateStatus() {
-            const id = parseInt(document.getElementById('editStatusId').value);
-            const customerName = document.getElementById('editStatusCustomerName').value;
-            const statusMessage = document.getElementById('editStatusMessage').value;
-
-            if (!customerName || !statusMessage) {
-                alert('Пожалуйста, заполните оба поля!');
-                return;
-            }
-
-            const statusIndex = statuses.findIndex(s => s.id === id);
-            if (statusIndex !== -1) {
-                statuses[statusIndex] = {
-                    ...statuses[statusIndex],
-                    customerName,
-                    statusMessage
-                };
-
-                if (isFirebaseEnabled) {
-                    const statusesObj = {};
-                    statuses.forEach(status => {
-                        statusesObj[status.id] = status;
-                    });
-                    database.ref('statuses').set(statusesObj);
-                } else {
-                    localStorage.setItem('statuses-data', JSON.stringify(statuses));
-                    renderStatuses();
-                }
-
-                closeEditStatusModal();
-            }
-        }
-
-        // Удаление статуса
-        function deleteStatus(id) {
-            if (!confirm('Вы уверены, что хотите удалить этот статус?')) return;
-
-            statuses = statuses.filter(status => status.id !== id);
-
-            if (isFirebaseEnabled) {
-                const statusesObj = {};
-                statuses.forEach(status => {
-                    statusesObj[status.id] = status;
-                });
-                database.ref('statuses').set(statusesObj);
-            } else {
-                localStorage.setItem('statuses-data', JSON.stringify(statuses));
-                renderStatuses();
-            }
-        }
-
-        // Добавление компенсации
-        function addCompensation() {
-            const orderNumber = document.getElementById('compensationOrderNumber').value;
-            const note = document.getElementById('compensationNote').value;
-
-            if (!orderNumber || !note) {
-                alert('Пожалуйста, заполните все обязательные поля!');
-                return;
-            }
-
-            const compensation = {
-                id: Date.now(),
-                orderNumber,
-                note,
-                responsible: currentUser,
-                createdAt: new Date().toISOString()
-            };
-
-            compensations.push(compensation);
-
-            if (isFirebaseEnabled) {
-                const compensationsObj = {};
-                compensations.forEach(comp => {
-                    compensationsObj[comp.id] = comp;
-                });
-                database.ref('compensations').set(compensationsObj);
-            } else {
-                localStorage.setItem('compensations-data', JSON.stringify(compensations));
-                renderCompensations();
-            }
-
-            document.getElementById('compensationOrderNumber').value = '';
-            document.getElementById('compensationNote').value = '';
-        }
-
-        // Отображение компенсаций
-        function renderCompensations() {
-            const compensationsList = document.getElementById('compensationsList');
-            if (compensations.length === 0) {
-                compensationsList.innerHTML = '';
-                return;
-            }
-
-            compensationsList.innerHTML = compensations.map(comp => `
-                <div class="compensation-item">
-                    <h3>💰 Заказ #${comp.orderNumber}</h3>
-                    <p><strong>Примечание:</strong> ${comp.note}</p>
-                    <p><strong>Дата:</strong> ${new Date(comp.createdAt).toLocaleString('ru-RU')}</p>
-                    <div class="responsible-tag">👤 Ответственный: ${comp.responsible}</div>
-                    <div class="button-group">
-                        <button class="edit-btn" onclick="openEditCompensationModal(${comp.id})">✏️ Редактировать</button>
-                        <button class="delete-btn" onclick="deleteCompensation(${comp.id})">🗑️ Удалить</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Открыть модальное окно редактирования компенсации
-        function openEditCompensationModal(id) {
-            const compensation = compensations.find(c => c.id === id);
-            if (!compensation) return;
-
-            document.getElementById('editCompensationId').value = compensation.id;
-            document.getElementById('editCompensationOrderNumber').value = compensation.orderNumber;
-            document.getElementById('editCompensationNote').value = compensation.note;
-
-            document.getElementById('editCompensationModal').style.display = 'block';
-        }
-
-        // Закрыть модальное окно редактирования компенсации
-        function closeEditCompensationModal() {
-            document.getElementById('editCompensationModal').style.display = 'none';
-        }
-
-        // Обновить компенсацию
-        function updateCompensation() {
-            const id = parseInt(document.getElementById('editCompensationId').value);
-            const orderNumber = document.getElementById('editCompensationOrderNumber').value;
-            const note = document.getElementById('editCompensationNote').value;
-
-            if (!orderNumber || !note) {
-                alert('Пожалуйста, заполните все поля!');
-                return;
-            }
-
-            const compIndex = compensations.findIndex(c => c.id === id);
-            if (compIndex !== -1) {
-                compensations[compIndex] = {
-                    ...compensations[compIndex],
-                    orderNumber,
-                    note
-                };
-
-                if (isFirebaseEnabled) {
-                    const compensationsObj = {};
-                    compensations.forEach(comp => {
-                        compensationsObj[comp.id] = comp;
-                    });
-                    database.ref('compensations').set(compensationsObj);
-                } else {
-                    localStorage.setItem('compensations-data', JSON.stringify(compensations));
-                    renderCompensations();
-                }
-
-                closeEditCompensationModal();
-            }
-        }
-
-        // Удаление компенсации
-        function deleteCompensation(id) {
-            if (!confirm('Вы уверены, что хотите удалить эту компенсацию?')) return;
-
-            compensations = compensations.filter(comp => comp.id !== id);
-
-            if (isFirebaseEnabled) {
-                const compensationsObj = {};
-                compensations.forEach(comp => {
-                    compensationsObj[comp.id] = comp;
-                });
-                database.ref('compensations').set(compensationsObj);
-            } else {
-                localStorage.setItem('compensations-data', JSON.stringify(compensations));
-                renderCompensations();
-            }
-        }
-
-        // Закрытие модальных окон при клике вне их
-        window.onclick = function(event) {
-            const orderModal = document.getElementById('editOrderModal');
-            const statusModal = document.getElementById('editStatusModal');
-            const compensationModal = document.getElementById('editCompensationModal');
-            
-            if (event.target == orderModal) {
-                closeEditOrderModal();
-            }
-            if (event.target == statusModal) {
-                closeEditStatusModal();
-            }
-            if (event.target == compensationModal) {
-                closeEditCompensationModal();
-            }
-        }
-    </script>
-</body>
-</html><textarea id="compensationNote" placeholder="Опишите причину компенсации..."></textarea>
+                <textarea id="compensationNote" placeholder="Опишите причину компенсации..."></textarea>
             </div>
             <button onclick="addCompensation()">💸 Добавить компенсацию</button>
 
@@ -1436,11 +861,11 @@
             <h2>✏️ Редактировать Статус</h2>
             <input type="hidden" id="editStatusId">
             <div class="form-group">
-                <label>Имя покупателя</label>
+                <label>Имя покупателя *</label>
                 <input type="text" id="editStatusCustomerName">
             </div>
             <div class="form-group">
-                <label>Статус покупателя</label>
+                <label>Статус покупателя *</label>
                 <textarea id="editStatusMessage"></textarea>
             </div>
             <button onclick="updateStatus()">💾 Сохранить изменения</button>
@@ -1459,3 +884,558 @@
             </div>
             <div class="form-group">
                 <label>Примечание *</label>
+                <textarea id="editCompensationNote"></textarea>
+            </div>
+            <button onclick="updateCompensation()">💾 Сохранить изменения</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfyX2uuTG77bQCFhWDtU5ZVOQI2l4Nfa4",
+            authDomain: "rentmywaifu-c200a.firebaseapp.com",
+            databaseURL: "https://rentmywaifu-c200a-default-rtdb.firebaseio.com",
+            projectId: "rentmywaifu-c200a",
+            storageBucket: "rentmywaifu-c200a.firebasestorage.app",
+            messagingSenderId: "935453652895",
+            appId: "1:935453652895:web:99283b78c06cd39da52faa",
+            measurementId: "G-YX501SS5KG"
+        };
+
+        const users = {
+            'Azim218': 'Emil210407!',
+            'Tiger': '123'
+        };
+
+        let database = null;
+        let ordersRef = null;
+        let isFirebaseEnabled = false;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            ordersRef = database.ref('orders');
+            isFirebaseEnabled = true;
+            console.log('✅ Firebase подключен успешно!');
+        } catch (error) {
+            console.error('Ошибка инициализации Firebase:', error);
+        }
+
+        let currentUser = null;
+        let orders = [];
+        let statuses = [];
+        let compensations = [];
+
+        window.addEventListener('load', function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = savedUser;
+                showMainApp();
+                loadData();
+            }
+        });
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('Пожалуйста, введите логин и пароль!');
+                return;
+            }
+
+            if (users[username] && users[username] === password) {
+                currentUser = username;
+                localStorage.setItem('currentUser', username);
+                showMainApp();
+                loadData();
+            } else {
+                alert('Неверный логин или пароль! 😢');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').classList.remove('active');
+            document.getElementById('loginUsername').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        function showMainApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainApp').classList.add('active');
+            document.getElementById('userInfo').textContent = '👤 ' + currentUser;
+        }
+
+        function loadData() {
+            if (isFirebaseEnabled) {
+                ordersRef.on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    orders = data ? Object.values(data) : [];
+                    renderOrders();
+                });
+
+                database.ref('statuses').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    statuses = data ? Object.values(data) : [];
+                    renderStatuses();
+                });
+
+                database.ref('compensations').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    compensations = data ? Object.values(data) : [];
+                    renderCompensations();
+                });
+            } else {
+                try {
+                    const savedOrders = localStorage.getItem('orders-data');
+                    if (savedOrders) {
+                        orders = JSON.parse(savedOrders);
+                        renderOrders();
+                    }
+
+                    const savedStatuses = localStorage.getItem('statuses-data');
+                    if (savedStatuses) {
+                        statuses = JSON.parse(savedStatuses);
+                        renderStatuses();
+                    }
+
+                    const savedCompensations = localStorage.getItem('compensations-data');
+                    if (savedCompensations) {
+                        compensations = JSON.parse(savedCompensations);
+                        renderCompensations();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки данных:', error);
+                }
+            }
+        }
+
+        function saveOrders() {
+            if (isFirebaseEnabled) {
+                const ordersObj = {};
+                orders.forEach(order => {
+                    ordersObj[order.id] = order;
+                });
+                ordersRef.set(ordersObj);
+            } else {
+                localStorage.setItem('orders-data', JSON.stringify(orders));
+            }
+        }
+
+        function addOrder() {
+            const accountName = document.getElementById('accountName').value;
+            const orderNumber = document.getElementById('orderNumber').value;
+            const customerName = document.getElementById('customerName').value;
+            const orderTime = document.getElementById('orderTime').value;
+            const orderEndTime = document.getElementById('orderEndTime').value;
+
+            if (!accountName || !orderNumber) {
+                alert('Пожалуйста, заполните обязательные поля: Имя аккаунта и Номер заказа!');
+                return;
+            }
+
+            const order = {
+                id: Date.now(),
+                accountName,
+                orderNumber,
+                customerName: customerName || '-',
+                orderTime: orderTime || '-',
+                orderEndTime: orderEndTime || '-',
+                responsible: currentUser,
+                createdAt: new Date().toISOString()
+            };
+
+            orders.push(order);
+            saveOrders();
+            
+            if (!isFirebaseEnabled) {
+                renderOrders();
+            }
+
+            document.getElementById('accountName').value = '';
+            document.getElementById('orderNumber').value = '';
+            document.getElementById('customerName').value = '';
+            document.getElementById('orderTime').value = '';
+            document.getElementById('orderEndTime').value = '';
+        }
+
+        function renderOrders() {
+            const ordersList = document.getElementById('ordersList');
+            if (orders.length === 0) {
+                ordersList.innerHTML = '';
+                return;
+            }
+
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-item">
+                    <h3>🛍️ Заказ #${order.orderNumber}</h3>
+                    <p><strong>Аккаунт:</strong> ${order.accountName}</p>
+                    ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
+                    ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
+                    ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
+                    <div class="responsible-tag">👤 Ответственный: ${order.responsible}</div>
+                    <div class="button-group">
+                        <button class="edit-btn" onclick="openEditOrderModal(${order.id})">✏️ Редактировать</button>
+                        <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openEditOrderModal(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+
+            document.getElementById('editOrderId').value = order.id;
+            document.getElementById('editAccountName').value = order.accountName;
+            document.getElementById('editOrderNumber').value = order.orderNumber;
+            document.getElementById('editCustomerName').value = order.customerName === '-' ? '' : order.customerName;
+            document.getElementById('editOrderTime').value = order.orderTime === '-' ? '' : order.orderTime;
+            document.getElementById('editOrderEndTime').value = order.orderEndTime === '-' ? '' : order.orderEndTime;
+
+            document.getElementById('editOrderModal').style.display = 'block';
+        }
+
+        function closeEditOrderModal() {
+            document.getElementById('editOrderModal').style.display = 'none';
+        }
+
+        function updateOrder() {
+            const id = parseInt(document.getElementById('editOrderId').value);
+            const accountName = document.getElementById('editAccountName').value;
+            const orderNumber = document.getElementById('editOrderNumber').value;
+            const customerName = document.getElementById('editCustomerName').value;
+            const orderTime = document.getElementById('editOrderTime').value;
+            const orderEndTime = document.getElementById('editOrderEndTime').value;
+
+            if (!accountName || !orderNumber) {
+                alert('Пожалуйста, заполните обязательные поля!');
+                return;
+            }
+
+            const orderIndex = orders.findIndex(o => o.id === id);
+            if (orderIndex !== -1) {
+                orders[orderIndex] = {
+                    ...orders[orderIndex],
+                    accountName,
+                    orderNumber,
+                    customerName: customerName || '-',
+                    orderTime: orderTime || '-',
+                    orderEndTime: orderEndTime || '-'
+                };
+
+                saveOrders();
+                
+                if (!isFirebaseEnabled) {
+                    renderOrders();
+                }
+
+                closeEditOrderModal();
+            }
+        }
+
+        function deleteOrder(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот заказ?')) return;
+
+            orders = orders.filter(order => order.id !== id);
+            saveOrders();
+            
+            if (!isFirebaseEnabled) {
+                renderOrders();
+            }
+        }
+
+        function calculateDifference() {
+            const hours1 = parseInt(document.getElementById('hours1').value) || 0;
+            const minutes1 = parseInt(document.getElementById('minutes1').value) || 0;
+            const hours2 = parseInt(document.getElementById('hours2').value) || 0;
+            const minutes2 = parseInt(document.getElementById('minutes2').value) || 0;
+
+            const totalMinutes1 = hours1 * 60 + minutes1;
+            const totalMinutes2 = hours2 * 60 + minutes2;
+            const diff = Math.abs(totalMinutes2 - totalMinutes1);
+
+            const resultHours = Math.floor(diff / 60);
+            const resultMinutes = diff % 60;
+
+            document.getElementById('calcResult').textContent = `⏱️ Разница: ${resultHours} ч. ${resultMinutes} мин. 💕`;
+        }
+
+        function calculateSum() {
+            const hours1 = parseInt(document.getElementById('hours1').value) || 0;
+            const minutes1 = parseInt(document.getElementById('minutes1').value) || 0;
+            const hours2 = parseInt(document.getElementById('hours2').value) || 0;
+            const minutes2 = parseInt(document.getElementById('minutes2').value) || 0;
+
+            const totalMinutes = (hours1 * 60 + minutes1) + (hours2 * 60 + minutes2);
+            const resultHours = Math.floor(totalMinutes / 60);
+            const resultMinutes = totalMinutes % 60;
+
+            document.getElementById('calcResult').textContent = `✨ Результат: ${resultHours} ч. ${resultMinutes} мин. 💕`;
+        }
+
+        function saveStatus() {
+            const customerName = document.getElementById('statusCustomerName').value;
+            const statusMessage = document.getElementById('statusMessage').value;
+
+            if (!customerName || !statusMessage) {
+                alert('Пожалуйста, заполните оба поля!');
+                return;
+            }
+
+            const statusData = {
+                id: Date.now(),
+                customerName,
+                statusMessage,
+                responsible: currentUser,
+                timestamp: new Date().toISOString()
+            };
+
+            statuses.push(statusData);
+
+            if (isFirebaseEnabled) {
+                const statusesObj = {};
+                statuses.forEach(status => {
+                    statusesObj[status.id] = status;
+                });
+                database.ref('statuses').set(statusesObj);
+            } else {
+                localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                renderStatuses();
+            }
+
+            document.getElementById('statusCustomerName').value = '';
+            document.getElementById('statusMessage').value = '';
+        }
+
+        function renderStatuses() {
+            const statusesList = document.getElementById('statusesList');
+            if (statuses.length === 0) {
+                statusesList.innerHTML = '';
+                return;
+            }
+
+            statusesList.innerHTML = statuses.map(status => `
+                <div class="status-item">
+                    <h3>💌 ${status.customerName}</h3>
+                    <p><strong>Статус:</strong> ${status.statusMessage}</p>
+                    <p><strong>Дата:</strong> ${new Date(status.timestamp).toLocaleString('ru-RU')}</p>
+                    <div class="responsible-tag">👤 Ответственный: ${status.responsible}</div>
+                    <div class="button-group">
+                        <button class="edit-btn" onclick="openEditStatusModal(${status.id})">✏️ Редактировать</button>
+                        <button class="delete-btn" onclick="deleteStatus(${status.id})">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openEditStatusModal(id) {
+            const status = statuses.find(s => s.id === id);
+            if (!status) return;
+
+            document.getElementById('editStatusId').value = status.id;
+            document.getElementById('editStatusCustomerName').value = status.customerName;
+            document.getElementById('editStatusMessage').value = status.statusMessage;
+
+            document.getElementById('editStatusModal').style.display = 'block';
+        }
+
+        function closeEditStatusModal() {
+            document.getElementById('editStatusModal').style.display = 'none';
+        }
+
+        function updateStatus() {
+            const id = parseInt(document.getElementById('editStatusId').value);
+            const customerName = document.getElementById('editStatusCustomerName').value;
+            const statusMessage = document.getElementById('editStatusMessage').value;
+
+            if (!customerName || !statusMessage) {
+                alert('Пожалуйста, заполните оба поля!');
+                return;
+            }
+
+            const statusIndex = statuses.findIndex(s => s.id === id);
+            if (statusIndex !== -1) {
+                statuses[statusIndex] = {
+                    ...statuses[statusIndex],
+                    customerName,
+                    statusMessage
+                };
+
+                if (isFirebaseEnabled) {
+                    const statusesObj = {};
+                    statuses.forEach(status => {
+                        statusesObj[status.id] = status;
+                    });
+                    database.ref('statuses').set(statusesObj);
+                } else {
+                    localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                    renderStatuses();
+                }
+
+                closeEditStatusModal();
+            }
+        }
+
+        function deleteStatus(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот статус?')) return;
+
+            statuses = statuses.filter(status => status.id !== id);
+
+            if (isFirebaseEnabled) {
+                const statusesObj = {};
+                statuses.forEach(status => {
+                    statusesObj[status.id] = status;
+                });
+                database.ref('statuses').set(statusesObj);
+            } else {
+                localStorage.setItem('statuses-data', JSON.stringify(statuses));
+                renderStatuses();
+            }
+        }
+
+        function addCompensation() {
+            const orderNumber = document.getElementById('compensationOrderNumber').value;
+            const note = document.getElementById('compensationNote').value;
+
+            if (!orderNumber || !note) {
+                alert('Пожалуйста, заполните все обязательные поля!');
+                return;
+            }
+
+            const compensation = {
+                id: Date.now(),
+                orderNumber,
+                note,
+                responsible: currentUser,
+                createdAt: new Date().toISOString()
+            };
+
+            compensations.push(compensation);
+
+            if (isFirebaseEnabled) {
+                const compensationsObj = {};
+                compensations.forEach(comp => {
+                    compensationsObj[comp.id] = comp;
+                });
+                database.ref('compensations').set(compensationsObj);
+            } else {
+                localStorage.setItem('compensations-data', JSON.stringify(compensations));
+                renderCompensations();
+            }
+
+            document.getElementById('compensationOrderNumber').value = '';
+            document.getElementById('compensationNote').value = '';
+        }
+
+        function renderCompensations() {
+            const compensationsList = document.getElementById('compensationsList');
+            if (compensations.length === 0) {
+                compensationsList.innerHTML = '';
+                return;
+            }
+
+            compensationsList.innerHTML = compensations.map(comp => `
+                <div class="compensation-item">
+                    <h3>💰 Заказ #${comp.orderNumber}</h3>
+                    <p><strong>Примечание:</strong> ${comp.note}</p>
+                    <p><strong>Дата:</strong> ${new Date(comp.createdAt).toLocaleString('ru-RU')}</p>
+                    <div class="responsible-tag">👤 Ответственный: ${comp.responsible}</div>
+                    <div class="button-group">
+                        <button class="edit-btn" onclick="openEditCompensationModal(${comp.id})">✏️ Редактировать</button>
+                        <button class="delete-btn" onclick="deleteCompensation(${comp.id})">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openEditCompensationModal(id) {
+            const compensation = compensations.find(c => c.id === id);
+            if (!compensation) return;
+
+            document.getElementById('editCompensationId').value = compensation.id;
+            document.getElementById('editCompensationOrderNumber').value = compensation.orderNumber;
+            document.getElementById('editCompensationNote').value = compensation.note;
+
+            document.getElementById('editCompensationModal').style.display = 'block';
+        }
+
+        function closeEditCompensationModal() {
+            document.getElementById('editCompensationModal').style.display = 'none';
+        }
+
+        function updateCompensation() {
+            const id = parseInt(document.getElementById('editCompensationId').value);
+            const orderNumber = document.getElementById('editCompensationOrderNumber').value;
+            const note = document.getElementById('editCompensationNote').value;
+
+            if (!orderNumber || !note) {
+                alert('Пожалуйста, заполните все поля!');
+                return;
+            }
+
+            const compIndex = compensations.findIndex(c => c.id === id);
+            if (compIndex !== -1) {
+                compensations[compIndex] = {
+                    ...compensations[compIndex],
+                    orderNumber,
+                    note
+                };
+
+                if (isFirebaseEnabled) {
+                    const compensationsObj = {};
+                    compensations.forEach(comp => {
+                        compensationsObj[comp.id] = comp;
+                    });
+                    database.ref('compensations').set(compensationsObj);
+                } else {
+                    localStorage.setItem('compensations-data', JSON.stringify(compensations));
+                    renderCompensations();
+                }
+
+                closeEditCompensationModal();
+            }
+        }
+
+        function deleteCompensation(id) {
+            if (!confirm('Вы уверены, что хотите удалить эту компенсацию?')) return;
+
+            compensations = compensations.filter(comp => comp.id !== id);
+
+            if (isFirebaseEnabled) {
+                const compensationsObj = {};
+                compensations.forEach(comp => {
+                    compensationsObj[comp.id] = comp;
+                });
+                database.ref('compensations').set(compensationsObj);
+            } else {
+                localStorage.setItem('compensations-data', JSON.stringify(compensations));
+                renderCompensations();
+            }
+        }
+
+        window.onclick = function(event) {
+            const orderModal = document.getElementById('editOrderModal');
+            const statusModal = document.getElementById('editStatusModal');
+            const compensationModal = document.getElementById('editCompensationModal');
+            
+            if (event.target == orderModal) {
+                closeEditOrderModal();
+            }
+            if (event.target == statusModal) {
+                closeEditStatusModal();
+            }
+            if (event.target == compensationModal) {
+                closeEditCompensationModal();
+            }
+        }
+    </script>
+</body>
+</html>
