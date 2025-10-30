@@ -1619,16 +1619,15 @@ function renderFreeAccounts() {
             );
             
             statusHTML = `
-                <div class="account-status busy">🔒 Занят</div>
-                <div class="account-details">
-                    <p><strong>Заказ:</strong> #${status.orderNumber}</p>
-                    <p><strong>Покупатель:</strong> ${status.customerName}</p>
-                    ${status.orderTime && status.orderTime !== '-' ? `<p><strong>Начало:</strong> ${status.orderTime}</p>` : ''}
-                    ${status.orderEndTime && status.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${status.orderEndTime}</p>` : ''}
-                    <p><strong>Скин заказа:</strong> ${busyOrder && busyOrder.skin ? busyOrder.skin : 'Не указан'}</p>
-                    <p><strong>Скин аккаунта:</strong> ${account.skin || 'Не указан'}</p>
-                </div>
-            `;
+    <div class="account-status busy">🔒 Занят</div>
+    <div class="account-details">
+        <p><strong>Заказ:</strong> #${status.orderNumber}</p>
+        <p><strong>Покупатель:</strong> ${status.customerName}</p>
+        ${status.orderTime && status.orderTime !== '-' ? `<p><strong>Начало:</strong> ${status.orderTime}</p>` : ''}
+        ${status.orderEndTime && status.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${status.orderEndTime}</p>` : ''}
+        <p><strong>Скин:</strong> ${account.skin || 'Не указан'}</p>
+    </div>
+`;
         }
         
         return `
