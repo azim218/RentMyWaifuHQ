@@ -58,6 +58,41 @@
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-30px) rotate(10deg); }
         }
+        #freeAccountsList .order-item {
+    min-height: auto;
+}
+
+.account-info-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+        .account-status {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-top: 10px;
+}
+
+.account-status.free {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    color: #2d8659;
+}
+
+.account-status.busy {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    color: #d9534f;
+}
+
+.account-details {
+    margin-top: 10px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    font-size: 0.95rem;
+}
 
         .login-container {
             display: flex;
@@ -807,7 +842,7 @@
             <div id="statusesList"></div>
         </div>
 
-        <!-- Секция 4: Компенсации -->
+<!-- Секция 4: Компенсации -->
         <div class="card compensation-section">
             <h2>💰 Компенсации</h2>
             <div class="form-group">
@@ -822,9 +857,26 @@
 
             <div id="compensationsList"></div>
         </div>
+
+        <!-- Секция 5: Свободные аккаунты -->
+        <div class="card">
+            <h2>🎮 Свободные Аккаунты</h2>
+            <div class="form-group">
+                <label>Имя аккаунта *</label>
+                <input type="text" id="freeAccountName" placeholder="Введите имя аккаунта">
+            </div>
+            <button onclick="addFreeAccount()">➕ Добавить аккаунт</button>
+            
+            <div id="freeAccountsList"></div>
+        </div>
     </div>
 
     <!-- Модальное окно для редактирования заказа -->
+    <div id="editOrderModal" class="modal">
+
+    
+
+</div>
     <div id="editOrderModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditOrderModal()">&times;</span>
@@ -889,7 +941,21 @@
             <button onclick="updateCompensation()">💾 Сохранить изменения</button>
         </div>
     </div>
-
+    
+    <!-- Модальное окно для редактирования свободного аккаунта -->
+<div id="editFreeAccountModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditFreeAccountModal()">&times;</span>
+        <h2>✏️ Редактировать Аккаунт</h2>
+        <input type="hidden" id="editFreeAccountId">
+        <div class="form-group">
+            <label>Имя аккаунта *</label>
+            <input type="text" id="editFreeAccountName">
+        </div>
+        <button onclick="updateFreeAccount()">💾 Сохранить изменения</button>
+    </div>
+</div>
+    
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -929,6 +995,7 @@
         let orders = [];
         let statuses = [];
         let compensations = [];
+        let freeAccounts = [];
 
         window.addEventListener('load', function() {
             const savedUser = localStorage.getItem('currentUser');
@@ -980,6 +1047,7 @@
                     orders = data ? Object.values(data) : [];
                     renderOrders();
                 });
+                
 
                 database.ref('statuses').on('value', (snapshot) => {
                     const data = snapshot.val();
@@ -992,6 +1060,11 @@
                     compensations = data ? Object.values(data) : [];
                     renderCompensations();
                 });
+                database.ref('freeAccounts').on('value', (snapshot) => {
+    const data = snapshot.val();
+    freeAccounts = data ? Object.values(data) : [];
+    renderFreeAccounts();
+});
             } else {
                 try {
                     const savedOrders = localStorage.getItem('orders-data');
@@ -1018,16 +1091,17 @@
         }
 
         function saveOrders() {
-            if (isFirebaseEnabled) {
-                const ordersObj = {};
-                orders.forEach(order => {
-                    ordersObj[order.id] = order;
-                });
-                ordersRef.set(ordersObj);
-            } else {
-                localStorage.setItem('orders-data', JSON.stringify(orders));
-            }
-        }
+    if (isFirebaseEnabled) {
+        const ordersObj = {};
+        orders.forEach(order => {
+            ordersObj[order.id] = order;
+        });
+        ordersRef.set(ordersObj);
+    } else {
+        localStorage.setItem('orders-data', JSON.stringify(orders));
+    }
+    renderFreeAccounts(); // Добавьте эту строку
+}
 
         function addOrder() {
             const accountName = document.getElementById('accountName').value;
@@ -1087,6 +1161,7 @@
                     </div>
                 </div>
             `).join('');
+            renderFreeAccounts();
         }
 
         function openEditOrderModal(id) {
@@ -1420,22 +1495,195 @@
                 renderCompensations();
             }
         }
+        
 
-        window.onclick = function(event) {
-            const orderModal = document.getElementById('editOrderModal');
-            const statusModal = document.getElementById('editStatusModal');
-            const compensationModal = document.getElementById('editCompensationModal');
-            
-            if (event.target == orderModal) {
-                closeEditOrderModal();
-            }
-            if (event.target == statusModal) {
-                closeEditStatusModal();
-            }
-            if (event.target == compensationModal) {
-                closeEditCompensationModal();
-            }
+// Добавьте в функцию loadData():
+// После загрузки compensations добавьте:
+
+
+// Функции для работы со свободными аккаунтами
+function checkAccountStatus(accountName) {
+    const normalizedName = accountName.toLowerCase().trim();
+    const busyOrder = orders.find(order => 
+        order.accountName.toLowerCase().trim() === normalizedName
+    );
+    
+    if (busyOrder) {
+        return {
+            isFree: false,
+            orderNumber: busyOrder.orderNumber,
+            customerName: busyOrder.customerName,
+            orderTime: busyOrder.orderTime,
+            orderEndTime: busyOrder.orderEndTime
+        };
+    }
+    
+    return { isFree: true };
+}
+
+function addFreeAccount() {
+    const accountName = document.getElementById('freeAccountName').value.trim();
+    
+    if (!accountName) {
+        alert('Пожалуйста, введите имя аккаунта!');
+        return;
+    }
+    
+    const normalizedName = accountName.toLowerCase();
+    const duplicate = freeAccounts.find(acc => 
+        acc.name.toLowerCase() === normalizedName
+    );
+    
+    if (duplicate) {
+        alert('Этот аккаунт уже добавлен в список!');
+        return;
+    }
+    
+    const account = {
+        id: Date.now(),
+        name: accountName,
+        addedBy: currentUser,
+        createdAt: new Date().toISOString()
+    };
+    
+    freeAccounts.push(account);
+    
+    if (isFirebaseEnabled) {
+        const accountsObj = {};
+        freeAccounts.forEach(acc => {
+            accountsObj[acc.id] = acc;
+        });
+        database.ref('freeAccounts').set(accountsObj);
+    } else {
+        localStorage.setItem('freeAccounts-data', JSON.stringify(freeAccounts));
+        renderFreeAccounts();
+    }
+    
+    document.getElementById('freeAccountName').value = '';
+}
+
+function renderFreeAccounts() {
+    const accountsList = document.getElementById('freeAccountsList');
+    if (freeAccounts.length === 0) {
+        accountsList.innerHTML = '';
+        return;
+    }
+    
+    accountsList.innerHTML = freeAccounts.map(account => {
+        const status = checkAccountStatus(account.name);
+        
+        let statusHTML = '';
+        if (status.isFree) {
+            statusHTML = '<div class="account-status free">✅ Свободен</div>';
+        } else {
+            statusHTML = `
+                <div class="account-status busy">🔒 Занят</div>
+                <div class="account-details">
+                    <p><strong>Заказ:</strong> #${status.orderNumber}</p>
+                    <p><strong>Покупатель:</strong> ${status.customerName}</p>
+                    ${status.orderTime && status.orderTime !== '-' ? `<p><strong>Начало:</strong> ${status.orderTime}</p>` : ''}
+                    ${status.orderEndTime && status.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${status.orderEndTime}</p>` : ''}
+                </div>
+            `;
         }
+        
+        return `
+            <div class="order-item">
+                <div class="account-info-wrapper">
+                    <h3>🎮 ${account.name}</h3>
+                    ${statusHTML}
+                    <div class="responsible-tag">👤 Добавил: ${account.addedBy}</div>
+                </div>
+                <div class="button-group">
+                    <button class="edit-btn" onclick="openEditFreeAccountModal(${account.id})">✏️ Редактировать</button>
+                    <button class="delete-btn" onclick="deleteFreeAccount(${account.id})">🗑️ Удалить</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function openEditFreeAccountModal(id) {
+    const account = freeAccounts.find(a => a.id === id);
+    if (!account) return;
+    
+    document.getElementById('editFreeAccountId').value = account.id;
+    document.getElementById('editFreeAccountName').value = account.name;
+    
+    document.getElementById('editFreeAccountModal').style.display = 'block';
+}
+
+function closeEditFreeAccountModal() {
+    document.getElementById('editFreeAccountModal').style.display = 'none';
+}
+
+function updateFreeAccount() {
+    const id = parseInt(document.getElementById('editFreeAccountId').value);
+    const accountName = document.getElementById('editFreeAccountName').value.trim();
+    
+    if (!accountName) {
+        alert('Пожалуйста, введите имя аккаунта!');
+        return;
+    }
+    
+    const accountIndex = freeAccounts.findIndex(a => a.id === id);
+    if (accountIndex !== -1) {
+        freeAccounts[accountIndex] = {
+            ...freeAccounts[accountIndex],
+            name: accountName
+        };
+        
+        if (isFirebaseEnabled) {
+            const accountsObj = {};
+            freeAccounts.forEach(acc => {
+                accountsObj[acc.id] = acc;
+            });
+            database.ref('freeAccounts').set(accountsObj);
+        } else {
+            localStorage.setItem('freeAccounts-data', JSON.stringify(freeAccounts));
+            renderFreeAccounts();
+        }
+        
+        closeEditFreeAccountModal();
+    }
+}
+
+function deleteFreeAccount(id) {
+    if (!confirm('Вы уверены, что хотите удалить этот аккаунт?')) return;
+    
+    freeAccounts = freeAccounts.filter(acc => acc.id !== id);
+    
+    if (isFirebaseEnabled) {
+        const accountsObj = {};
+        freeAccounts.forEach(acc => {
+            accountsObj[acc.id] = acc;
+        });
+        database.ref('freeAccounts').set(accountsObj);
+    } else {
+        localStorage.setItem('freeAccounts-data', JSON.stringify(freeAccounts));
+        renderFreeAccounts();
+    }
+}
+
+window.onclick = function(event) {
+    const orderModal = document.getElementById('editOrderModal');
+    const statusModal = document.getElementById('editStatusModal');
+    const compensationModal = document.getElementById('editCompensationModal');
+    const freeAccountModal = document.getElementById('editFreeAccountModal');
+    
+    if (event.target == orderModal) {
+        closeEditOrderModal();
+    }
+    if (event.target == statusModal) {
+        closeEditStatusModal();
+    }
+    if (event.target == compensationModal) {
+        closeEditCompensationModal();
+    }
+    if (event.target == freeAccountModal) {
+        closeEditFreeAccountModal();
+    }
+}
     </script>
 </body>
 </html>
