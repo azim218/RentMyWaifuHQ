@@ -447,20 +447,23 @@
         }
 
         .modal-content {
-            background: linear-gradient(135deg, #fff 0%, #ffe4e9 100%);
-            margin: 3% auto;
-            padding: 45px;
-            border: 5px solid #ffb6c1;
-            border-radius: 40px;
-            width: 90%;
-            max-width: 650px;
-            box-shadow: 0 25px 70px rgba(255, 105, 180, 0.5);
-            animation: slideUp 0.5s ease-out;
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
+    background: linear-gradient(135deg, #fff 0%, #ffe4e9 100%);
+    margin: 3% auto;
+    padding: 45px 45px 80px 45px;
+    border: 5px solid #ffb6c1;
+    border-radius: 40px;
+    width: 90%;
+    max-width: 650px;
+    box-shadow: 0 25px 70px rgba(255, 105, 180, 0.5);
+    animation: slideUp 0.5s ease-out;
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+        .modal-content button {
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
         .modal-content::before {
             content: '🌸';
             position: absolute;
@@ -791,7 +794,16 @@
             </div>
             <div class="form-group">
                 <label>Дата и время окончания заказа</label>
-                <input type="text" id="orderEndTime" placeholder="Например: 18:00, завтра, или любой текст">
+                <input type="text" id="orderEndTime" placeholder="Например: 18:00, завтра, или любой текст">    
+            </div>
+            <div class="form-group">
+                <label>Скин *</label>
+                <select id="orderSkin" style="width: 100%; padding: 16px 22px; border: 4px solid #ffb6c1; border-radius: 25px; font-size: 1.05rem; background: linear-gradient(135deg, #fff 0%, #fff5fa 100%); font-family: 'Quicksand', sans-serif; font-weight: 500; cursor: pointer;">
+                    <option value="">Выберите...</option>
+                    <option value="Да">Да</option>
+                    <option value="Нет">Нет</option>
+                </select>
+            </div>
             </div>
             <button onclick="addOrder()">💖 Добавить заказ</button>
 
@@ -865,18 +877,18 @@
                 <label>Имя аккаунта *</label>
                 <input type="text" id="freeAccountName" placeholder="Введите имя аккаунта">
             </div>
+            <div class="form-group">
+                <label>Скин *</label>
+                <select id="freeAccountSkin" style="width: 100%; padding: 16px 22px; border: 4px solid #ffb6c1; border-radius: 25px; font-size: 1.05rem; background: linear-gradient(135deg, #fff 0%, #fff5fa 100%); font-family: 'Quicksand', sans-serif; font-weight: 500; cursor: pointer;">
+                    <option value="">Выберите...</option>
+                    <option value="Да">Да</option>
+                    <option value="Нет">Нет</option>
+                </select>
+            </div>
             <button onclick="addFreeAccount()">➕ Добавить аккаунт</button>
-            
             <div id="freeAccountsList"></div>
         </div>
     </div>
-
-    <!-- Модальное окно для редактирования заказа -->
-    <div id="editOrderModal" class="modal">
-
-    
-
-</div>
     <div id="editOrderModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeEditOrderModal()">&times;</span>
@@ -901,6 +913,14 @@
             <div class="form-group">
                 <label>Дата и время окончания</label>
                 <input type="text" id="editOrderEndTime">
+            </div>
+            <div class="form-group">
+                <label>Скин *</label>
+                <select id="editOrderSkin" style="width: 100%; padding: 16px 22px; border: 4px solid #ffb6c1; border-radius: 25px; font-size: 1.05rem; background: linear-gradient(135deg, #fff 0%, #fff5fa 100%); font-family: 'Quicksand', sans-serif; font-weight: 500; cursor: pointer;">
+                    <option value="">Выберите...</option>
+                    <option value="Да">Да</option>
+                    <option value="Нет">Нет</option>
+                </select>
             </div>
             <button onclick="updateOrder()">💾 Сохранить изменения</button>
         </div>
@@ -951,6 +971,14 @@
         <div class="form-group">
             <label>Имя аккаунта *</label>
             <input type="text" id="editFreeAccountName">
+        </div>
+        <div class="form-group">
+            <label>Скин *</label>
+            <select id="editFreeAccountSkin" style="width: 100%; padding: 16px 22px; border: 4px solid #ffb6c1; border-radius: 25px; font-size: 1.05rem; background: linear-gradient(135deg, #fff 0%, #fff5fa 100%); font-family: 'Quicksand', sans-serif; font-weight: 500; cursor: pointer;">
+                <option value="">Выберите...</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
         </div>
         <button onclick="updateFreeAccount()">💾 Сохранить изменения</button>
     </div>
@@ -1104,117 +1132,120 @@
 }
 
         function addOrder() {
-            const accountName = document.getElementById('accountName').value;
-            const orderNumber = document.getElementById('orderNumber').value;
-            const customerName = document.getElementById('customerName').value;
-            const orderTime = document.getElementById('orderTime').value;
-            const orderEndTime = document.getElementById('orderEndTime').value;
+    const accountName = document.getElementById('accountName').value;
+    const orderNumber = document.getElementById('orderNumber').value;
+    const customerName = document.getElementById('customerName').value;
+    const orderTime = document.getElementById('orderTime').value;
+    const orderEndTime = document.getElementById('orderEndTime').value;
+    const orderSkin = document.getElementById('orderSkin').value;
 
-            if (!accountName || !orderNumber) {
-                alert('Пожалуйста, заполните обязательные поля: Имя аккаунта и Номер заказа!');
-                return;
-            }
+    if (!accountName || !orderNumber || !orderSkin) {
+        alert('Пожалуйста, заполните обязательные поля: Имя аккаунта, Номер заказа и Скин!');
+        return;
+    }
 
-            const order = {
-                id: Date.now(),
-                accountName,
-                orderNumber,
-                customerName: customerName || '-',
-                orderTime: orderTime || '-',
-                orderEndTime: orderEndTime || '-',
-                responsible: currentUser,
-                createdAt: new Date().toISOString()
-            };
+    const order = {
+        id: Date.now(),
+        accountName,
+        orderNumber,
+        customerName: customerName || '-',
+        orderTime: orderTime || '-',
+        orderEndTime: orderEndTime || '-',
+        skin: orderSkin,
+        responsible: currentUser,
+        createdAt: new Date().toISOString()
+    };
 
-            orders.push(order);
-            saveOrders();
-            
-            if (!isFirebaseEnabled) {
-                renderOrders();
-            }
+    orders.push(order);
+    saveOrders();
+    
+    if (!isFirebaseEnabled) {
+        renderOrders();
+    }
 
-            document.getElementById('accountName').value = '';
-            document.getElementById('orderNumber').value = '';
-            document.getElementById('customerName').value = '';
-            document.getElementById('orderTime').value = '';
-            document.getElementById('orderEndTime').value = '';
-        }
+    document.getElementById('accountName').value = '';
+    document.getElementById('orderNumber').value = '';
+    document.getElementById('customerName').value = '';
+    document.getElementById('orderTime').value = '';
+    document.getElementById('orderEndTime').value = '';
+    document.getElementById('orderSkin').value = '';
+}
 
         function renderOrders() {
-            const ordersList = document.getElementById('ordersList');
-            if (orders.length === 0) {
-                ordersList.innerHTML = '';
-                return;
-            }
+    const ordersList = document.getElementById('ordersList');
+    if (orders.length === 0) {
+        ordersList.innerHTML = '';
+        return;
+    }
 
-            ordersList.innerHTML = orders.map(order => `
-                <div class="order-item">
-                    <h3>🛍️ Заказ #${order.orderNumber}</h3>
-                    <p><strong>Аккаунт:</strong> ${order.accountName}</p>
-                    ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
-                    ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
-                    ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
-                    <div class="responsible-tag">👤 Ответственный: ${order.responsible}</div>
-                    <div class="button-group">
-                        <button class="edit-btn" onclick="openEditOrderModal(${order.id})">✏️ Редактировать</button>
-                        <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️ Удалить</button>
-                    </div>
-                </div>
-            `).join('');
-            renderFreeAccounts();
-        }
+    ordersList.innerHTML = orders.map(order => `
+        <div class="order-item">
+            <h3>🛍️ Заказ #${order.orderNumber}</h3>
+            <p><strong>Аккаунт:</strong> ${order.accountName}</p>
+            ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
+            ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
+            ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
+            <p><strong>Скин:</strong> ${order.skin || 'Не указан'}</p>
+            <div class="responsible-tag">👤 Ответственный: ${order.responsible}</div>
+            <div class="button-group">
+                <button class="edit-btn" onclick="openEditOrderModal(${order.id})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️ Удалить</button>
+            </div>
+        </div>
+    `).join('');
+    renderFreeAccounts();
+}
 
         function openEditOrderModal(id) {
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
+    const order = orders.find(o => o.id === id);
+    if (!order) return;
 
-            document.getElementById('editOrderId').value = order.id;
-            document.getElementById('editAccountName').value = order.accountName;
-            document.getElementById('editOrderNumber').value = order.orderNumber;
-            document.getElementById('editCustomerName').value = order.customerName === '-' ? '' : order.customerName;
-            document.getElementById('editOrderTime').value = order.orderTime === '-' ? '' : order.orderTime;
-            document.getElementById('editOrderEndTime').value = order.orderEndTime === '-' ? '' : order.orderEndTime;
+    document.getElementById('editOrderId').value = order.id;
+    document.getElementById('editAccountName').value = order.accountName;
+    document.getElementById('editOrderNumber').value = order.orderNumber;
+    document.getElementById('editCustomerName').value = order.customerName === '-' ? '' : order.customerName;
+    document.getElementById('editOrderTime').value = order.orderTime === '-' ? '' : order.orderTime;
+    document.getElementById('editOrderEndTime').value = order.orderEndTime === '-' ? '' : order.orderEndTime;
+    document.getElementById('editOrderSkin').value = order.skin || '';
 
-            document.getElementById('editOrderModal').style.display = 'block';
-        }
-
-        function closeEditOrderModal() {
-            document.getElementById('editOrderModal').style.display = 'none';
-        }
+    document.getElementById('editOrderModal').style.display = 'block';
+}
 
         function updateOrder() {
-            const id = parseInt(document.getElementById('editOrderId').value);
-            const accountName = document.getElementById('editAccountName').value;
-            const orderNumber = document.getElementById('editOrderNumber').value;
-            const customerName = document.getElementById('editCustomerName').value;
-            const orderTime = document.getElementById('editOrderTime').value;
-            const orderEndTime = document.getElementById('editOrderEndTime').value;
+    const id = parseInt(document.getElementById('editOrderId').value);
+    const accountName = document.getElementById('editAccountName').value;
+    const orderNumber = document.getElementById('editOrderNumber').value;
+    const customerName = document.getElementById('editCustomerName').value;
+    const orderTime = document.getElementById('editOrderTime').value;
+    const orderEndTime = document.getElementById('editOrderEndTime').value;
+    const orderSkin = document.getElementById('editOrderSkin').value;
 
-            if (!accountName || !orderNumber) {
-                alert('Пожалуйста, заполните обязательные поля!');
-                return;
-            }
+    if (!accountName || !orderNumber || !orderSkin) {
+        alert('Пожалуйста, заполните обязательные поля!');
+        return;
+    }
 
-            const orderIndex = orders.findIndex(o => o.id === id);
-            if (orderIndex !== -1) {
-                orders[orderIndex] = {
-                    ...orders[orderIndex],
-                    accountName,
-                    orderNumber,
-                    customerName: customerName || '-',
-                    orderTime: orderTime || '-',
-                    orderEndTime: orderEndTime || '-'
-                };
+    const orderIndex = orders.findIndex(o => o.id === id);
+    if (orderIndex !== -1) {
+        orders[orderIndex] = {
+            ...orders[orderIndex],
+            accountName,
+            orderNumber,
+            customerName: customerName || '-',
+            orderTime: orderTime || '-',
+            orderEndTime: orderEndTime || '-',
+            skin: orderSkin
+        };
 
-                saveOrders();
-                
-                if (!isFirebaseEnabled) {
-                    renderOrders();
-                }
-
-                closeEditOrderModal();
-            }
+        saveOrders();
+        
+        if (!isFirebaseEnabled) {
+            renderOrders();
         }
+
+        closeEditOrderModal();
+    }
+}
 
         function deleteOrder(id) {
             if (!confirm('Вы уверены, что хотите удалить этот заказ?')) return;
@@ -1523,9 +1554,10 @@ function checkAccountStatus(accountName) {
 
 function addFreeAccount() {
     const accountName = document.getElementById('freeAccountName').value.trim();
+    const accountSkin = document.getElementById('freeAccountSkin').value;
     
-    if (!accountName) {
-        alert('Пожалуйста, введите имя аккаунта!');
+    if (!accountName || !accountSkin) {
+        alert('Пожалуйста, заполните все обязательные поля: Имя аккаунта и Скин!');
         return;
     }
     
@@ -1542,6 +1574,7 @@ function addFreeAccount() {
     const account = {
         id: Date.now(),
         name: accountName,
+        skin: accountSkin,
         addedBy: currentUser,
         createdAt: new Date().toISOString()
     };
@@ -1560,6 +1593,7 @@ function addFreeAccount() {
     }
     
     document.getElementById('freeAccountName').value = '';
+    document.getElementById('freeAccountSkin').value = '';
 }
 
 function renderFreeAccounts() {
@@ -1574,8 +1608,16 @@ function renderFreeAccounts() {
         
         let statusHTML = '';
         if (status.isFree) {
-            statusHTML = '<div class="account-status free">✅ Свободен</div>';
+            statusHTML = `
+                <div class="account-status free">✅ Свободен</div>
+                <p style="margin-top: 10px;"><strong>Скин:</strong> ${account.skin || 'Не указан'}</p>
+            `;
         } else {
+            const normalizedName = account.name.toLowerCase().trim();
+            const busyOrder = orders.find(order => 
+                order.accountName.toLowerCase().trim() === normalizedName
+            );
+            
             statusHTML = `
                 <div class="account-status busy">🔒 Занят</div>
                 <div class="account-details">
@@ -1583,6 +1625,8 @@ function renderFreeAccounts() {
                     <p><strong>Покупатель:</strong> ${status.customerName}</p>
                     ${status.orderTime && status.orderTime !== '-' ? `<p><strong>Начало:</strong> ${status.orderTime}</p>` : ''}
                     ${status.orderEndTime && status.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${status.orderEndTime}</p>` : ''}
+                    <p><strong>Скин заказа:</strong> ${busyOrder && busyOrder.skin ? busyOrder.skin : 'Не указан'}</p>
+                    <p><strong>Скин аккаунта:</strong> ${account.skin || 'Не указан'}</p>
                 </div>
             `;
         }
@@ -1609,10 +1653,13 @@ function openEditFreeAccountModal(id) {
     
     document.getElementById('editFreeAccountId').value = account.id;
     document.getElementById('editFreeAccountName').value = account.name;
+    document.getElementById('editFreeAccountSkin').value = account.skin || '';
     
     document.getElementById('editFreeAccountModal').style.display = 'block';
 }
-
+function closeEditOrderModal() {
+    document.getElementById('editOrderModal').style.display = 'none';
+}
 function closeEditFreeAccountModal() {
     document.getElementById('editFreeAccountModal').style.display = 'none';
 }
@@ -1620,9 +1667,10 @@ function closeEditFreeAccountModal() {
 function updateFreeAccount() {
     const id = parseInt(document.getElementById('editFreeAccountId').value);
     const accountName = document.getElementById('editFreeAccountName').value.trim();
+    const accountSkin = document.getElementById('editFreeAccountSkin').value;
     
-    if (!accountName) {
-        alert('Пожалуйста, введите имя аккаунта!');
+    if (!accountName || !accountSkin) {
+        alert('Пожалуйста, заполните все обязательные поля!');
         return;
     }
     
@@ -1630,7 +1678,8 @@ function updateFreeAccount() {
     if (accountIndex !== -1) {
         freeAccounts[accountIndex] = {
             ...freeAccounts[accountIndex],
-            name: accountName
+            name: accountName,
+            skin: accountSkin
         };
         
         if (isFirebaseEnabled) {
