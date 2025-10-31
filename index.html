@@ -207,6 +207,9 @@
             border: 5px solid rgba(255, 192, 203, 0.5);
             position: relative;
             overflow: hidden;
+            max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
         }
 
         .card::before {
@@ -323,6 +326,9 @@
             border: 4px solid rgba(255, 255, 255, 0.7);
             position: relative;
             overflow: hidden;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
         }
 
         .order-item::before, .status-item::before, .compensation-item::before {
@@ -371,7 +377,8 @@
         .order-item .button-group, .status-item .button-group, .compensation-item .button-group {
             display: flex;
             gap: 15px;
-            margin-top: 25px;
+            margin-top: auto;
+    padding-top: 25px;
         }
 
         .order-item button, .status-item button, .compensation-item button {
@@ -804,12 +811,36 @@
                     <option value="Нет">Нет</option>
                 </select>
             </div>
-            </div>
+            <div class="form-group">
+    <label>Заметка</label>
+    <textarea id="orderNote" placeholder="Дополнительная информация (необязательно)" style="min-height: 100px;"></textarea>
+</div>
             <button onclick="addOrder()">💖 Добавить заказ</button>
 
             <div class="orders-list" id="ordersList"></div>
         </div>
-
+        <div class="card">
+            <h2>🎮 Свободные Аккаунты</h2>
+            <div class="form-group">
+                <label>Имя аккаунта *</label>
+                <input type="text" id="freeAccountName" placeholder="Введите имя аккаунта">
+            </div>
+            <div class="form-group">
+                <label>Скин *</label>
+                <select id="freeAccountSkin" style="width: 100%; padding: 16px 22px; border: 4px solid #ffb6c1; border-radius: 25px; font-size: 1.05rem; background: linear-gradient(135deg, #fff 0%, #fff5fa 100%); font-family: 'Quicksand', sans-serif; font-weight: 500; cursor: pointer;">
+                    <option value="">Выберите...</option>
+                    <option value="Да">Да</option>
+                    <option value="Нет">Нет</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Заметка</label>
+                <textarea id="freeAccountNote" placeholder="Дополнительная информация (необязательно)" style="min-height: 100px;"></textarea>
+            </div>
+            </div>
+            <button onclick="addFreeAccount()">➕ Добавить аккаунт</button>
+            <div id="freeAccountsList"></div>
+        </div>
         <!-- Секция 2: Калькулятор времени -->
         <div class="card">
             <h2>⏰ Калькулятор Времени</h2>
@@ -871,23 +902,7 @@
         </div>
 
         <!-- Секция 5: Свободные аккаунты -->
-        <div class="card">
-            <h2>🎮 Свободные Аккаунты</h2>
-            <div class="form-group">
-                <label>Имя аккаунта *</label>
-                <input type="text" id="freeAccountName" placeholder="Введите имя аккаунта">
-            </div>
-            <div class="form-group">
-                <label>Скин *</label>
-                <select id="freeAccountSkin" style="width: 100%; padding: 16px 22px; border: 4px solid #ffb6c1; border-radius: 25px; font-size: 1.05rem; background: linear-gradient(135deg, #fff 0%, #fff5fa 100%); font-family: 'Quicksand', sans-serif; font-weight: 500; cursor: pointer;">
-                    <option value="">Выберите...</option>
-                    <option value="Да">Да</option>
-                    <option value="Нет">Нет</option>
-                </select>
-            </div>
-            <button onclick="addFreeAccount()">➕ Добавить аккаунт</button>
-            <div id="freeAccountsList"></div>
-        </div>
+        
     </div>
     <div id="editOrderModal" class="modal">
         <div class="modal-content">
@@ -921,6 +936,11 @@
                     <option value="Да">Да</option>
                     <option value="Нет">Нет</option>
                 </select>
+            </select>
+            </div>
+            <div class="form-group">
+                <label>Заметка</label>
+                <textarea id="editOrderNote" style="min-height: 100px;"></textarea>
             </div>
             <button onclick="updateOrder()">💾 Сохранить изменения</button>
         </div>
@@ -979,6 +999,10 @@
                 <option value="Да">Да</option>
                 <option value="Нет">Нет</option>
             </select>
+            </div>
+        <div class="form-group">
+            <label>Заметка</label>
+            <textarea id="editFreeAccountNote" style="min-height: 100px;"></textarea>
         </div>
         <button onclick="updateFreeAccount()">💾 Сохранить изменения</button>
     </div>
@@ -1069,7 +1093,7 @@
         }
 
         function loadData() {
-            if (isFirebaseEnabled) {
+                if (isFirebaseEnabled) {
                 ordersRef.on('value', (snapshot) => {
                     const data = snapshot.val();
                     orders = data ? Object.values(data) : [];
@@ -1094,29 +1118,35 @@
     renderFreeAccounts();
 });
             } else {
-                try {
-                    const savedOrders = localStorage.getItem('orders-data');
-                    if (savedOrders) {
-                        orders = JSON.parse(savedOrders);
-                        renderOrders();
-                    }
-
-                    const savedStatuses = localStorage.getItem('statuses-data');
-                    if (savedStatuses) {
-                        statuses = JSON.parse(savedStatuses);
-                        renderStatuses();
-                    }
-
-                    const savedCompensations = localStorage.getItem('compensations-data');
-                    if (savedCompensations) {
-                        compensations = JSON.parse(savedCompensations);
-                        renderCompensations();
-                    }
-                } catch (error) {
-                    console.error('Ошибка загрузки данных:', error);
-                }
-            }
+    try {
+        const savedOrders = localStorage.getItem('orders-data');
+        if (savedOrders) {
+            orders = JSON.parse(savedOrders);
+            renderOrders();
         }
+
+        const savedStatuses = localStorage.getItem('statuses-data');
+        if (savedStatuses) {
+            statuses = JSON.parse(savedStatuses);
+            renderStatuses();
+        }
+
+        const savedCompensations = localStorage.getItem('compensations-data');
+        if (savedCompensations) {
+            compensations = JSON.parse(savedCompensations);
+            renderCompensations();
+        }
+
+        const savedFreeAccounts = localStorage.getItem('freeAccounts-data');
+        if (savedFreeAccounts) {
+            freeAccounts = JSON.parse(savedFreeAccounts);
+            renderFreeAccounts();
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+    }
+}
+}
 
         function saveOrders() {
     if (isFirebaseEnabled) {
@@ -1138,6 +1168,7 @@
     const orderTime = document.getElementById('orderTime').value;
     const orderEndTime = document.getElementById('orderEndTime').value;
     const orderSkin = document.getElementById('orderSkin').value;
+    const orderNote = document.getElementById('orderNote').value;
 
     if (!accountName || !orderNumber || !orderSkin) {
         alert('Пожалуйста, заполните обязательные поля: Имя аккаунта, Номер заказа и Скин!');
@@ -1152,6 +1183,7 @@
         orderTime: orderTime || '-',
         orderEndTime: orderEndTime || '-',
         skin: orderSkin,
+        note: orderNote || '-',
         responsible: currentUser,
         createdAt: new Date().toISOString()
     };
@@ -1169,6 +1201,7 @@
     document.getElementById('orderTime').value = '';
     document.getElementById('orderEndTime').value = '';
     document.getElementById('orderSkin').value = '';
+    document.getElementById('orderNote').value = '';
 }
 
         function renderOrders() {
@@ -1186,6 +1219,7 @@
             ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
             ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
             <p><strong>Скин:</strong> ${order.skin || 'Не указан'}</p>
+            ${order.note && order.note !== '-' ? `<p><strong>Заметка:</strong> ${order.note}</p>` : ''}
             <div class="responsible-tag">👤 Ответственный: ${order.responsible}</div>
             <div class="button-group">
                 <button class="edit-btn" onclick="openEditOrderModal(${order.id})">✏️ Редактировать</button>
@@ -1207,7 +1241,7 @@
     document.getElementById('editOrderTime').value = order.orderTime === '-' ? '' : order.orderTime;
     document.getElementById('editOrderEndTime').value = order.orderEndTime === '-' ? '' : order.orderEndTime;
     document.getElementById('editOrderSkin').value = order.skin || '';
-
+    document.getElementById('editOrderNote').value = order.note === '-' ? '' : (order.note || '');
     document.getElementById('editOrderModal').style.display = 'block';
 }
 
@@ -1219,6 +1253,7 @@
     const orderTime = document.getElementById('editOrderTime').value;
     const orderEndTime = document.getElementById('editOrderEndTime').value;
     const orderSkin = document.getElementById('editOrderSkin').value;
+    const orderNote = document.getElementById('editOrderNote').value;
 
     if (!accountName || !orderNumber || !orderSkin) {
         alert('Пожалуйста, заполните обязательные поля!');
@@ -1234,7 +1269,8 @@
             customerName: customerName || '-',
             orderTime: orderTime || '-',
             orderEndTime: orderEndTime || '-',
-            skin: orderSkin
+            skin: orderSkin,
+            note: orderNote || '-',
         };
 
         saveOrders();
@@ -1553,6 +1589,7 @@ function checkAccountStatus(accountName) {
 }
 
 function addFreeAccount() {
+    const accountNote = document.getElementById('freeAccountNote').value;
     const accountName = document.getElementById('freeAccountName').value.trim();
     const accountSkin = document.getElementById('freeAccountSkin').value;
     
@@ -1572,6 +1609,7 @@ function addFreeAccount() {
     }
     
     const account = {
+        note: accountNote || '-',
         id: Date.now(),
         name: accountName,
         skin: accountSkin,
@@ -1594,6 +1632,7 @@ function addFreeAccount() {
     
     document.getElementById('freeAccountName').value = '';
     document.getElementById('freeAccountSkin').value = '';
+    document.getElementById('freeAccountNote').value = '';
 }
 
 function renderFreeAccounts() {
@@ -1608,11 +1647,12 @@ function renderFreeAccounts() {
         
         let statusHTML = '';
         if (status.isFree) {
-            statusHTML = `
-                <div class="account-status free">✅ Свободен</div>
-                <p style="margin-top: 10px;"><strong>Скин:</strong> ${account.skin || 'Не указан'}</p>
-            `;
-        } else {
+    statusHTML = `
+        <div class="account-status free">✅ Свободен</div>
+        <p style="margin-top: 10px;"><strong>Скин:</strong> ${account.skin || 'Не указан'}</p>
+        ${account.note && account.note !== '-' ? `<p><strong>Заметка:</strong> ${account.note}</p>` : ''}
+    `;
+} else {
             const normalizedName = account.name.toLowerCase().trim();
             const busyOrder = orders.find(order => 
                 order.accountName.toLowerCase().trim() === normalizedName
@@ -1626,6 +1666,7 @@ function renderFreeAccounts() {
         ${status.orderTime && status.orderTime !== '-' ? `<p><strong>Начало:</strong> ${status.orderTime}</p>` : ''}
         ${status.orderEndTime && status.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${status.orderEndTime}</p>` : ''}
         <p><strong>Скин:</strong> ${account.skin || 'Не указан'}</p>
+        ${account.note && account.note !== '-' ? `<p><strong>Заметка:</strong> ${account.note}</p>` : ''}
     </div>
 `;
         }
@@ -1653,6 +1694,7 @@ function openEditFreeAccountModal(id) {
     document.getElementById('editFreeAccountId').value = account.id;
     document.getElementById('editFreeAccountName').value = account.name;
     document.getElementById('editFreeAccountSkin').value = account.skin || '';
+    document.getElementById('editFreeAccountNote').value = account.note === '-' ? '' : (account.note || '');
     
     document.getElementById('editFreeAccountModal').style.display = 'block';
 }
@@ -1667,6 +1709,7 @@ function updateFreeAccount() {
     const id = parseInt(document.getElementById('editFreeAccountId').value);
     const accountName = document.getElementById('editFreeAccountName').value.trim();
     const accountSkin = document.getElementById('editFreeAccountSkin').value;
+    const accountNote = document.getElementById('editFreeAccountNote').value;
     
     if (!accountName || !accountSkin) {
         alert('Пожалуйста, заполните все обязательные поля!');
@@ -1678,7 +1721,8 @@ function updateFreeAccount() {
         freeAccounts[accountIndex] = {
             ...freeAccounts[accountIndex],
             name: accountName,
-            skin: accountSkin
+            skin: accountSkin,
+            note: accountNote || '-'
         };
         
         if (isFirebaseEnabled) {
