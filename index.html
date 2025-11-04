@@ -1851,6 +1851,47 @@ window.onclick = function(event) {
         closeEditFreeAccountModal();
     }
 }
+    window.addEventListener('load', () => {
+  const debugBox = document.createElement('div');
+  debugBox.id = 'debugBox';
+  debugBox.style.position = 'fixed';
+  debugBox.style.bottom = '10px';
+  debugBox.style.left = '10px';
+  debugBox.style.background = 'rgba(0,0,0,0.7)';
+  debugBox.style.color = 'white';
+  debugBox.style.padding = '10px 15px';
+  debugBox.style.borderRadius = '10px';
+  debugBox.style.fontSize = '14px';
+  debugBox.style.zIndex = '9999';
+  debugBox.textContent = '⏳ Проверка подключения...';
+  document.body.appendChild(debugBox);
+
+  try {
+    if (isFirebaseEnabled && database) {
+      debugBox.textContent = '✅ Firebase активен';
+      database.ref('.info/connected').on('value', snap => {
+        if (snap.val() === true) {
+          debugBox.textContent = '🟢 Firebase подключен к сети';
+        } else {
+          debugBox.textContent = '🟡 Firebase не подключен (offline?)';
+        }
+      });
+    } else {
+      debugBox.textContent = '❌ Firebase не активен (localStorage)';
+    }
+  } catch (err) {
+    debugBox.textContent = '⚠️ Ошибка Firebase: ' + err.message;
+  }
+
+  // Логирование ошибок загрузки данных
+  database.ref('freeAccounts').on('value', snapshot => {
+    if (!snapshot.exists()) {
+      debugBox.textContent = '⚠️ Нет данных в freeAccounts';
+    }
+  }, err => {
+    debugBox.textContent = '🔥 Ошибка чтения freeAccounts: ' + err.message;
+  });
+});
 </script>
 </head>
 <body>
@@ -2060,3 +2101,4 @@ window.onclick = function(event) {
                 <button onclick="addFreeAccount()">➕ Добавить аккаунт</button>
                 <div id="freeAccountsList"></div>
             </div>
+
