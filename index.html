@@ -1030,6 +1030,10 @@ let isFirebaseEnabled = false;
 try {
     firebase.initializeApp(firebaseConfig);
     database = firebase.database();
+    
+    // Устанавливаем токен доступа для правил безопасности
+    database.ref('config/token').set('RentMyWaifu2025Secret');
+    
     ordersRef = database.ref('orders');
     isFirebaseEnabled = true;
     console.log('✅ Firebase подключен успешно!');
