@@ -2043,21 +2043,47 @@ function updatePenaltyStats() {
     }
 }
 
-function updateSalaryStats() {
-    const total = salaries.length;
-    const totalAmount = salaries.reduce((sum, s) => sum + s.amount, 0);
-    
-    let dates = salaries.map(s => s.date).filter(d => d);
-    
-    document.getElementById('totalSalaries').textContent = total;
-    document.getElementById('totalSalaryAmount').textContent = totalAmount + '₽';
-    
-    if (dates.length > 0) {
-        const firstDate = dates[0];
-        const lastDate = dates[dates.length - 1];
-        document.getElementById('salaryPeriod').textContent = `${firstDate} - ${lastDate}`;
-    } else {
-        document.getElementById('salaryPeriod').textContent = '-';
+function updateSalary() {
+    // Только Azim218 может редактировать зарплаты
+    if (currentUser !== 'Azim218') {
+        alert('Только Azim218 может редактировать зарплаты!');
+        return;
+    }
+
+    const id = parseInt(document.getElementById('editSalaryId').value);
+    const date = document.getElementById('editSalaryDate').value;
+    const employee = document.getElementById('editSalaryEmployee').value;
+    const amount = document.getElementById('editSalaryAmount').value;
+    const note = document.getElementById('editSalaryNote').value;
+
+    if (!date || !employee || !amount || !note) {
+        alert('Пожалуйста, заполните все поля!');
+        return;
+    }
+
+    const salaryIndex = salaries.findIndex(s => s.id === id);
+    if (salaryIndex !== -1) {
+        salaries[salaryIndex] = {
+            ...salaries[salaryIndex],
+            date: date,
+            employee: employee,
+            amount: parseFloat(amount),
+            note: note
+        };
+
+        if (isFirebaseEnabled) {
+            const salariesObj = {};
+            salaries.forEach(s => {
+                salariesObj[s.id] = s;
+            });
+            database.ref('salaries').set(salariesObj);
+        } else {
+            localStorage.setItem('salaries-data', JSON.stringify(salaries));
+            renderSalaries();
+            updateSalaryStats();
+        }
+
+        closeEditSalaryModal();
     }
 }
 
@@ -2219,8 +2245,9 @@ function renderSalaries() {
     `).join('');
 }
 function updateSalary() {
-    if (!canAccessSalaries()) {
-        alert('У вас нет доступа к этому разделу!');
+    // Только Azim218 может редактировать зарплаты
+    if (currentUser !== 'Azim218') {
+        alert('Только Azim218 может редактировать зарплаты!');
         return;
     }
 
@@ -2321,8 +2348,9 @@ function updateSalary() {
 }
 
 function deleteSalary(id) {
-    if (!canAccessSalaries()) {
-        alert('У вас нет доступа к этому разделу!');
+    // Только Azim218 может удалять зарплаты
+    if (currentUser !== 'Azim218') {
+        alert('Только Azim218 может удалять зарплаты!');
         return;
     }
 
