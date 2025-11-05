@@ -1001,6 +1001,62 @@
             </div>
             <button onclick="updateFreeAccount()">💾 Сохранить изменения</button>
         </div>
+        <div id="editPenaltyModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditPenaltyModal()">&times;</span>
+        <h2>✏️ Редактировать Штраф</h2>
+        <input type="hidden" id="editPenaltyId">
+        <div class="form-group">
+            <label>Дата и время *</label>
+            <input type="text" id="editPenaltyDate" placeholder="Например: 05.11.2024 или вчера">
+        </div>
+        <div class="form-group">
+            <label>Сотрудник *</label>
+            <select id="editPenaltyEmployee">
+                <option value="">Выберите...</option>
+                <option value="Tiger">Tiger</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Сумма (₽) *</label>
+            <input type="number" id="editPenaltyAmount" min="0">
+        </div>
+        <div class="form-group">
+            <label>Заметка *</label>
+            <textarea id="editPenaltyNote"></textarea>
+        </div>
+        <button onclick="updatePenalty()">💾 Сохранить изменения</button>
+    </div>
+</div>
+
+<div id="editSalaryModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditSalaryModal()">&times;</span>
+        <h2>✏️ Редактировать Зарплату</h2>
+        <input type="hidden" id="editSalaryId">
+        <div class="form-group">
+            <label>Дата и время *</label>
+            <input type="text" id="editSalaryDate" placeholder="Например: 05.11.2024 или сегодня">
+        </div>
+        <div class="form-group">
+            <label>Сотрудник *</label>
+            <select id="editSalaryEmployee">
+                <option value="">Выберите...</option>
+                <option value="Tiger">Tiger</option>
+                <option value="sanya">sanya</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Сумма (₽) *</label>
+            <input type="number" id="editSalaryAmount" min="0">
+        </div>
+        <div class="form-group">
+            <label>Заметка *</label>
+            <textarea id="editSalaryNote"></textarea>
+        </div>
+        <button onclick="updateSalary()">💾 Сохранить изменения</button>
+    </div>
+</div>
     </div>
     
        <!-- Firebase SDK -->
@@ -1020,7 +1076,8 @@ const firebaseConfig = {
 
 const users = {
     'Azim218': 'Emil210407!',
-    'Tiger': '123'
+    'Tiger': '123',
+    'sanya': '321'
 };
 
 let database = null;
@@ -1046,6 +1103,8 @@ let orders = [];
 let statuses = [];
 let compensations = [];
 let freeAccounts = [];
+let penalties = [];
+let salaries = [];
 
 window.addEventListener('load', function() {
     const savedUser = localStorage.getItem('currentUser');
@@ -1172,6 +1231,20 @@ function loadData() {
             renderFreeAccounts();
             updateAccountStats();
         });
+
+        database.ref('penalties').on('value', (snapshot) => {
+            const data = snapshot.val();
+            penalties = data ? Object.values(data) : [];
+            renderPenalties();
+            updatePenaltyStats();
+        });
+
+        database.ref('salaries').on('value', (snapshot) => {
+            const data = snapshot.val();
+            salaries = data ? Object.values(data) : [];
+            renderSalaries();
+            updateSalaryStats();
+        });
     } else {
         try {
             const savedOrders = localStorage.getItem('orders-data');
@@ -1198,6 +1271,20 @@ function loadData() {
                 renderFreeAccounts();
                 updateAccountStats();
             }
+
+            const savedPenalties = localStorage.getItem('penalties-data');
+            if (savedPenalties) {
+                penalties = JSON.parse(savedPenalties);
+                renderPenalties();
+                updatePenaltyStats();
+            }
+
+            const savedSalaries = localStorage.getItem('salaries-data');
+            if (savedSalaries) {
+                salaries = JSON.parse(savedSalaries);
+                renderSalaries();
+                updateSalaryStats();
+            }
         } catch (error) {
             console.error('Ошибка загрузки данных:', error);
         }
@@ -1215,6 +1302,7 @@ function saveOrders() {
         localStorage.setItem('orders-data', JSON.stringify(orders));
     }
     renderFreeAccounts();
+
 }
 
 function addOrder() {
@@ -1837,6 +1925,8 @@ window.onclick = function(event) {
     const statusModal = document.getElementById('editStatusModal');
     const compensationModal = document.getElementById('editCompensationModal');
     const freeAccountModal = document.getElementById('editFreeAccountModal');
+    const penaltyModal = document.getElementById('editPenaltyModal');
+    const salaryModal = document.getElementById('editSalaryModal');
     
     if (event.target == orderModal) {
         closeEditOrderModal();
@@ -1850,48 +1940,408 @@ window.onclick = function(event) {
     if (event.target == freeAccountModal) {
         closeEditFreeAccountModal();
     }
+    if (event.target == penaltyModal) {
+        closeEditPenaltyModal();
+    }
+    if (event.target == salaryModal) {
+        closeEditSalaryModal();
+    }
 }
-    window.addEventListener('load', () => {
-  const debugBox = document.createElement('div');
-  debugBox.id = 'debugBox';
-  debugBox.style.position = 'fixed';
-  debugBox.style.bottom = '10px';
-  debugBox.style.left = '10px';
-  debugBox.style.background = 'rgba(0,0,0,0.7)';
-  debugBox.style.color = 'white';
-  debugBox.style.padding = '10px 15px';
-  debugBox.style.borderRadius = '10px';
-  debugBox.style.fontSize = '14px';
-  debugBox.style.zIndex = '9999';
-  debugBox.textContent = '⏳ Проверка подключения...';
-  document.body.appendChild(debugBox);
+function canAccessPenalties() {
+    return currentUser === 'Azim218' || currentUser === 'sanya';
+}
 
-  try {
-    if (isFirebaseEnabled && database) {
-      debugBox.textContent = '✅ Firebase активен';
-      database.ref('.info/connected').on('value', snap => {
-        if (snap.val() === true) {
-          debugBox.textContent = '🟢 Firebase подключен к сети';
-        } else {
-          debugBox.textContent = '🟡 Firebase не подключен (offline?)';
-        }
-      });
+function canAccessSalaries() {
+    return currentUser === 'Azim218' || currentUser === 'sanya' || currentUser === 'Tiger';
+}
+
+function addPenalty() {
+    if (!canAccessPenalties()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const date = document.getElementById('penaltyDate').value;
+    const employee = document.getElementById('penaltyEmployee').value;
+    const amount = document.getElementById('penaltyAmount').value;
+    const note = document.getElementById('penaltyNote').value;
+
+    if (!date || !employee || !amount || !note) {
+        alert('Пожалуйста, заполните все обязательные поля!');
+        return;
+    }
+
+    const penalty = {
+        id: Date.now(),
+        date: date,
+        employee: employee,
+        amount: parseFloat(amount),
+        note: note,
+        createdBy: currentUser,
+        createdAt: new Date().toISOString()
+    };
+
+    penalties.push(penalty);
+
+    if (isFirebaseEnabled) {
+        const penaltiesObj = {};
+        penalties.forEach(p => {
+            penaltiesObj[p.id] = p;
+        });
+        database.ref('penalties').set(penaltiesObj);
     } else {
-      debugBox.textContent = '❌ Firebase не активен (localStorage)';
+        localStorage.setItem('penalties-data', JSON.stringify(penalties));
+        renderPenalties();
+        updatePenaltyStats();
     }
-  } catch (err) {
-    debugBox.textContent = '⚠️ Ошибка Firebase: ' + err.message;
-  }
 
-  // Логирование ошибок загрузки данных
-  database.ref('freeAccounts').on('value', snapshot => {
-    if (!snapshot.exists()) {
-      debugBox.textContent = '⚠️ Нет данных в freeAccounts';
+    document.getElementById('penaltyDate').value = '';
+    document.getElementById('penaltyEmployee').value = '';
+    document.getElementById('penaltyAmount').value = '';
+    document.getElementById('penaltyNote').value = '';
+}
+
+function renderPenalties() {
+    const penaltiesList = document.getElementById('penaltiesList');
+    if (penalties.length === 0) {
+        penaltiesList.innerHTML = '';
+        return;
     }
-  }, err => {
-    debugBox.textContent = '🔥 Ошибка чтения freeAccounts: ' + err.message;
-  });
-});
+
+    const sortedPenalties = [...penalties].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    penaltiesList.innerHTML = sortedPenalties.map(penalty => `
+        <div class="compensation-item">
+            <h3>⚠️ Штраф</h3>
+            <p><strong>Дата:</strong> ${penalty.date}</p>
+            <p><strong>Сотрудник:</strong> ${penalty.employee}</p>
+            <p><strong>Сумма:</strong> ${penalty.amount}₽</p>
+            <p><strong>Причина:</strong> ${penalty.note}</p>
+            <div class="responsible-tag">👤 Ответственный: ${penalty.createdBy}</div>
+            <div class="button-group">
+                <button class="edit-btn" onclick="openEditPenaltyModal(${penalty.id})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deletePenalty(${penalty.id})">🗑️ Удалить</button>
+            </div>
+        </div>
+    `).join('');
+}
+function updatePenaltyStats() {
+    const total = penalties.length;
+    const totalAmount = penalties.reduce((sum, p) => sum + p.amount, 0);
+    
+    let dates = penalties.map(p => p.date).filter(d => d);
+    
+    document.getElementById('totalPenalties').textContent = total;
+    document.getElementById('totalPenaltyAmount').textContent = totalAmount + '₽';
+    
+    if (dates.length > 0) {
+        const firstDate = dates[0];
+        const lastDate = dates[dates.length - 1];
+        document.getElementById('penaltyPeriod').textContent = `${firstDate} - ${lastDate}`;
+    } else {
+        document.getElementById('penaltyPeriod').textContent = '-';
+    }
+}
+
+function updateSalaryStats() {
+    const total = salaries.length;
+    const totalAmount = salaries.reduce((sum, s) => sum + s.amount, 0);
+    
+    let dates = salaries.map(s => s.date).filter(d => d);
+    
+    document.getElementById('totalSalaries').textContent = total;
+    document.getElementById('totalSalaryAmount').textContent = totalAmount + '₽';
+    
+    if (dates.length > 0) {
+        const firstDate = dates[0];
+        const lastDate = dates[dates.length - 1];
+        document.getElementById('salaryPeriod').textContent = `${firstDate} - ${lastDate}`;
+    } else {
+        document.getElementById('salaryPeriod').textContent = '-';
+    }
+}
+
+function openEditPenaltyModal(id) {
+    const penalty = penalties.find(p => p.id === id);
+    if (!penalty) return;
+
+    document.getElementById('editPenaltyId').value = penalty.id;
+    document.getElementById('editPenaltyDate').value = penalty.date;
+    document.getElementById('editPenaltyEmployee').value = penalty.employee;
+    document.getElementById('editPenaltyAmount').value = penalty.amount;
+    document.getElementById('editPenaltyNote').value = penalty.note;
+
+    document.getElementById('editPenaltyModal').style.display = 'block';
+}
+
+function closeEditPenaltyModal() {
+    document.getElementById('editPenaltyModal').style.display = 'none';
+}
+
+function updatePenalty() {
+    if (!canAccessPenalties()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const id = parseInt(document.getElementById('editPenaltyId').value);
+    const date = document.getElementById('editPenaltyDate').value;
+    const employee = document.getElementById('editPenaltyEmployee').value;
+    const amount = document.getElementById('editPenaltyAmount').value;
+    const note = document.getElementById('editPenaltyNote').value;
+
+    if (!date || !employee || !amount || !note) {
+        alert('Пожалуйста, заполните все поля!');
+        return;
+    }
+
+    const penaltyIndex = penalties.findIndex(p => p.id === id);
+    if (penaltyIndex !== -1) {
+        penalties[penaltyIndex] = {
+            ...penalties[penaltyIndex],
+            date: date,
+            employee: employee,
+            amount: parseFloat(amount),
+            note: note
+        };
+
+        if (isFirebaseEnabled) {
+            const penaltiesObj = {};
+            penalties.forEach(p => {
+                penaltiesObj[p.id] = p;
+            });
+            database.ref('penalties').set(penaltiesObj);
+        } else {
+            localStorage.setItem('penalties-data', JSON.stringify(penalties));
+            renderPenalties();
+            updatePenaltyStats();
+        }
+
+        closeEditPenaltyModal();
+    }
+}
+
+function deletePenalty(id) {
+    if (!canAccessPenalties()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    if (!confirm('Вы уверены, что хотите удалить этот штраф?')) return;
+
+    penalties = penalties.filter(p => p.id !== id);
+
+    if (isFirebaseEnabled) {
+        const penaltiesObj = {};
+        penalties.forEach(p => {
+            penaltiesObj[p.id] = p;
+        });
+        database.ref('penalties').set(penaltiesObj);
+    } else {
+        localStorage.setItem('penalties-data', JSON.stringify(penalties));
+        renderPenalties();
+        updatePenaltyStats();
+    }
+}
+function addSalary() {
+    if (!canAccessSalaries()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const date = document.getElementById('salaryDate').value;
+    const employee = document.getElementById('salaryEmployee').value;
+    const amount = document.getElementById('salaryAmount').value;
+    const note = document.getElementById('salaryNote').value;
+
+    if (!date || !employee || !amount || !note) {
+        alert('Пожалуйста, заполните все обязательные поля!');
+        return;
+    }
+
+    // Ограничение для Tiger - может добавлять только себе
+    if (currentUser === 'Tiger' && employee !== 'Tiger') {
+        alert('Вы можете добавлять зарплату только для себя!');
+        return;
+    }
+
+    const salary = {
+        id: Date.now(),
+        date: date,
+        employee: employee,
+        amount: parseFloat(amount),
+        note: note,
+        createdBy: currentUser,
+        createdAt: new Date().toISOString()
+    };
+
+    salaries.push(salary);
+
+    if (isFirebaseEnabled) {
+        const salariesObj = {};
+        salaries.forEach(s => {
+            salariesObj[s.id] = s;
+        });
+        database.ref('salaries').set(salariesObj);
+    } else {
+        localStorage.setItem('salaries-data', JSON.stringify(salaries));
+        renderSalaries();
+        updateSalaryStats();
+    }
+
+    document.getElementById('salaryDate').value = '';
+    document.getElementById('salaryEmployee').value = '';
+    document.getElementById('salaryAmount').value = '';
+    document.getElementById('salaryNote').value = '';
+}
+function renderSalaries() {
+    const salariesList = document.getElementById('salariesList');
+    if (salaries.length === 0) {
+        salariesList.innerHTML = '';
+        return;
+    }
+
+    const sortedSalaries = [...salaries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    salariesList.innerHTML = sortedSalaries.map(salary => `
+        <div class="compensation-item">
+            <h3>💵 Зарплата</h3>
+            <p><strong>Дата:</strong> ${salary.date}</p>
+            <p><strong>Сотрудник:</strong> ${salary.employee}</p>
+            <p><strong>Сумма:</strong> ${salary.amount}₽</p>
+            <p><strong>Комментарий:</strong> ${salary.note}</p>
+            <div class="responsible-tag">👤 Ответственный: ${salary.createdBy}</div>
+            <div class="button-group">
+                <button class="edit-btn" onclick="openEditSalaryModal(${salary.id})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deleteSalary(${salary.id})">🗑️ Удалить</button>
+            </div>
+        </div>
+    `).join('');
+}
+function updateSalary() {
+    if (!canAccessSalaries()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const id = parseInt(document.getElementById('editSalaryId').value);
+    const date = document.getElementById('editSalaryDate').value;
+    const employee = document.getElementById('editSalaryEmployee').value;
+    const amount = document.getElementById('editSalaryAmount').value;
+    const note = document.getElementById('editSalaryNote').value;
+
+    if (!date || !employee || !amount || !note) {
+        alert('Пожалуйста, заполните все поля!');
+        return;
+    }
+
+    const salaryIndex = salaries.findIndex(s => s.id === id);
+    if (salaryIndex !== -1) {
+        salaries[salaryIndex] = {
+            ...salaries[salaryIndex],
+            date: date,
+            employee: employee,
+            amount: parseFloat(amount),
+            note: note
+        };
+
+        if (isFirebaseEnabled) {
+            const salariesObj = {};
+            salaries.forEach(s => {
+                salariesObj[s.id] = s;
+            });
+            database.ref('salaries').set(salariesObj);
+        } else {
+            localStorage.setItem('salaries-data', JSON.stringify(salaries));
+            renderSalaries();
+            updateSalaryStats();
+        }
+
+        closeEditSalaryModal();
+    }
+}
+function openEditSalaryModal(id) {
+    const salary = salaries.find(s => s.id === id);
+    if (!salary) return;
+
+    document.getElementById('editSalaryId').value = salary.id;
+    document.getElementById('editSalaryDate').value = salary.date;
+    document.getElementById('editSalaryEmployee').value = salary.employee;
+    document.getElementById('editSalaryAmount').value = salary.amount;
+    document.getElementById('editSalaryNote').value = salary.note;
+
+    document.getElementById('editSalaryModal').style.display = 'block';
+}
+
+function closeEditSalaryModal() {
+    document.getElementById('editSalaryModal').style.display = 'none';
+}
+
+function updateSalary() {
+    if (!canAccessFinancials()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const id = parseInt(document.getElementById('editSalaryId').value);
+    const date = document.getElementById('editSalaryDate').value;
+    const employee = document.getElementById('editSalaryEmployee').value;
+    const amount = document.getElementById('editSalaryAmount').value;
+    const note = document.getElementById('editSalaryNote').value;
+
+    if (!date || !employee || !amount || !note) {
+        alert('Пожалуйста, заполните все поля!');
+        return;
+    }
+
+    const salaryIndex = salaries.findIndex(s => s.id === id);
+    if (salaryIndex !== -1) {
+        salaries[salaryIndex] = {
+            ...salaries[salaryIndex],
+            date: date,
+            employee: employee,
+            amount: parseFloat(amount),
+            note: note
+        };
+
+        if (isFirebaseEnabled) {
+            const salariesObj = {};
+            salaries.forEach(s => {
+                salariesObj[s.id] = s;
+            });
+            database.ref('salaries').set(salariesObj);
+        } else {
+            localStorage.setItem('salaries-data', JSON.stringify(salaries));
+            renderSalaries();
+            updateSalaryStats();
+        }
+
+        closeEditSalaryModal();
+    }
+}
+
+function deleteSalary(id) {
+    if (!canAccessSalaries()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    if (!confirm('Вы уверены, что хотите удалить эту выплату?')) return;
+
+    salaries = salaries.filter(s => s.id !== id);
+
+    if (isFirebaseEnabled) {
+        const salariesObj = {};
+        salaries.forEach(s => {
+            salariesObj[s.id] = s;
+        });
+        database.ref('salaries').set(salariesObj);
+    } else {
+        localStorage.setItem('salaries-data', JSON.stringify(salaries));
+        renderSalaries();
+        updateSalaryStats();
+    }
+}
 </script>
 </head>
 <body>
@@ -1930,6 +2380,8 @@ window.onclick = function(event) {
             <div class="nav-tab" onclick="switchTab('statuses')">📨 Статусы</div>
             <div class="nav-tab" onclick="switchTab('compensations')">💰 Компенсации</div>
             <div class="nav-tab" onclick="switchTab('accounts')">🎮 Аккаунты</div>
+            <div class="nav-tab" onclick="switchTab('penalties')">⚠️ Штрафы</div>
+<div class="nav-tab" onclick="switchTab('salaries')">💵 Зарплаты</div>
         </div>
 
         <!-- Вкладка: Заказы -->
@@ -2101,4 +2553,146 @@ window.onclick = function(event) {
                 <button onclick="addFreeAccount()">➕ Добавить аккаунт</button>
                 <div id="freeAccountsList"></div>
             </div>
+        </div>
+                <!-- Вкладка: Штрафы -->
+<div id="penaltiesTab" class="tab-content">
+    <div class="stats-section">
+        <h3>📊 Статистика штрафов</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="totalPenalties">0</div>
+                <div class="stat-label">Всего штрафов</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalPenaltyAmount">0₽</div>
+                <div class="stat-label">Общая сумма</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="penaltyPeriod">-</div>
+                <div class="stat-label">Период</div>
+            </div>
+        </div>
+    </div>
 
+    <div class="card">
+        <h2>⚠️ Добавить Штраф</h2>
+        <div class="form-group">
+            <label>Дата и время *</label>
+            <input type="text" id="penaltyDate" placeholder="Например: 05.11.2024 или вчера, или любой текст">
+        </div>
+        <div class="form-group">
+            <label>Сотрудник *</label>
+            <select id="penaltyEmployee">
+    <option value="">Выберите...</option>
+    <option value="Tiger">Tiger</option>
+</select>
+        </div>
+        <div class="form-group">
+            <label>Сумма (₽) *</label>
+            <input type="number" id="penaltyAmount" placeholder="Введите сумму" min="0">
+        </div>
+        <div class="form-group">
+            <label>Заметка *</label>
+            <textarea id="penaltyNote" placeholder="Причина штрафа..." style="min-height: 100px;"></textarea>
+        </div>
+        <button onclick="addPenalty()">💸 Добавить штраф</button>
+
+        <div id="penaltiesList"></div>
+    </div>
+</div>
+
+<!-- Вкладка: Зарплаты -->
+<div id="salariesTab" class="tab-content">
+    <div class="stats-section">
+        <h3>📊 Статистика зарплат</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="totalSalaries">0</div>
+                <div class="stat-label">Всего выплат</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalSalaryAmount">0₽</div>
+                <div class="stat-label">Общая сумма</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="salaryPeriod">-</div>
+                <div class="stat-label">Период</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>💵 Добавить Зарплату</h2>
+        <div class="form-group">
+            <label>Дата и время *</label>
+            <input type="text" id="salaryDate" placeholder="Например: 05.11.2024 или сегодня, или любой текст">
+        </div>
+        <div class="form-group">
+    <label>Сотрудник *</label>
+    <select id="salaryEmployee">
+        <option value="">Выберите...</option>
+        <option value="Tiger">Tiger</option>
+        <option value="sanya">sanya</option>
+    </select>
+</div>
+        <div class="form-group">
+            <label>Сумма (₽) *</label>
+            <input type="number" id="salaryAmount" placeholder="Введите сумму" min="0">
+        </div>
+        <div class="form-group">
+            <label>Заметка *</label>
+            <textarea id="salaryNote" placeholder="Комментарий к выплате..." style="min-height: 100px;"></textarea>
+        </div>
+        <button onclick="addSalary()">💰 Добавить зарплату</button>
+
+        <div id="salariesList"></div>
+    </div>
+</div>
+<!-- Вкладка: Зарплаты -->
+<div id="salariesTab" class="tab-content">
+    <div class="stats-section">
+        <h3>📊 Статистика зарплат</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="totalSalaries">0</div>
+                <div class="stat-label">Всего выплат</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="totalSalaryAmount">0₽</div>
+                <div class="stat-label">Общая сумма</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="salaryPeriod">-</div>
+                <div class="stat-label">Период</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>💵 Добавить Зарплату</h2>
+        <div class="form-group">
+            <label>Дата *</label>
+            <input type="date" id="salaryDate">
+        </div>
+        <div class="form-group">
+            <label>Сотрудник *</label>
+            <select id="salaryEmployee">
+                <option value="">Выберите...</option>
+                <option value="Tiger">Tiger</option>
+                <option value="self">Я (текущий пользователь)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Сумма (₽) *</label>
+            <input type="number" id="salaryAmount" placeholder="Введите сумму" min="0">
+        </div>
+        <div class="form-group">
+            <label>Заметка *</label>
+            <textarea id="salaryNote" placeholder="Комментарий к выплате..." style="min-height: 100px;"></textarea>
+        </div>
+        <button onclick="addSalary()">💰 Добавить зарплату</button>
+
+        <div id="salariesList"></div>
+    </div>
+</div>
+            </div>
