@@ -900,7 +900,8 @@
             }
         }
     </style>
-    </div>
+    </head>
+<body>
 
     <!-- Модальные окна -->
     <div id="editOrderModal" class="modal">
@@ -1057,7 +1058,42 @@
         <button onclick="updateSalary()">💾 Сохранить изменения</button>
     </div>
 </div>
+    <div id="editApplicationModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditApplicationModal()">&times;</span>
+        <h2>✏️ Редактировать Заявление</h2>
+        <input type="hidden" id="editApplicationId">
+        <div class="form-group">
+            <label>Дата *</label>
+            <input type="text" id="editApplicationDate">
+        </div>
+        <div class="form-group">
+            <label>Причина *</label>
+            <select id="editApplicationReason">
+                <option value="">Выберите...</option>
+                <option value="Увольнение">Увольнение</option>
+                <option value="Повышение">Повышение</option>
+                <option value="Понижение">Понижение</option>
+                <option value="Отпуск">Отпуск</option>
+                <option value="Премия">Премия</option>
+                <option value="Перевод">Перевод на другую должность</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ФИО Сотрудника *</label>
+            <input type="text" id="editApplicationEmployeeName">
+        </div>
+        <div class="form-group">
+            <label>Должность *</label>
+            <input type="text" id="editApplicationPosition">
+        </div>
+        <div class="form-group">
+            <label>Ваше имя *</label>
+            <input type="text" id="editApplicationMyName">
+        </div>
+        <button onclick="updateApplication()">💾 Сохранить изменения</button>
     </div>
+</div>
     
        <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -1079,7 +1115,7 @@ const users = {
     'Tiger': '123',
     'sanya': '321'
 };
-
+let applications = [];
 let database = null;
 let ordersRef = null;
 let isFirebaseEnabled = false;
@@ -1112,10 +1148,14 @@ window.addEventListener('load', function() {
         currentUser = savedUser;
         showMainApp();
         loadData();
+    } else {
+        // 👇 Добавь эту строку:
+        document.getElementById('loginScreen').style.display = 'flex';
     }
 });
 
-function login() {
+
+function login() {  
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
 
@@ -1218,6 +1258,11 @@ function loadData() {
             statuses = data ? Object.values(data) : [];
             renderStatuses();
         });
+        database.ref('applications').on('value', (snapshot) => {
+    const data = snapshot.val();
+    applications = data ? Object.values(data) : [];
+    renderApplications();
+});
 
         database.ref('compensations').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -1252,6 +1297,11 @@ function loadData() {
                 orders = JSON.parse(savedOrders);
                 renderOrders();
             }
+            const savedApplications = localStorage.getItem('applications-data');
+if (savedApplications) {
+    applications = JSON.parse(savedApplications);
+    renderApplications();
+}
 
             const savedStatuses = localStorage.getItem('statuses-data');
             if (savedStatuses) {
@@ -1290,7 +1340,349 @@ function loadData() {
         }
     }
 }
+function updateSalaryStats() {
+    const total = salaries.length;
+    const totalAmount = salaries.reduce((sum, s) => sum + s.amount, 0);
+    
+    let dates = salaries.map(s => s.date).filter(d => d);
+    
+    document.getElementById('totalSalaries').textContent = total;
+    document.getElementById('totalSalaryAmount').textContent = totalAmount + '₽';
+    
+    if (dates.length > 0) {
+        const firstDate = dates[0];
+        const lastDate = dates[dates.length - 1];
+        document.getElementById('salaryPeriod').textContent = `${firstDate} - ${lastDate}`;
+    } else {
+        document.getElementById('salaryPeriod').textContent = '-';
+    }
+}
+// Функция добавления заявления
+function addApplication() {
+    if (!canAccessApplications()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
 
+    const date = document.getElementById('applicationDate').value;
+    const reason = document.getElementById('applicationReason').value;
+    const employeeName = document.getElementById('applicationEmployeeName').value;
+    const position = document.getElementById('applicationPosition').value;
+    const myName = document.getElementById('applicationMyName').value;
+
+    if (!date || !reason || !employeeName || !position || !myName) {
+        alert('Пожалуйста, заполните все обязательные поля!');
+        return;
+    }
+
+    const application = {
+        id: Date.now(),
+        date: date,
+        reason: reason,
+        employeeName: employeeName,
+        position: position,
+        myName: myName,
+        createdBy: currentUser,
+        createdAt: new Date().toISOString()
+    };
+
+    applications.push(application);
+
+    if (isFirebaseEnabled) {
+        const applicationsObj = {};
+        applications.forEach(app => {
+            applicationsObj[app.id] = app;
+        });
+        database.ref('applications').set(applicationsObj);
+    } else {
+        localStorage.setItem('applications-data', JSON.stringify(applications));
+        renderApplications();
+    }
+
+    document.getElementById('applicationDate').value = '';
+    document.getElementById('applicationReason').value = '';
+    document.getElementById('applicationEmployeeName').value = '';
+    document.getElementById('applicationPosition').value = '';
+    document.getElementById('applicationMyName').value = '';
+}
+
+// Функция отображения заявлений
+function renderApplications() {
+    const applicationsList = document.getElementById('applicationsList');
+    if (applications.length === 0) {
+        applicationsList.innerHTML = '';
+        return;
+    }
+
+    const sortedApplications = [...applications].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    applicationsList.innerHTML = sortedApplications.map(app => {
+        const reasonText = getReasonText(app.reason);
+        const actionText = getActionText(app.reason);
+        
+        return `
+        <div class="compensation-item">
+            <h3>📄 Заявление</h3>
+            <p><strong>Дата:</strong> ${app.date}</p>
+            <p><strong>О ${reasonText}</strong></p>
+            <p>Я, ${app.myName}, ПРИКАЗЫВАЮ:</p>
+            <p>${actionText} ${app.employeeName}, занимающего должность ${app.position}, с ${app.date}.</p>
+            <p>Произвести голосование в соответствии с регламентом.</p>
+            <div class="responsible-tag">👤 Ответственный: ${app.createdBy}</div>
+            <button class="edit-btn" onclick="downloadApplicationDoc(${app.id})" style="margin-top: 15px; width: auto; display: inline-block;">📥 Скачать DOCX</button>
+            <div class="button-group">
+                <button class="edit-btn" onclick="openEditApplicationModal(${app.id})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deleteApplication(${app.id})">🗑️ Удалить</button>
+            </div>
+        </div>
+    `;
+    }).join('');
+}
+
+// Вспомогательные функции для текста
+function getReasonText(reason) {
+    const reasonMap = {
+        'Увольнение': 'увольнении',
+        'Повышение': 'повышении',
+        'Понижение': 'понижении',
+        'Отпуск': 'отпуске',
+        'Премия': 'премии',
+        'Перевод': 'переводе'
+    };
+    return reasonMap[reason] || reason.toLowerCase();
+}
+
+function getActionText(reason) {
+    const actionMap = {
+        'Увольнение': 'Уволить',
+        'Повышение': 'Повысить',
+        'Понижение': 'Понизить',
+        'Отпуск': 'Предоставить отпуск',
+        'Премия': 'Выдать премию',
+        'Перевод': 'Перевести'
+    };
+    return actionMap[reason] || reason;
+}
+
+// Функция редактирования
+function openEditApplicationModal(id) {
+    const application = applications.find(a => a.id === id);
+    if (!application) return;
+
+    if (application.createdBy !== currentUser) {
+        alert('Вы можете редактировать только свои заявления!');
+        return;
+    }
+
+    document.getElementById('editApplicationId').value = application.id;
+    document.getElementById('editApplicationDate').value = application.date;
+    document.getElementById('editApplicationReason').value = application.reason;
+    document.getElementById('editApplicationEmployeeName').value = application.employeeName;
+    document.getElementById('editApplicationPosition').value = application.position;
+    document.getElementById('editApplicationMyName').value = application.myName;
+
+    document.getElementById('editApplicationModal').style.display = 'block';
+}
+
+// Функция обновления
+function updateApplication() {
+    if (!canAccessApplications()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const id = parseInt(document.getElementById('editApplicationId').value);
+    const application = applications.find(a => a.id === id);
+    
+    if (application && application.createdBy !== currentUser) {
+        alert('Вы можете редактировать только свои заявления!');
+        return;
+    }
+
+    const date = document.getElementById('editApplicationDate').value;
+    const reason = document.getElementById('editApplicationReason').value;
+    const employeeName = document.getElementById('editApplicationEmployeeName').value;
+    const position = document.getElementById('editApplicationPosition').value;
+    const myName = document.getElementById('editApplicationMyName').value;
+
+    if (!date || !reason || !employeeName || !position || !myName) {
+        alert('Пожалуйста, заполните все поля!');
+        return;
+    }
+
+    const appIndex = applications.findIndex(a => a.id === id);
+    if (appIndex !== -1) {
+        applications[appIndex] = {
+            ...applications[appIndex],
+            date: date,
+            reason: reason,
+            employeeName: employeeName,
+            position: position,
+            myName: myName
+        };
+
+        if (isFirebaseEnabled) {
+            const applicationsObj = {};
+            applications.forEach(app => {
+                applicationsObj[app.id] = app;
+            });
+            database.ref('applications').set(applicationsObj);
+        } else {
+            localStorage.setItem('applications-data', JSON.stringify(applications));
+            renderApplications();
+        }
+
+        closeEditApplicationModal();
+    }
+}
+
+// Функция скачивания документа
+function downloadApplicationDoc(id) {
+    const application = applications.find(a => a.id === id);
+    if (!application) return;
+
+    const reasonText = getReasonText(application.reason);
+    const actionText = getActionText(application.reason);
+
+    // HTML разметка для Word документа
+    const htmlContent = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset='utf-8'>
+    <style>
+        @page {
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Segoe Script', 'Brush Script MT', cursive;
+            font-size: 14pt;
+            line-height: 1.8;
+        }
+        .header {
+            text-align: center;
+            font-size: 20pt;
+            font-weight: bold;
+            color: #2F4F4F;
+            margin-bottom: 30pt;
+            text-decoration: underline;
+            letter-spacing: 3pt;
+        }
+        .date {
+            text-align: right;
+            font-size: 12pt;
+            margin-bottom: 20pt;
+            font-style: italic;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            color: #4169E1;
+            margin: 25pt 0 15pt 0;
+            text-transform: uppercase;
+            letter-spacing: 2pt;
+        }
+        .content {
+            text-align: justify;
+            margin: 15pt 0;
+            text-indent: 30pt;
+        }
+        .command {
+            font-weight: bold;
+            color: #8B0000;
+            letter-spacing: 4pt;
+            margin: 20pt 0;
+        }
+        .action-text {
+            margin-left: 40pt;
+            line-height: 2;
+        }
+        .footer {
+            margin-top: 50pt;
+            border-top: 2px solid #000;
+            padding-top: 20pt;
+        }
+        .signature-line {
+            margin-top: 40pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">З А Я В Л Е Н И Е</div>
+    
+    <div class="date">Дата: ${application.date}</div>
+    
+    <div class="section-title">О ${reasonText.toUpperCase()}</div>
+    
+    <div class="content">
+        Я, <span style="font-weight: bold; color: #2F4F4F;">${application.myName}</span>,
+    </div>
+    
+    <div class="command">П Р И К А З Ы В А Ю:</div>
+    
+    <div class="action-text">
+        <p><strong style="color: #8B0000;">${actionText}</strong> <span style="color: #2F4F4F;">${application.employeeName}</span>,</p>
+        <p>занимающего должность <strong>${application.position}</strong>,</p>
+        <p>с <strong>${application.date}</strong>.</p>
+    </div>
+    
+    <div class="content" style="margin-top: 30pt;">
+        Произвести голосование в соответствии с регламентом.
+    </div>
+    
+    <div class="footer">
+        <div class="signature-line">
+            <p>Подпись: _____________________ / ${application.myName} /</p>
+            <p style="margin-top: 20pt;">Дата: ${application.date}</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+    const blob = new Blob(['\ufeff', htmlContent], {
+        type: 'application/msword'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Заявление_${application.reason}_${application.date.replace(/\./g, '-')}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+function deleteApplication(id) {
+    if (!canAccessApplications()) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const application = applications.find(a => a.id === id);
+    if (application && application.createdBy !== currentUser) {
+        alert('Вы можете удалять только свои заявления!');
+        return;
+    }
+
+    if (!confirm('Вы уверены, что хотите удалить это заявление?')) return;
+
+    applications = applications.filter(a => a.id !== id);
+
+    if (isFirebaseEnabled) {
+        const applicationsObj = {};
+        applications.forEach(app => {
+            applicationsObj[app.id] = app;
+        });
+        database.ref('applications').set(applicationsObj);
+    } else {
+        localStorage.setItem('applications-data', JSON.stringify(applications));
+        renderApplications();
+    }
+}
+
+function closeEditApplicationModal() {
+    document.getElementById('editApplicationModal').style.display = 'none';
+}
 function saveOrders() {
     if (isFirebaseEnabled) {
         const ordersObj = {};
@@ -1927,6 +2319,10 @@ window.onclick = function(event) {
     const freeAccountModal = document.getElementById('editFreeAccountModal');
     const penaltyModal = document.getElementById('editPenaltyModal');
     const salaryModal = document.getElementById('editSalaryModal');
+    const applicationModal = document.getElementById('editApplicationModal');
+if (event.target == applicationModal) {
+    closeEditApplicationModal();
+}
     
     if (event.target == orderModal) {
         closeEditOrderModal();
@@ -1952,9 +2348,11 @@ function canAccessPenalties() {
 }
 
 function canAccessSalaries() {
-    return currentUser === 'Azim218' || currentUser === 'sanya' || currentUser === 'Tiger';
+    return currentUser === 'Azim218';
 }
-
+function canAccessApplications() {
+    return currentUser === 'Azim218' || currentUser === 'sanya';
+}
 function addPenalty() {
     if (!canAccessPenalties()) {
         alert('У вас нет доступа к этому разделу!');
@@ -2025,85 +2423,6 @@ function renderPenalties() {
         </div>
     `).join('');
 }
-function updatePenaltyStats() {
-    const total = penalties.length;
-    const totalAmount = penalties.reduce((sum, p) => sum + p.amount, 0);
-    
-    let dates = penalties.map(p => p.date).filter(d => d);
-    
-    document.getElementById('totalPenalties').textContent = total;
-    document.getElementById('totalPenaltyAmount').textContent = totalAmount + '₽';
-    
-    if (dates.length > 0) {
-        const firstDate = dates[0];
-        const lastDate = dates[dates.length - 1];
-        document.getElementById('penaltyPeriod').textContent = `${firstDate} - ${lastDate}`;
-    } else {
-        document.getElementById('penaltyPeriod').textContent = '-';
-    }
-}
-
-function updateSalary() {
-    // Только Azim218 может редактировать зарплаты
-    if (currentUser !== 'Azim218') {
-        alert('Только Azim218 может редактировать зарплаты!');
-        return;
-    }
-
-    const id = parseInt(document.getElementById('editSalaryId').value);
-    const date = document.getElementById('editSalaryDate').value;
-    const employee = document.getElementById('editSalaryEmployee').value;
-    const amount = document.getElementById('editSalaryAmount').value;
-    const note = document.getElementById('editSalaryNote').value;
-
-    if (!date || !employee || !amount || !note) {
-        alert('Пожалуйста, заполните все поля!');
-        return;
-    }
-
-    const salaryIndex = salaries.findIndex(s => s.id === id);
-    if (salaryIndex !== -1) {
-        salaries[salaryIndex] = {
-            ...salaries[salaryIndex],
-            date: date,
-            employee: employee,
-            amount: parseFloat(amount),
-            note: note
-        };
-
-        if (isFirebaseEnabled) {
-            const salariesObj = {};
-            salaries.forEach(s => {
-                salariesObj[s.id] = s;
-            });
-            database.ref('salaries').set(salariesObj);
-        } else {
-            localStorage.setItem('salaries-data', JSON.stringify(salaries));
-            renderSalaries();
-            updateSalaryStats();
-        }
-
-        closeEditSalaryModal();
-    }
-}
-
-function openEditPenaltyModal(id) {
-    const penalty = penalties.find(p => p.id === id);
-    if (!penalty) return;
-
-    document.getElementById('editPenaltyId').value = penalty.id;
-    document.getElementById('editPenaltyDate').value = penalty.date;
-    document.getElementById('editPenaltyEmployee').value = penalty.employee;
-    document.getElementById('editPenaltyAmount').value = penalty.amount;
-    document.getElementById('editPenaltyNote').value = penalty.note;
-
-    document.getElementById('editPenaltyModal').style.display = 'block';
-}
-
-function closeEditPenaltyModal() {
-    document.getElementById('editPenaltyModal').style.display = 'none';
-}
-
 function updatePenalty() {
     if (!canAccessPenalties()) {
         alert('У вас нет доступа к этому разделу!');
@@ -2111,6 +2430,13 @@ function updatePenalty() {
     }
 
     const id = parseInt(document.getElementById('editPenaltyId').value);
+    const penalty = penalties.find(p => p.id === id);
+    
+    if (penalty && penalty.createdBy !== currentUser) {
+        alert('Вы можете редактировать только свои штрафы!');
+        return;
+    }
+
     const date = document.getElementById('editPenaltyDate').value;
     const employee = document.getElementById('editPenaltyEmployee').value;
     const amount = document.getElementById('editPenaltyAmount').value;
@@ -2147,9 +2473,36 @@ function updatePenalty() {
     }
 }
 
+
+
+function openEditPenaltyModal(id) {
+    const penalty = penalties.find(p => p.id === id);
+    if (!penalty) return;
+
+    document.getElementById('editPenaltyId').value = penalty.id;
+    document.getElementById('editPenaltyDate').value = penalty.date;
+    document.getElementById('editPenaltyEmployee').value = penalty.employee;
+    document.getElementById('editPenaltyAmount').value = penalty.amount;
+    document.getElementById('editPenaltyNote').value = penalty.note;
+
+    document.getElementById('editPenaltyModal').style.display = 'block';
+}
+
+function closeEditPenaltyModal() {
+    document.getElementById('editPenaltyModal').style.display = 'none';
+}
+
+
+
 function deletePenalty(id) {
     if (!canAccessPenalties()) {
         alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+
+    const penalty = penalties.find(p => p.id === id);
+    if (penalty && penalty.createdBy !== currentUser) {
+        alert('Вы можете удалять только свои штрафы!');
         return;
     }
 
@@ -2167,6 +2520,23 @@ function deletePenalty(id) {
         localStorage.setItem('penalties-data', JSON.stringify(penalties));
         renderPenalties();
         updatePenaltyStats();
+    }
+}
+function updatePenaltyStats() {
+    const total = penalties.length;
+    const totalAmount = penalties.reduce((sum, p) => sum + p.amount, 0);
+    
+    let dates = penalties.map(p => p.date).filter(d => d);
+    
+    document.getElementById('totalPenalties').textContent = total;
+    document.getElementById('totalPenaltyAmount').textContent = totalAmount + '₽';
+    
+    if (dates.length > 0) {
+        const firstDate = dates[0];
+        const lastDate = dates[dates.length - 1];
+        document.getElementById('penaltyPeriod').textContent = `${firstDate} - ${lastDate}`;
+    } else {
+        document.getElementById('penaltyPeriod').textContent = '-';
     }
 }
 function addSalary() {
@@ -2245,7 +2615,6 @@ function renderSalaries() {
     `).join('');
 }
 function updateSalary() {
-    // Только Azim218 может редактировать зарплаты
     if (currentUser !== 'Azim218') {
         alert('Только Azim218 может редактировать зарплаты!');
         return;
@@ -2304,48 +2673,7 @@ function closeEditSalaryModal() {
     document.getElementById('editSalaryModal').style.display = 'none';
 }
 
-function updateSalary() {
-    if (!canAccessFinancials()) {
-        alert('У вас нет доступа к этому разделу!');
-        return;
-    }
 
-    const id = parseInt(document.getElementById('editSalaryId').value);
-    const date = document.getElementById('editSalaryDate').value;
-    const employee = document.getElementById('editSalaryEmployee').value;
-    const amount = document.getElementById('editSalaryAmount').value;
-    const note = document.getElementById('editSalaryNote').value;
-
-    if (!date || !employee || !amount || !note) {
-        alert('Пожалуйста, заполните все поля!');
-        return;
-    }
-
-    const salaryIndex = salaries.findIndex(s => s.id === id);
-    if (salaryIndex !== -1) {
-        salaries[salaryIndex] = {
-            ...salaries[salaryIndex],
-            date: date,
-            employee: employee,
-            amount: parseFloat(amount),
-            note: note
-        };
-
-        if (isFirebaseEnabled) {
-            const salariesObj = {};
-            salaries.forEach(s => {
-                salariesObj[s.id] = s;
-            });
-            database.ref('salaries').set(salariesObj);
-        } else {
-            localStorage.setItem('salaries-data', JSON.stringify(salaries));
-            renderSalaries();
-            updateSalaryStats();
-        }
-
-        closeEditSalaryModal();
-    }
-}
 
 function deleteSalary(id) {
     // Только Azim218 может удалять зарплаты
@@ -2373,7 +2701,7 @@ function deleteSalary(id) {
 </script>
 </head>
 <body>
-    
+
     <!-- Экран логина -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
@@ -2389,9 +2717,10 @@ function deleteSalary(id) {
             <button onclick="login()">💖 Войти</button>
         </div>
     </div>
+</div>
 
     <!-- Основное приложение -->
-    <div class="container" id="mainApp">
+    <div id="mainApp" class="container">
         <div class="header">
             <div class="user-info" id="userInfo">👤</div>
             <div class="header-center">
@@ -2400,6 +2729,7 @@ function deleteSalary(id) {
             </div>
             <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
         </div>
+        
 
         <!-- Навигационная панель -->
         <div class="nav-tabs">
@@ -2409,6 +2739,7 @@ function deleteSalary(id) {
             <div class="nav-tab" onclick="switchTab('compensations')">💰 Компенсации</div>
             <div class="nav-tab" onclick="switchTab('accounts')">🎮 Аккаунты</div>
             <div class="nav-tab" onclick="switchTab('penalties')">⚠️ Штрафы</div>
+            <div class="nav-tab" onclick="switchTab('applications')">📄 Заявления</div>
 <div class="nav-tab" onclick="switchTab('salaries')">💵 Зарплаты</div>
         </div>
 
@@ -2629,53 +2960,7 @@ function deleteSalary(id) {
     </div>
 </div>
 
-<!-- Вкладка: Зарплаты -->
-<div id="salariesTab" class="tab-content">
-    <div class="stats-section">
-        <h3>📊 Статистика зарплат</h3>
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-value" id="totalSalaries">0</div>
-                <div class="stat-label">Всего выплат</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="totalSalaryAmount">0₽</div>
-                <div class="stat-label">Общая сумма</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="salaryPeriod">-</div>
-                <div class="stat-label">Период</div>
-            </div>
-        </div>
-    </div>
 
-    <div class="card">
-        <h2>💵 Добавить Зарплату</h2>
-        <div class="form-group">
-            <label>Дата и время *</label>
-            <input type="text" id="salaryDate" placeholder="Например: 05.11.2024 или сегодня, или любой текст">
-        </div>
-        <div class="form-group">
-    <label>Сотрудник *</label>
-    <select id="salaryEmployee">
-        <option value="">Выберите...</option>
-        <option value="Tiger">Tiger</option>
-        <option value="sanya">sanya</option>
-    </select>
-</div>
-        <div class="form-group">
-            <label>Сумма (₽) *</label>
-            <input type="number" id="salaryAmount" placeholder="Введите сумму" min="0">
-        </div>
-        <div class="form-group">
-            <label>Заметка *</label>
-            <textarea id="salaryNote" placeholder="Комментарий к выплате..." style="min-height: 100px;"></textarea>
-        </div>
-        <button onclick="addSalary()">💰 Добавить зарплату</button>
-
-        <div id="salariesList"></div>
-    </div>
-</div>
 <!-- Вкладка: Зарплаты -->
 <div id="salariesTab" class="tab-content">
     <div class="stats-section">
@@ -2700,7 +2985,7 @@ function deleteSalary(id) {
         <h2>💵 Добавить Зарплату</h2>
         <div class="form-group">
             <label>Дата *</label>
-            <input type="date" id="salaryDate">
+            <input type="text">
         </div>
         <div class="form-group">
             <label>Сотрудник *</label>
@@ -2723,4 +3008,40 @@ function deleteSalary(id) {
         <div id="salariesList"></div>
     </div>
 </div>
-            </div>
+            <div id="applicationsTab" class="tab-content">
+    <div class="card">
+        <h2>📄 Новое Заявление</h2>
+        <div class="form-group">
+            <label>Дата *</label>
+            <input type="text" id="applicationDate" placeholder="Например: 06.11.2024">
+        </div>
+        <div class="form-group">
+            <label>Причина *</label>
+            <select id="applicationReason">
+                <option value="">Выберите...</option>
+                <option value="Увольнение">Увольнение</option>
+                <option value="Повышение">Повышение</option>
+                <option value="Понижение">Понижение</option>
+                <option value="Отпуск">Отпуск</option>
+                <option value="Премия">Премия</option>
+                <option value="Перевод">Перевод на другую должность</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>ФИО Сотрудника *</label>
+            <input type="text" id="applicationEmployeeName" placeholder="Введите ФИО сотрудника">
+        </div>
+        <div class="form-group">
+            <label>Должность *</label>
+            <input type="text" id="applicationPosition" placeholder="Например: Менеджер">
+        </div>
+        <div class="form-group">
+            <label>Ваше имя *</label>
+            <input type="text" id="applicationMyName" placeholder="Введите ваше имя">
+        </div>
+        <button onclick="addApplication()">📝 Создать заявление</button>
+
+        <div id="applicationsList"></div>
+    </div>
+</div>
+</div>
