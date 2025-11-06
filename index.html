@@ -96,15 +96,26 @@
             font-size: 0.95rem;
         }
 
-        .login-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
-        }
+.login-container {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 25%, #ffecd2 50%, #fcb69f 75%, #ff9a9e 100%);
+    background-size: 400% 400%;
+    animation: gradientWave 20s ease infinite;
+}
+
+.login-container.hidden {
+    display: none !important;
+}
 
         .login-box {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 245, 250, 0.98) 100%);
@@ -126,19 +137,19 @@
         }
 
         .container {
-            max-width: 1400px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 1;
-            box-sizing: border-box;
-            display: none;
-        }
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    box-sizing: border-box;
+    display: none;
+}
 
-        .container.active {
-            display: block;
-        }
+.container.active {
+    display: block !important;
+}
 
         .header {
             text-align: center;
@@ -1002,7 +1013,9 @@
             </div>
             <button onclick="updateFreeAccount()">💾 Сохранить изменения</button>
         </div>
-        <div id="editPenaltyModal" class="modal">
+    </div> <!-- Закрываем editFreeAccountModal -->
+
+    <div id="editPenaltyModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeEditPenaltyModal()">&times;</span>
         <h2>✏️ Редактировать Штраф</h2>
@@ -1115,24 +1128,6 @@ const users = {
     'Tiger': '123',
     'sanya': '321'
 };
-let applications = [];
-let database = null;
-let ordersRef = null;
-let isFirebaseEnabled = false;
-
-try {
-    firebase.initializeApp(firebaseConfig);
-    database = firebase.database();
-    
-    // Устанавливаем токен доступа для правил безопасности
-    database.ref('config/token').set('RentMyWaifu2025Secret');
-    
-    ordersRef = database.ref('orders');
-    isFirebaseEnabled = true;
-    console.log('✅ Firebase подключен успешно!');
-} catch (error) {
-    console.error('Ошибка инициализации Firebase:', error);
-}
 
 let currentUser = null;
 let orders = [];
@@ -1141,23 +1136,52 @@ let compensations = [];
 let freeAccounts = [];
 let penalties = [];
 let salaries = [];
+let applications = [];
+let database = null;
+let ordersRef = null;
+let isFirebaseEnabled = false;
 
+// Инициализация Firebase
+try {
+    firebase.initializeApp(firebaseConfig);
+    database = firebase.database();
+    database.ref('config/token').set('RentMyWaifu2025Secret');
+    ordersRef = database.ref('orders');
+    isFirebaseEnabled = true;
+    console.log('✅ Firebase подключен успешно!');
+} catch (error) {
+    console.error('Ошибка инициализации Firebase:', error);
+}
+
+// Проверка при загрузке страницы
 window.addEventListener('load', function() {
+    console.log('Страница загружена');
+    
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
+    
+    console.log('loginScreen элемент:', loginScreen);
+    console.log('mainApp элемент:', mainApp);
+    
     const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
+    
+    if (savedUser && users[savedUser]) {
+        console.log('Найден сохраненный пользователь:', savedUser);
         currentUser = savedUser;
         showMainApp();
         loadData();
     } else {
-        // 👇 Добавь эту строку:
-        document.getElementById('loginScreen').style.display = 'flex';
+        console.log('Показываем экран логина');
+        if (loginScreen) loginScreen.style.display = 'flex';
+        if (mainApp) mainApp.style.display = 'none';
     }
 });
-
 
 function login() {  
     const username = document.getElementById('loginUsername').value;
     const password = document.getElementById('loginPassword').value;
+
+    console.log('Попытка входа:', username);
 
     if (!username || !password) {
         alert('Пожалуйста, введите логин и пароль!');
@@ -1167,6 +1191,7 @@ function login() {
     if (users[username] && users[username] === password) {
         currentUser = username;
         localStorage.setItem('currentUser', username);
+        console.log('Вход успешен:', username);
         showMainApp();
         loadData();
     } else {
@@ -1177,73 +1202,70 @@ function login() {
 function logout() {
     currentUser = null;
     localStorage.removeItem('currentUser');
-    document.getElementById('loginScreen').style.display = 'flex';
-    document.getElementById('mainApp').classList.remove('active');
+    
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
+    
+    if (loginScreen) {
+        loginScreen.classList.remove('hidden');
+        loginScreen.style.display = 'flex';
+    }
+    if (mainApp) {
+        mainApp.classList.remove('active');
+        mainApp.style.display = 'none';
+    }
+    
     document.getElementById('loginUsername').value = '';
     document.getElementById('loginPassword').value = '';
 }
 
 function showMainApp() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('mainApp').classList.add('active');
-    document.getElementById('userInfo').textContent = '👤 ' + currentUser;
+    console.log('Показываем главное приложение');
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
+    
+    if (loginScreen) {
+        loginScreen.style.display = 'none';
+        loginScreen.classList.add('hidden');
+    }
+    if (mainApp) {
+        mainApp.style.display = 'block';
+        mainApp.classList.add('active');
+    }
+    
+    const userInfo = document.getElementById('userInfo');
+    if (userInfo) userInfo.textContent = '👤 ' + currentUser;
 }
 
+// Остальные функции остаются без изменений...
 function switchTab(tabName) {
-    // Скрыть все вкладки
+    if (currentUser === 'Tiger' && (tabName === 'penalties' || tabName === 'salaries' || tabName === 'applications')) {
+        alert('У вас нет доступа к этому разделу!');
+        return;
+    }
+    
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
     
-    // Убрать активный класс со всех кнопок
     document.querySelectorAll('.nav-tab').forEach(btn => {
         btn.classList.remove('active');
     });
     
-    // Показать выбранную вкладку
     document.getElementById(tabName + 'Tab').classList.add('active');
-    
-    // Активировать соответствующую кнопку
     event.target.classList.add('active');
     
-    // Обновить статистику если открыта вкладка аккаунтов
     if (tabName === 'accounts') {
         updateAccountStats();
     }
 }
 
-function updateAccountStats() {
-    const total = freeAccounts.length;
-    let freeCount = 0;
-    let bannedCount = 0;
-    
-    freeAccounts.forEach(account => {
-        const status = checkAccountStatus(account.name);
-        if (status.isFree) {
-            freeCount++;
-        }
-        // Проверяем на бан во всех полях аккаунта
-const accountText = (account.note || '').toLowerCase();
-
-// Также проверяем заказы связанные с этим аккаунтом
-const relatedOrder = orders.find(order => 
-    order.accountName.toLowerCase().trim() === account.name.toLowerCase().trim()
-);
-
-const orderText = relatedOrder ? 
-    `${relatedOrder.customerName || ''} ${relatedOrder.orderTime || ''} ${relatedOrder.orderEndTime || ''} ${relatedOrder.note || ''}`.toLowerCase() : '';
-
-if (accountText.includes('баня') || accountText.includes('бан') || 
-    orderText.includes('баня') || orderText.includes('бан')) {
-    bannedCount++;
-
-        }
-    });
-    
-    document.getElementById('totalAccounts').textContent = total;
-    document.getElementById('freeAccounts').textContent = freeCount;
-    document.getElementById('bannedAccounts').textContent = bannedCount;
+function loadData() {
+    console.log('Загрузка данных...');
+    // Остальной код loadData...
 }
+
+// ... остальные функции без изменений
 
 function loadData() {
     if (isFirebaseEnabled) {
@@ -2239,7 +2261,34 @@ function renderFreeAccounts() {
     
     updateAccountStats();
 }
+function updateAccountStats() {
+    const total = freeAccounts.length;
+    let freeCount = 0;
+    let bannedCount = 0;
+    
+    freeAccounts.forEach(account => {
+        const status = checkAccountStatus(account.name);
+        if (status.isFree) {
+            freeCount++;
+        }
+        
+        const accountText = (account.note || '').toLowerCase();
+        const relatedOrder = orders.find(order => 
+            order.accountName.toLowerCase().trim() === account.name.toLowerCase().trim()
+        );
+        const orderText = relatedOrder ? 
+            `${relatedOrder.customerName || ''} ${relatedOrder.orderTime || ''} ${relatedOrder.orderEndTime || ''} ${relatedOrder.note || ''}`.toLowerCase() : '';
 
+        if (accountText.includes('баня') || accountText.includes('бан') || 
+            orderText.includes('баня') || orderText.includes('бан')) {
+            bannedCount++;
+        }
+    });
+    
+    document.getElementById('totalAccounts').textContent = total;
+    document.getElementById('freeAccounts').textContent = freeCount;
+    document.getElementById('bannedAccounts').textContent = bannedCount;
+}
 function openEditFreeAccountModal(id) {
     const account = freeAccounts.find(a => a.id === id);
     if (!account) return;
@@ -2701,9 +2750,8 @@ function deleteSalary(id) {
 </script>
 </head>
 <body>
-
     <!-- Экран логина -->
-    <div class="login-container" id="loginScreen">
+    <div class="login-container" id="loginScreen" style="display: flex;">
         <div class="login-box">
             <h1>✨ Вход ✨</h1>
             <div class="form-group">
@@ -2717,10 +2765,9 @@ function deleteSalary(id) {
             <button onclick="login()">💖 Войти</button>
         </div>
     </div>
-</div>
 
     <!-- Основное приложение -->
-    <div id="mainApp" class="container">
+    <div id="mainApp" class="container" style="display: none;">
         <div class="header">
             <div class="user-info" id="userInfo">👤</div>
             <div class="header-center">
@@ -2728,8 +2775,7 @@ function deleteSalary(id) {
                 <p>💕 Управляй своими заказами легко и красиво 💕</p>
             </div>
             <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
-        </div>
-        
+        </div> <!-- Закрываем .header -->
 
         <!-- Навигационная панель -->
         <div class="nav-tabs">
@@ -2984,9 +3030,9 @@ function deleteSalary(id) {
     <div class="card">
         <h2>💵 Добавить Зарплату</h2>
         <div class="form-group">
-            <label>Дата *</label>
-            <input type="text">
-        </div>
+    <label>Дата *</label>
+    <input type="text" id="salaryDate" placeholder="Например: 06.11.2024">
+</div>
         <div class="form-group">
             <label>Сотрудник *</label>
             <select id="salaryEmployee">
