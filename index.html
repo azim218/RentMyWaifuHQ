@@ -2481,7 +2481,8 @@ function updatePenalty() {
     const id = parseInt(document.getElementById('editPenaltyId').value);
     const penalty = penalties.find(p => p.id === id);
     
-    if (penalty && penalty.createdBy !== currentUser) {
+    // Azim218 может редактировать любые штрафы, остальные - только свои
+    if (penalty && penalty.createdBy !== currentUser && currentUser !== 'Azim218') {
         alert('Вы можете редактировать только свои штрафы!');
         return;
     }
@@ -2550,7 +2551,9 @@ function deletePenalty(id) {
     }
 
     const penalty = penalties.find(p => p.id === id);
-    if (penalty && penalty.createdBy !== currentUser) {
+    
+    // Azim218 может удалять любые штрафы, остальные - только свои
+    if (penalty && penalty.createdBy !== currentUser && currentUser !== 'Azim218') {
         alert('Вы можете удалять только свои штрафы!');
         return;
     }
