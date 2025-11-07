@@ -1140,7 +1140,191 @@ let applications = [];
 let database = null;
 let ordersRef = null;
 let isFirebaseEnabled = false;
+let warnings = [];
 
+function canAccessWarnings() {
+    return currentUser === 'Azim218' || currentUser === 'sanya' || currentUser === 'Tiger';
+}
+
+function addWarning() {
+    if (!canAccessWarnings()) {
+        alert('У вас нет доступа!');
+        return;
+    }
+    
+    if (currentUser === 'Tiger') {
+        alert('У вас доступ только для просмотра!');
+        return;
+    }
+
+    const employee = document.getElementById('warningEmployee').value;
+    const reason = document.getElementById('warningReason').value;
+    const startDate = document.getElementById('warningStartDate').value;
+    const endDate = document.getElementById('warningEndDate').value;
+    const note = document.getElementById('warningNote').value;
+
+    if (!employee || !reason || !startDate || !endDate) {
+        alert('Заполните все обязательные поля!');
+        return;
+    }
+
+    const warning = {
+        id: Date.now(),
+        employee,
+        reason,
+        startDate,
+        endDate,
+        note: note || '-',
+        createdBy: currentUser,
+        createdAt: new Date().toISOString()
+    };
+
+    warnings.push(warning);
+
+    if (isFirebaseEnabled) {
+        const warningsObj = {};
+        warnings.forEach(w => { warningsObj[w.id] = w; });
+        database.ref('warnings').set(warningsObj);
+    } else {
+        localStorage.setItem('warnings-data', JSON.stringify(warnings));
+        renderWarnings();
+        updateWarningStats();
+    }
+
+    document.getElementById('warningEmployee').value = '';
+    document.getElementById('warningReason').value = '';
+    document.getElementById('warningStartDate').value = '';
+    document.getElementById('warningEndDate').value = '';
+    document.getElementById('warningNote').value = '';
+}
+
+function renderWarnings() {
+    const list = document.getElementById('warningsList');
+    if (warnings.length === 0) {
+        list.innerHTML = '';
+        return;
+    }
+
+    const sorted = [...warnings].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const showButtons = currentUser !== 'Tiger';
+
+    list.innerHTML = sorted.map(w => `
+        <div class="compensation-item">
+            <h3>📋 Предупреждение</h3>
+            <p><strong>Сотрудник:</strong> ${w.employee}</p>
+            <p><strong>Причина:</strong> ${w.reason}</p>
+            <p><strong>Начало:</strong> ${w.startDate}</p>
+            <p><strong>Окончание:</strong> ${w.endDate}</p>
+            ${w.note && w.note !== '-' ? `<p><strong>Заметка:</strong> ${w.note}</p>` : ''}
+            <div class="responsible-tag">👤 Ответственный: ${w.createdBy}</div>
+            ${showButtons && (currentUser === 'Azim218' || w.createdBy === currentUser) ? `
+            <div class="button-group">
+                <button class="edit-btn" onclick="openEditWarningModal(${w.id})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deleteWarning(${w.id})">🗑️ Удалить</button>
+            </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+function openEditWarningModal(id) {
+    const w = warnings.find(x => x.id === id);
+    if (!w) return;
+
+    if (w.createdBy !== currentUser && currentUser !== 'Azim218') {
+        alert('Можете редактировать только свои!');
+        return;
+    }
+
+    document.getElementById('editWarningId').value = w.id;
+    document.getElementById('editWarningEmployee').value = w.employee;
+    document.getElementById('editWarningReason').value = w.reason;
+    document.getElementById('editWarningStartDate').value = w.startDate;
+    document.getElementById('editWarningEndDate').value = w.endDate;
+    document.getElementById('editWarningNote').value = w.note === '-' ? '' : w.note;
+    document.getElementById('editWarningModal').style.display = 'block';
+}
+
+function closeEditWarningModal() {
+    document.getElementById('editWarningModal').style.display = 'none';
+}
+
+function updateWarning() {
+    const id = parseInt(document.getElementById('editWarningId').value);
+    const w = warnings.find(x => x.id === id);
+    
+    if (w && w.createdBy !== currentUser && currentUser !== 'Azim218') {
+        alert('Можете редактировать только свои!');
+        return;
+    }
+
+    const employee = document.getElementById('editWarningEmployee').value;
+    const reason = document.getElementById('editWarningReason').value;
+    const startDate = document.getElementById('editWarningStartDate').value;
+    const endDate = document.getElementById('editWarningEndDate').value;
+    const note = document.getElementById('editWarningNote').value;
+
+    if (!employee || !reason || !startDate || !endDate) {
+        alert('Заполните все поля!');
+        return;
+    }
+
+    const idx = warnings.findIndex(x => x.id === id);
+    if (idx !== -1) {
+        warnings[idx] = { ...warnings[idx], employee, reason, startDate, endDate, note: note || '-' };
+
+        if (isFirebaseEnabled) {
+            const warningsObj = {};
+            warnings.forEach(w => { warningsObj[w.id] = w; });
+            database.ref('warnings').set(warningsObj);
+        } else {
+            localStorage.setItem('warnings-data', JSON.stringify(warnings));
+            renderWarnings();
+            updateWarningStats();
+        }
+
+        closeEditWarningModal();
+    }
+}
+
+function deleteWarning(id) {
+    if (!canAccessWarnings()) {
+        alert('Нет доступа!');
+        return;
+    }
+
+    const w = warnings.find(x => x.id === id);
+    if (w && w.createdBy !== currentUser && currentUser !== 'Azim218') {
+        alert('Можете удалять только свои!');
+        return;
+    }
+
+    if (!confirm('Удалить предупреждение?')) return;
+
+    warnings = warnings.filter(x => x.id !== id);
+
+    if (isFirebaseEnabled) {
+        const warningsObj = {};
+        warnings.forEach(w => { warningsObj[w.id] = w; });
+        database.ref('warnings').set(warningsObj);
+    } else {
+        localStorage.setItem('warnings-data', JSON.stringify(warnings));
+        renderWarnings();
+        updateWarningStats();
+    }
+}
+
+function updateWarningStats() {
+    const total = warnings.length;
+    const now = new Date();
+    const active = warnings.filter(w => {
+        const end = new Date(w.endDate.split('.').reverse().join('-'));
+        return end >= now;
+    }).length;
+    
+    document.getElementById('totalWarnings').textContent = total;
+    document.getElementById('activeWarnings').textContent = active;
+}
 // Инициализация Firebase
 try {
     firebase.initializeApp(firebaseConfig);
@@ -1235,15 +1419,11 @@ function showMainApp() {
     
     const userInfo = document.getElementById('userInfo');
     if (userInfo) userInfo.textContent = '👤 ' + currentUser;
+    document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
 }
 
 // Остальные функции остаются без изменений...
 function switchTab(tabName) {
-    if (currentUser === 'Tiger' && (tabName === 'penalties' || tabName === 'salaries' || tabName === 'applications')) {
-        alert('У вас нет доступа к этому разделу!');
-        return;
-    }
-    
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.classList.remove('active');
     });
@@ -1252,12 +1432,34 @@ function switchTab(tabName) {
         btn.classList.remove('active');
     });
     
-    document.getElementById(tabName + 'Tab').classList.add('active');
-    event.target.classList.add('active');
+    const targetTab = document.getElementById(tabName + 'Tab');
+    if (targetTab) targetTab.classList.add('active');
+    
+    // Находим нажатую кнопку по тексту
+    document.querySelectorAll('.nav-tab').forEach(btn => {
+        if (btn.textContent.includes(getTabText(tabName))) {
+            btn.classList.add('active');
+        }
+    });
     
     if (tabName === 'accounts') {
         updateAccountStats();
     }
+}
+
+function getTabText(tabName) {
+    const map = {
+        'orders': '💝 Заказы',
+        'calculator': '⏰ Калькулятор',
+        'statuses': '📨 Статусы',
+        'compensations': '💰 Компенсации',
+        'accounts': '🎮 Аккаунты',
+        'penalties': '⚠️ Штрафы',
+        'applications': '📄 Заявления',
+        'warnings': '📋 Предупреждения',
+        'salaries': '💵 Зарплаты'
+    };
+    return map[tabName] || '';
 }
 
 function loadData() {
@@ -1291,6 +1493,20 @@ function loadData() {
             compensations = data ? Object.values(data) : [];
             renderCompensations();
         });
+        database.ref('warnings').on('value', (snapshot) => {
+    const data = snapshot.val();
+    warnings = data ? Object.values(data) : [];
+    renderWarnings();
+    updateWarningStats();
+});
+
+// localStorage
+const savedWarnings = localStorage.getItem('warnings-data');
+if (savedWarnings) {
+    warnings = JSON.parse(savedWarnings);
+    renderWarnings();
+    updateWarningStats();
+}
         
         database.ref('freeAccounts').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -1385,6 +1601,13 @@ function addApplication() {
         alert('У вас нет доступа к этому разделу!');
         return;
     }
+    
+    if (currentUser === 'Tiger') {
+        alert('У вас есть доступ только для просмотра!');
+        return;
+    }
+
+    // остальной код функции остается без изменений
 
     const date = document.getElementById('applicationDate').value;
     const reason = document.getElementById('applicationReason').value;
@@ -1441,6 +1664,7 @@ function renderApplications() {
     applicationsList.innerHTML = sortedApplications.map(app => {
         const reasonText = getReasonText(app.reason);
         const actionText = getActionText(app.reason);
+        const showButtons = currentUser !== 'Tiger';
         
         return `
         <div class="compensation-item">
@@ -1452,10 +1676,12 @@ function renderApplications() {
             <p>Произвести голосование в соответствии с регламентом.</p>
             <div class="responsible-tag">👤 Ответственный: ${app.createdBy}</div>
             <button class="edit-btn" onclick="downloadApplicationDoc(${app.id})" style="margin-top: 15px; width: auto; display: inline-block;">📥 Скачать DOCX</button>
+            ${showButtons ? `
             <div class="button-group">
                 <button class="edit-btn" onclick="openEditApplicationModal(${app.id})">✏️ Редактировать</button>
                 <button class="delete-btn" onclick="deleteApplication(${app.id})">🗑️ Удалить</button>
             </div>
+            ` : ''}
         </div>
     `;
     }).join('');
@@ -2369,6 +2595,10 @@ window.onclick = function(event) {
     const penaltyModal = document.getElementById('editPenaltyModal');
     const salaryModal = document.getElementById('editSalaryModal');
     const applicationModal = document.getElementById('editApplicationModal');
+    const warningModal = document.getElementById('editWarningModal');
+if (event.target == warningModal) {
+    closeEditWarningModal();
+}
 if (event.target == applicationModal) {
     closeEditApplicationModal();
 }
@@ -2393,20 +2623,27 @@ if (event.target == applicationModal) {
     }
 }
 function canAccessPenalties() {
-    return currentUser === 'Azim218' || currentUser === 'sanya';
+    return currentUser === 'Azim218' || currentUser === 'sanya' || currentUser === 'Tiger';
 }
 
 function canAccessSalaries() {
-    return currentUser === 'Azim218';
+    return currentUser === 'Azim218' || currentUser === 'Tiger';
 }
 function canAccessApplications() {
-    return currentUser === 'Azim218' || currentUser === 'sanya';
+    return currentUser === 'Azim218' || currentUser === 'sanya' || currentUser === 'Tiger';
 }
 function addPenalty() {
     if (!canAccessPenalties()) {
         alert('У вас нет доступа к этому разделу!');
         return;
     }
+    
+    if (currentUser === 'Tiger') {
+        alert('У вас есть доступ только для просмотра!');
+        return;
+    }
+
+    // остальной код функции остается без изменений
 
     const date = document.getElementById('penaltyDate').value;
     const employee = document.getElementById('penaltyEmployee').value;
@@ -2457,7 +2694,9 @@ function renderPenalties() {
 
     const sortedPenalties = [...penalties].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    penaltiesList.innerHTML = sortedPenalties.map(penalty => `
+    penaltiesList.innerHTML = sortedPenalties.map(penalty => {
+        const showButtons = currentUser !== 'Tiger';
+        return `
         <div class="compensation-item">
             <h3>⚠️ Штраф</h3>
             <p><strong>Дата:</strong> ${penalty.date}</p>
@@ -2465,12 +2704,14 @@ function renderPenalties() {
             <p><strong>Сумма:</strong> ${penalty.amount}₽</p>
             <p><strong>Причина:</strong> ${penalty.note}</p>
             <div class="responsible-tag">👤 Ответственный: ${penalty.createdBy}</div>
+            ${showButtons ? `
             <div class="button-group">
                 <button class="edit-btn" onclick="openEditPenaltyModal(${penalty.id})">✏️ Редактировать</button>
                 <button class="delete-btn" onclick="deletePenalty(${penalty.id})">🗑️ Удалить</button>
             </div>
+            ` : ''}
         </div>
-    `).join('');
+    `}).join('');
 }
 function updatePenalty() {
     if (!canAccessPenalties()) {
@@ -2592,10 +2833,12 @@ function updatePenaltyStats() {
     }
 }
 function addSalary() {
-    if (!canAccessSalaries()) {
-        alert('У вас нет доступа к этому разделу!');
+    if (currentUser !== 'Azim218') {
+        alert('Только Azim218 может добавлять зарплаты!');
         return;
     }
+    
+    // остальной код без изменений
 
     const date = document.getElementById('salaryDate').value;
     const employee = document.getElementById('salaryEmployee').value;
@@ -2651,7 +2894,9 @@ function renderSalaries() {
 
     const sortedSalaries = [...salaries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    salariesList.innerHTML = sortedSalaries.map(salary => `
+    salariesList.innerHTML = sortedSalaries.map(salary => {
+        const showButtons = currentUser === 'Azim218';
+        return `
         <div class="compensation-item">
             <h3>💵 Зарплата</h3>
             <p><strong>Дата:</strong> ${salary.date}</p>
@@ -2659,12 +2904,14 @@ function renderSalaries() {
             <p><strong>Сумма:</strong> ${salary.amount}₽</p>
             <p><strong>Комментарий:</strong> ${salary.note}</p>
             <div class="responsible-tag">👤 Ответственный: ${salary.createdBy}</div>
+            ${showButtons ? `
             <div class="button-group">
                 <button class="edit-btn" onclick="openEditSalaryModal(${salary.id})">✏️ Редактировать</button>
                 <button class="delete-btn" onclick="deleteSalary(${salary.id})">🗑️ Удалить</button>
             </div>
+            ` : ''}
         </div>
-    `).join('');
+    `}).join('');
 }
 function updateSalary() {
     if (currentUser !== 'Azim218') {
@@ -2789,6 +3036,7 @@ function deleteSalary(id) {
             <div class="nav-tab" onclick="switchTab('accounts')">🎮 Аккаунты</div>
             <div class="nav-tab" onclick="switchTab('penalties')">⚠️ Штрафы</div>
             <div class="nav-tab" onclick="switchTab('applications')">📄 Заявления</div>
+            <div class="nav-tab" onclick="switchTab('warnings')">📋 Предупреждения</div>
 <div class="nav-tab" onclick="switchTab('salaries')">💵 Зарплаты</div>
         </div>
 
@@ -3009,7 +3257,86 @@ function deleteSalary(id) {
     </div>
 </div>
 
+<!-- Вкладка: Предупреждения -->
+<div id="warningsTab" class="tab-content">
+    <div class="stats-section">
+        <h3>📊 Статистика предупреждений</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value" id="totalWarnings">0</div>
+                <div class="stat-label">Всего предупреждений</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="activeWarnings">0</div>
+                <div class="stat-label">Активных</div>
+            </div>
+        </div>
+    </div>
 
+    <div class="card">
+        <h2>⚠️ Добавить Предупреждение</h2>
+        <div class="form-group">
+            <label>Сотрудник *</label>
+            <select id="warningEmployee">
+                <option value="">Выберите...</option>
+                <option value="Tiger">Tiger</option>
+                <option value="sanya">sanya</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Причина *</label>
+            <input type="text" id="warningReason" placeholder="Укажите причину">
+        </div>
+        <div class="form-group">
+            <label>Дата создания *</label>
+            <input type="text" id="warningStartDate" placeholder="Например: 07.11.2024">
+        </div>
+        <div class="form-group">
+            <label>Дата окончания *</label>
+            <input type="text" id="warningEndDate" placeholder="Например: 14.11.2024">
+        </div>
+        <div class="form-group">
+            <label>Заметка</label>
+            <textarea id="warningNote" placeholder="Дополнительная информация" style="min-height: 100px;"></textarea>
+        </div>
+        <button onclick="addWarning()">📝 Добавить предупреждение</button>
+
+        <div id="warningsList"></div>
+    </div>
+</div>
+
+<div id="editWarningModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditWarningModal()">&times;</span>
+        <h2>✏️ Редактировать Предупреждение</h2>
+        <input type="hidden" id="editWarningId">
+        <div class="form-group">
+            <label>Сотрудник *</label>
+            <select id="editWarningEmployee">
+                <option value="">Выберите...</option>
+                <option value="Tiger">Tiger</option>
+                <option value="sanya">sanya</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Причина *</label>
+            <input type="text" id="editWarningReason">
+        </div>
+        <div class="form-group">
+            <label>Дата создания *</label>
+            <input type="text" id="editWarningStartDate">
+        </div>
+        <div class="form-group">
+            <label>Дата окончания *</label>
+            <input type="text" id="editWarningEndDate">
+        </div>
+        <div class="form-group">
+            <label>Заметка</label>
+            <textarea id="editWarningNote"></textarea>
+        </div>
+        <button onclick="updateWarning()">💾 Сохранить</button>
+    </div>
+</div>
 <!-- Вкладка: Зарплаты -->
 <div id="salariesTab" class="tab-content">
     <div class="stats-section">
