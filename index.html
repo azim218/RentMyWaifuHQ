@@ -1141,6 +1141,7 @@ let database = null;
 let ordersRef = null;
 let isFirebaseEnabled = false;
 let warnings = [];
+let reports = [];
 
 function canAccessWarnings() {
     return currentUser === 'Azim218' || currentUser === 'sanya' || currentUser === 'Tiger';
@@ -1457,7 +1458,9 @@ function getTabText(tabName) {
         'penalties': '⚠️ Штрафы',
         'applications': '📄 Заявления',
         'warnings': '📋 Предупреждения',
+        'reports': '📋 Отчеты',
         'salaries': '💵 Зарплаты'
+
     };
     return map[tabName] || '';
 }
@@ -1493,11 +1496,17 @@ function loadData() {
             compensations = data ? Object.values(data) : [];
             renderCompensations();
         });
-        database.ref('warnings').on('value', (snapshot) => {
+       database.ref('warnings').on('value', (snapshot) => {
     const data = snapshot.val();
     warnings = data ? Object.values(data) : [];
     renderWarnings();
     updateWarningStats();
+});
+
+database.ref('reports').on('value', (snapshot) => {
+    const data = snapshot.val();
+    reports = data ? Object.values(data) : [];
+    renderReports();
 });
 
 // localStorage
@@ -2596,6 +2605,10 @@ window.onclick = function(event) {
     const salaryModal = document.getElementById('editSalaryModal');
     const applicationModal = document.getElementById('editApplicationModal');
     const warningModal = document.getElementById('editWarningModal');
+    const reportModal = document.getElementById('editReportModal');
+if (event.target == reportModal) {
+    closeEditReportModal();
+}
 if (event.target == warningModal) {
     closeEditWarningModal();
 }
@@ -2997,6 +3010,216 @@ function deleteSalary(id) {
         updateSalaryStats();
     }
 }
+function addReport() {
+    const date = document.getElementById('reportDate').value;
+    const period = document.getElementById('reportPeriod').value;
+    const tasks = document.getElementById('reportTasks').value;
+    const problems = document.getElementById('reportProblems').value;
+    const finesPaid = document.getElementById('reportFinesPaid').value;
+    const deadlines = document.getElementById('reportDeadlines').value;
+    const comments = document.getElementById('reportComments').value;
+    const respect = document.getElementById('reportRespect').value;
+    const rules = document.getElementById('reportRules').value;
+    const instructions = document.getElementById('reportInstructions').value;
+    const plan = document.getElementById('reportPlan').value;
+
+    if (!date || !period || !tasks || !problems || !finesPaid || !deadlines || !comments || !respect || !rules || !instructions || !plan) {
+        alert('Заполните все поля!');
+        return;
+    }
+
+    const report = {
+        id: Date.now(),
+        date, period, tasks, problems, finesPaid, deadlines, comments, respect, rules, instructions, plan,
+        employee: currentUser,
+        createdAt: new Date().toISOString()
+    };
+
+    reports.push(report);
+
+    if (isFirebaseEnabled) {
+        const reportsObj = {};
+        reports.forEach(r => { reportsObj[r.id] = r; });
+        database.ref('reports').set(reportsObj);
+    } else {
+        localStorage.setItem('reports-data', JSON.stringify(reports));
+        renderReports();
+    }
+
+    ['reportDate','reportPeriod','reportTasks','reportProblems','reportFinesPaid','reportDeadlines','reportComments','reportRespect','reportRules','reportInstructions','reportPlan'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderReports() {
+    const list = document.getElementById('reportsList');
+    if (reports.length === 0) {
+        list.innerHTML = '';
+        return;
+    }
+
+    const sorted = [...reports].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    list.innerHTML = sorted.map(r => `
+        <div class="compensation-item">
+            <h3>📋 Отчет о работоспособности</h3>
+            <p><strong>Сотрудник:</strong> ${r.employee}</p>
+            <p><strong>Дата отчёта:</strong> ${r.date}</p>
+            <p><strong>Период:</strong> ${r.period}</p>
+            <p><strong>Выполненные задачи:</strong><br>${r.tasks.replace(/\n/g, '<br>')}</p>
+            <p><strong>Проблемы/ошибки:</strong><br>${r.problems.replace(/\n/g, '<br>')}</p>
+            <p><strong>Штраф оплачен:</strong> ${r.finesPaid}</p>
+            <p><strong>Сроки соблюдены:</strong> ${r.deadlines}</p>
+            <p><strong>Комментарии:</strong> ${r.comments}</p>
+            <p><strong>Коллег не оскорблял:</strong> ${r.respect}</p>
+            <p><strong>Правила соблюдаю:</strong> ${r.rules}</p>
+            <p><strong>Указания исполняю:</strong> ${r.instructions}</p>
+            <p><strong>План на следующий день:</strong><br>${r.plan.replace(/\n/g, '<br>')}</p>
+            <button class="edit-btn" onclick="downloadReportDoc(${r.id})" style="margin-top: 15px; width: auto; display: inline-block;">📥 Скачать DOC</button>
+            ${(currentUser === 'Azim218' || r.employee === currentUser) ? `
+            <div class="button-group">
+                <button class="edit-btn" onclick="openEditReportModal(${r.id})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deleteReport(${r.id})">🗑️ Удалить</button>
+            </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+function openEditReportModal(id) {
+    const r = reports.find(x => x.id === id);
+    if (!r || (r.employee !== currentUser && currentUser !== 'Azim218')) {
+        alert('Можете редактировать только свои!');
+        return;
+    }
+
+    document.getElementById('editReportId').value = r.id;
+    document.getElementById('editReportDate').value = r.date;
+    document.getElementById('editReportPeriod').value = r.period;
+    document.getElementById('editReportTasks').value = r.tasks;
+    document.getElementById('editReportProblems').value = r.problems;
+    document.getElementById('editReportFinesPaid').value = r.finesPaid;
+    document.getElementById('editReportDeadlines').value = r.deadlines;
+    document.getElementById('editReportComments').value = r.comments;
+    document.getElementById('editReportRespect').value = r.respect;
+    document.getElementById('editReportRules').value = r.rules;
+    document.getElementById('editReportInstructions').value = r.instructions;
+    document.getElementById('editReportPlan').value = r.plan;
+    document.getElementById('editReportModal').style.display = 'block';
+}
+
+function closeEditReportModal() {
+    document.getElementById('editReportModal').style.display = 'none';
+}
+
+function updateReport() {
+    const id = parseInt(document.getElementById('editReportId').value);
+    const r = reports.find(x => x.id === id);
+    
+    if (r && r.employee !== currentUser && currentUser !== 'Azim218') {
+        alert('Можете редактировать только свои!');
+        return;
+    }
+
+    const date = document.getElementById('editReportDate').value;
+    const period = document.getElementById('editReportPeriod').value;
+    const tasks = document.getElementById('editReportTasks').value;
+    const problems = document.getElementById('editReportProblems').value;
+    const finesPaid = document.getElementById('editReportFinesPaid').value;
+    const deadlines = document.getElementById('editReportDeadlines').value;
+    const comments = document.getElementById('editReportComments').value;
+    const respect = document.getElementById('editReportRespect').value;
+    const rules = document.getElementById('editReportRules').value;
+    const instructions = document.getElementById('editReportInstructions').value;
+    const plan = document.getElementById('editReportPlan').value;
+
+    if (!date || !period || !tasks || !problems || !finesPaid || !deadlines || !comments || !respect || !rules || !instructions || !plan) {
+        alert('Заполните все поля!');
+        return;
+    }
+
+    const idx = reports.findIndex(x => x.id === id);
+    if (idx !== -1) {
+        reports[idx] = { ...reports[idx], date, period, tasks, problems, finesPaid, deadlines, comments, respect, rules, instructions, plan };
+
+        if (isFirebaseEnabled) {
+            const reportsObj = {};
+            reports.forEach(r => { reportsObj[r.id] = r; });
+            database.ref('reports').set(reportsObj);
+        } else {
+            localStorage.setItem('reports-data', JSON.stringify(reports));
+            renderReports();
+        }
+
+        closeEditReportModal();
+    }
+}
+
+function deleteReport(id) {
+    const r = reports.find(x => x.id === id);
+    if (r && r.employee !== currentUser && currentUser !== 'Azim218') {
+        alert('Можете удалять только свои!');
+        return;
+    }
+
+    if (!confirm('Удалить отчет?')) return;
+
+    reports = reports.filter(x => x.id !== id);
+
+    if (isFirebaseEnabled) {
+        const reportsObj = {};
+        reports.forEach(r => { reportsObj[r.id] = r; });
+        database.ref('reports').set(reportsObj);
+    } else {
+        localStorage.setItem('reports-data', JSON.stringify(reports));
+        renderReports();
+    }
+}
+
+function downloadReportDoc(id) {
+    const r = reports.find(x => x.id === id);
+    if (!r) return;
+
+    const htmlContent = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+    <meta charset='utf-8'>
+    <style>
+        @page { margin: 2cm; }
+        body { font-family: 'Segoe Script', 'Brush Script MT', cursive; font-size: 14pt; line-height: 1.8; }
+        .header { text-align: center; font-size: 20pt; font-weight: bold; color: #2F4F4F; margin-bottom: 30pt; text-decoration: underline; letter-spacing: 3pt; }
+        .section { margin: 15pt 0; }
+        .label { font-weight: bold; color: #8B0000; }
+    </style>
+</head>
+<body>
+    <div class="header">✅ ОТЧЁТ О РАБОТОСПОСОБНОСТИ СТАТУСА</div>
+    <div class="section"><span class="label">Сотрудник:</span> ${r.employee}</div>
+    <div class="section"><span class="label">Дата отчёта:</span> ${r.date}</div>
+    <div class="section"><span class="label">Период:</span> ${r.period}</div>
+    <div class="section"><span class="label">1. Выполненные задачи:</span><br>${r.tasks.replace(/\n/g, '<br>')}</div>
+    <div class="section"><span class="label">2. Проблемы/ошибки:</span><br>${r.problems.replace(/\n/g, '<br>')}</div>
+    <div class="section"><span class="label">3. Статус штрафов и обязанностей:</span><br>
+    Штраф оплачен: ${r.finesPaid}<br>
+    Сроки исправления соблюдены: ${r.deadlines}<br>
+    Комментарии: ${r.comments}</div>
+    <div class="section"><span class="label">4. Поведение и дисциплина:</span><br>
+    Коллег не оскорблял: ${r.respect}<br>
+    Правила соблюдаю: ${r.rules}<br>
+    Указания исполняю: ${r.instructions}</div>
+    <div class="section"><span class="label">5. План на следующий день:</span><br>${r.plan.replace(/\n/g, '<br>')}</div>
+    <div style="margin-top: 50pt;"><span class="label">Подпись сотрудника:</span> ${r.employee} ✅</div>
+</body>
+</html>`;
+
+    const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Отчет_${r.employee}_${r.date.replace(/\./g, '-')}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
 </script>
 </head>
 <body>
@@ -3037,6 +3260,7 @@ function deleteSalary(id) {
             <div class="nav-tab" onclick="switchTab('penalties')">⚠️ Штрафы</div>
             <div class="nav-tab" onclick="switchTab('applications')">📄 Заявления</div>
             <div class="nav-tab" onclick="switchTab('warnings')">📋 Предупреждения</div>
+            <div class="nav-tab" onclick="switchTab('reports')">📋 Отчеты</div>
 <div class="nav-tab" onclick="switchTab('salaries')">💵 Зарплаты</div>
         </div>
 
@@ -3335,6 +3559,148 @@ function deleteSalary(id) {
             <textarea id="editWarningNote"></textarea>
         </div>
         <button onclick="updateWarning()">💾 Сохранить</button>
+    </div>
+</div>
+<div id="editReportModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditReportModal()">&times;</span>
+        <h2>✏️ Редактировать Отчет</h2>
+        <input type="hidden" id="editReportId">
+        <div class="form-group">
+            <label>Дата отчёта *</label>
+            <input type="text" id="editReportDate">
+        </div>
+        <div class="form-group">
+            <label>Период отчета *</label>
+            <input type="text" id="editReportPeriod">
+        </div>
+        <div class="form-group">
+            <label>Выполненные задачи *</label>
+            <textarea id="editReportTasks"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Проблемы/ошибки *</label>
+            <textarea id="editReportProblems"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Штраф оплачен *</label>
+            <select id="editReportFinesPaid">
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+                <option value="Нет штрафов">Нет штрафов</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Сроки исправления соблюдены *</label>
+            <select id="editReportDeadlines">
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Дополнительные комментарии *</label>
+            <textarea id="editReportComments"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Коллег не оскорблял *</label>
+            <select id="editReportRespect">
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Соблюдаю правила сервиса *</label>
+            <select id="editReportRules">
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Исполняю указания инспекции *</label>
+            <select id="editReportInstructions">
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>План на следующий день *</label>
+            <textarea id="editReportPlan"></textarea>
+        </div>
+        <button onclick="updateReport()">💾 Сохранить изменения</button>
+    </div>
+</div>
+<!-- Вкладка: Отчеты -->
+<div id="reportsTab" class="tab-content">
+    <div class="card">
+        <h2>📋 Новый Отчет</h2>
+        <div class="form-group">
+            <label>Дата отчёта *</label>
+            <input type="text" id="reportDate" placeholder="Например: 07.11.2024">
+        </div>
+        <div class="form-group">
+            <label>Период отчета *</label>
+            <input type="text" id="reportPeriod" placeholder="Например: с 01.11 по 07.11">
+        </div>
+        <div class="form-group">
+            <label>Выполненные задачи *</label>
+            <textarea id="reportTasks" placeholder="Перечислите выполненные задачи" style="min-height: 100px;"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Проблемы/ошибки *</label>
+            <textarea id="reportProblems" placeholder="Какие проблемы были и как исправили" style="min-height: 100px;"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Штраф оплачен *</label>
+            <select id="reportFinesPaid">
+                <option value="">Выберите...</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+                <option value="Нет штрафов">Нет штрафов</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Сроки исправления соблюдены *</label>
+            <select id="reportDeadlines">
+                <option value="">Выберите...</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Дополнительные комментарии *</label>
+            <textarea id="reportComments" placeholder="Ваши комментарии" style="min-height: 80px;"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Коллег не оскорблял *</label>
+            <select id="reportRespect">
+                <option value="">Выберите...</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Соблюдаю правила сервиса *</label>
+            <select id="reportRules">
+                <option value="">Выберите...</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Исполняю указания инспекции *</label>
+            <select id="reportInstructions">
+                <option value="">Выберите...</option>
+                <option value="Да">Да</option>
+                <option value="Нет">Нет</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>План на следующий день *</label>
+            <textarea id="reportPlan" placeholder="Что планируете сделать" style="min-height: 100px;"></textarea>
+        </div>
+        <button onclick="addReport()">📝 Создать отчет</button>
+
+        <div id="reportsList"></div>
     </div>
 </div>
 <!-- Вкладка: Зарплаты -->
