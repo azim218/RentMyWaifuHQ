@@ -2850,8 +2850,6 @@ function addSalary() {
         alert('Только Azim218 может добавлять зарплаты!');
         return;
     }
-    
-    // остальной код без изменений
 
     const date = document.getElementById('salaryDate').value;
     const employee = document.getElementById('salaryEmployee').value;
@@ -2860,12 +2858,6 @@ function addSalary() {
 
     if (!date || !employee || !amount || !note) {
         alert('Пожалуйста, заполните все обязательные поля!');
-        return;
-    }
-
-    // Ограничение для Tiger - может добавлять только себе
-    if (currentUser === 'Tiger' && employee !== 'Tiger') {
-        alert('Вы можете добавлять зарплату только для себя!');
         return;
     }
 
@@ -3730,13 +3722,13 @@ function downloadReportDoc(id) {
     <input type="text" id="salaryDate" placeholder="Например: 06.11.2024">
 </div>
         <div class="form-group">
-            <label>Сотрудник *</label>
-            <select id="salaryEmployee">
-                <option value="">Выберите...</option>
-                <option value="Tiger">Tiger</option>
-                <option value="self">Я (текущий пользователь)</option>
-            </select>
-        </div>
+    <label>Сотрудник *</label>
+    <select id="salaryEmployee">
+        <option value="">Выберите...</option>
+        <option value="Tiger">Tiger</option>
+        <option value="sanya">sanya</option>
+    </select>
+</div>
         <div class="form-group">
             <label>Сумма (₽) *</label>
             <input type="number" id="salaryAmount" placeholder="Введите сумму" min="0">
