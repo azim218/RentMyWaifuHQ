@@ -1459,7 +1459,8 @@ function getTabText(tabName) {
         'applications': '📄 Заявления',
         'warnings': '📋 Предупреждения',
         'reports': '📋 Отчеты',
-        'salaries': '💵 Зарплаты'
+        'salaries': '💵 Зарплаты',
+'regulations': '📜 Регламент'
 
     };
     return map[tabName] || '';
@@ -3253,6 +3254,7 @@ function downloadReportDoc(id) {
             <div class="nav-tab" onclick="switchTab('applications')">📄 Заявления</div>
             <div class="nav-tab" onclick="switchTab('warnings')">📋 Предупреждения</div>
             <div class="nav-tab" onclick="switchTab('reports')">📋 Отчеты</div>
+            <div class="nav-tab" onclick="switchTab('regulations')">📜 Регламент</div>
 <div class="nav-tab" onclick="switchTab('salaries')">💵 Зарплаты</div>
         </div>
 
@@ -3776,6 +3778,215 @@ function downloadReportDoc(id) {
         <button onclick="addApplication()">📝 Создать заявление</button>
 
         <div id="applicationsList"></div>
+    </div>
+</div>
+    <!-- Вкладка: Регламент -->
+<div id="regulationsTab" class="tab-content">
+    <div class="card">
+        <h2>📜 Регламент Менеджеров RentMyWaifu Network</h2>
+        
+        <div style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <p><strong>Версия:</strong> 1.0</p>
+            <p><strong>Дата:</strong> 10 ноября 2025</p>
+            <p><strong>Утверждено:</strong> CEO RentMyWaifu Network</p>
+        </div>
+
+        <!-- Структура компании -->
+        <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px;">1. Структура компании и иерархия</h3>
+            <pre style="background: #fff; padding: 15px; border-radius: 10px; overflow-x: auto; font-family: monospace;">Уровень 1: CEO
+    ↓
+Уровень 2: Супервайзер Инспекции (Саня)
+    ↓
+Уровень 3: Менеджеры и Инспекторы
+    ↓
+Уровень 4: Остальной персонал
+
+Отдельно: Народный Трибун (независимый арбитр)</pre>
+            <p><strong>Менеджеры:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Дневная смена: Миша Понамарёв (Менеджер + Инспектор)</li>
+                <li>Ночная смена: Саня (совмещает с супервизией)</li>
+            </ul>
+        </div>
+
+        <!-- Обязанности -->
+        <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px;">2. Обязанности менеджеров</h3>
+            <p><strong>Основные функции:</strong></p>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>✅ Первая линия поддержки клиентов</li>
+                <li>✅ Оформление заказов</li>
+                <li>✅ Решение простых споров и жалоб</li>
+                <li>✅ Выдача компенсаций (в рамках лимитов)</li>
+                <li>✅ Еженедельная отчётность</li>
+                <li>✅ Соблюдение стандартов обслуживания</li>
+            </ul>
+            <p><strong>Стандарты обслуживания:</strong></p>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>✅ Вежливость: Всегда уважительный тон</li>
+                <li>✅ Скорость ответа: До 5 минут в рабочее время</li>
+                <li>✅ Профессионализм: Без хамства, даже с токсичными клиентами</li>
+                <li>✅ Честность: Не обещать того, что не можем дать</li>
+            </ul>
+        </div>
+
+        <!-- Компенсации -->
+        <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px;">3. Алгоритм компенсаций</h3>
+            
+            <h4 style="color: #8b3a62; margin: 15px 0;">3.1. Технические проблемы (НЕ наша вина)</h4>
+            <p><strong>Примеры:</strong> Отключили свет/интернет у клиента, сломался ПК</p>
+            <p><strong>Правила:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>✅ Первый раз: До 5% от времени заказа бесплатно</li>
+                <li>✅ БЕЗ проверки/доказательств</li>
+                <li>❌ Второй раз и далее: Только заморозка по тарифу</li>
+            </ul>
+
+            <h4 style="color: #8b3a62; margin: 15px 0;">3.2. Технические проблемы (НАША вина)</h4>
+            <p><strong>Примеры:</strong> Сервер лёг, аккаунт забанен, неправильные данные</p>
+            <p><strong>Правила:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>✅ БЕЗЛИМИТНАЯ компенсация</li>
+                <li>✅ Время простоя + 20% бонус</li>
+                <li>✅ Если простой >50% заказа → Полный возврат + скидка 20%</li>
+            </ul>
+
+            <h4 style="color: #8b3a62; margin: 15px 0;">3.3. Недовольство качеством (обоснованное)</h4>
+            <p><strong>Примеры:</strong> Нет войс чата, забанены плейсы как указано</p>
+            <p><strong>Решение:</strong> Скидка 50% на следующий заказ + извинения</p>
+
+            <h4 style="color: #8b3a62; margin: 15px 0;">3.4. VIP-клиенты</h4>
+            <p><strong>Критерий:</strong> 5+ заказов ИЛИ сумма 5000₽+</p>
+            <p><strong>Привилегии:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>✅ Приоритетная поддержка</li>
+                <li>✅ Скидка 5-10% на все заказы</li>
+                <li>✅ Бесплатная заморозка 1 раз в месяц</li>
+            </ul>
+        </div>
+
+        <!-- Работа со сложными клиентами -->
+        <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px;">4. Работа со сложными клиентами</h3>
+            
+            <h4 style="color: #8b3a62; margin: 15px 0;">Агрессивные клиенты</h4>
+            <p><strong>Алгоритм:</strong></p>
+            <ol style="margin-left: 20px; line-height: 1.8;">
+                <li>Сохраняйте спокойствие - не отвечайте хамством</li>
+                <li>Одно предупреждение: "Просим общаться уважительно"</li>
+                <li>Если продолжает → Эскалация к Супервайзеру</li>
+                <li>Если угрозы/мат → Немедленная эскалация</li>
+            </ol>
+
+            <h4 style="color: #8b3a62; margin: 15px 0;">Мошенники</h4>
+            <p><strong>Действия:</strong></p>
+            <ol style="margin-left: 20px; line-height: 1.8;">
+                <li>Проверьте логи</li>
+                <li>Запросите доказательства</li>
+                <li>Если обман очевиден → Вежливый отказ</li>
+                <li>Рецидив → Чёрный список</li>
+            </ol>
+        </div>
+
+        <!-- Лимиты полномочий -->
+        <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px;">5. Лимиты полномочий</h3>
+            
+            <h4 style="color: #8b3a62; margin: 15px 0;">БЕЗ согласования:</h4>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>✅ Компенсации до 5% заказа</li>
+                <li>✅ Промокоды на скидку 10%</li>
+                <li>✅ Бесплатное продление новичкам (+30 мин)</li>
+                <li>✅ Решение типовых споров</li>
+            </ul>
+
+            <h4 style="color: #8b3a62; margin: 15px 0;">Требует согласования с Супервайзером:</h4>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>🔒 Компенсации >20% заказа</li>
+                <li>🔒 Полный возврат средств</li>
+                <li>🔒 Промокоды >30% скидки</li>
+                <li>🔒 Бан/блокировка клиента</li>
+            </ul>
+
+            <h4 style="color: #8b3a62; margin: 15px 0;">Только CEO:</h4>
+            <ul style="margin-left: 20px; line-height: 1.8;">
+                <li>🚫 Возврат >2022₽</li>
+                <li>🚫 Судебные угрозы</li>
+                <li>🚫 Изменение правил/регламента</li>
+                <li>🚫 Увольнение персонала</li>
+            </ul>
+        </div>
+
+        <!-- Дисциплина -->
+        <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px;">6. Дисциплина и штрафы</h3>
+            
+            <h4 style="color: #8b3a62; margin: 15px 0;">Уровни нарушений:</h4>
+            <p><strong>🟡 МЕЛКИЕ (1 предупреждение):</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Опоздание до 15 минут</li>
+                <li>Забыл отчёт (первый раз)</li>
+                <li>Медленный ответ (>10 минут)</li>
+            </ul>
+
+            <p><strong>🟠 СРЕДНИЕ (2 предупреждения):</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Грубость с клиентом</li>
+                <li>Превышение лимита компенсаций</li>
+                <li>Систематические опоздания</li>
+            </ul>
+
+            <p><strong>🔴 СЕРЬЁЗНЫЕ (3 предупреждения или увольнение):</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Хамство/оскорбления клиента</li>
+                <li>Воровство/мошенничество</li>
+                <li>Раздача услуг друзьям</li>
+                <li>Разглашение информации</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>Таблица штрафов:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Опоздание на смену: 10₽</li>
+                <li>Забыл отчёт: 10₽</li>
+                <li>Превышение лимита: Сумма превышения</li>
+                <li>Грубость с клиентом: 20₽</li>
+                <li>Невыполнение обязанностей: 30₽</li>
+            </ul>
+        </div>
+
+        <!-- График работы -->
+        <div style="background: rgba(255, 255, 255, 0.7); padding: 20px; border-radius: 20px; margin-bottom: 20px;">
+            <h3 style="color: #ff1493; font-family: 'Pacifico', cursive; margin-bottom: 15px;">7. Система смен</h3>
+            
+            <p><strong>🌅 Дневная смена (Миша):</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Время: 10:00 - 22:00 (МСК)</li>
+                <li>Обязательная доступность</li>
+                <li>Перерывы: 2×30 минут</li>
+            </ul>
+
+            <p><strong>🌙 Ночная смена (Саня):</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Время: 22:00 - 10:00 (МСК)</li>
+                <li>Дежурный режим: Ответ до 30 минут</li>
+                <li>Допустим сон с уведомлениями</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>Бонусы:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>Переработки: +50₽/час</li>
+                <li>Подмена: +100₽/смена</li>
+                <li>Рейтинг 4.8+: +200₽</li>
+                <li>0 жалоб: +150₽</li>
+            </ul>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #ff6b9d 0%, #fec5e5 100%); padding: 20px; border-radius: 20px; text-align: center; color: white;">
+            <p style="font-weight: bold; font-size: 1.1rem;">🔒 КОНФИДЕНЦИАЛЬНО</p>
+            <p>Этот документ предназначен только для сотрудников RentMyWaifu Network</p>
+        </div>
     </div>
 </div>
 </div>
