@@ -3331,10 +3331,10 @@ async function generateReceiptHTML(id) {
     const now = new Date();
     const dateStr = now.toLocaleDateString('ru-RU');
     const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-    
-    const vat = (r.cost * 0.2).toFixed(2);
-    const subtotal = r.cost.toFixed(2);
-    const total = (parseFloat(subtotal) + parseFloat(vat) - r.discount).toFixed(2);
+       
+    const subtotal = parseFloat(r.cost).toFixed(2);
+    const vat = (parseFloat(subtotal) * 0.2).toFixed(2);
+    const total = (parseFloat(subtotal) + parseFloat(vat) - parseFloat(r.discount)).toFixed(2);
     
     const deadlineDate = new Date(r.confirmDate.split('.').reverse().join('-'));
     const confirmParts = r.confirmTime.split(':');
@@ -3411,12 +3411,23 @@ async function generateReceiptHTML(id) {
         '🌈 Приходите к нам снова',
         '✨ Пусть вайфу будет верной!',
         '───────────────────────────────────────',
-        'RentMyWaifu Network © 2025',
-        'Сервис аренды аккаунтов Roblox',
-        '═══════════════════════════════════════',
-        '',
-        'https://funpay.com/users/6285734/'
-    ];
+          'RentMyWaifu Network © 2025',
+    'Сервис аренды аккаунтов Roblox',
+    '═══════════════════════════════════════',
+    '',
+    ' ███████╗██████╗  ██████╗ ███╗   ██╗███████╗ ██████╗ ██████╗ ',
+    ' ██╔════╝██╔══██╗██╔═══██╗████╗  ██║██╔════╝██╔═══██╗██╔══██╗',
+    ' ███████╗██████╔╝██║   ██║██╔██╗ ██║███████╗██║   ██║██████╔╝',
+    ' ╚════██║██╔═══╝ ██║   ██║██║╚██╗██║╚════██║██║   ██║██╔══██╗',
+    ' ███████║██║     ╚██████╔╝██║ ╚████║███████║╚██████╔╝██║  ██║',
+    ' ╚══════╝╚═╝      ╚═════╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝ ╚═╝  ╚═╝',
+    '',
+    '╔════════════════════════════════════════════════════════════╗',
+    '║                                                            ║',
+    '║          https://funpay.com/users/6285734/                 ║',
+    '║                                                            ║',
+    '╚════════════════════════════════════════════════════════════╝'
+];
     
     lines.forEach(line => {
         ctx.fillText(line, 20, y);
