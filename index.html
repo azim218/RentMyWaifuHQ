@@ -3228,25 +3228,27 @@ function downloadReportDoc(id) {
 }
 // ========== ЧЕКИ ==========
 let receipts = [];
-
 function addReceipt() {
-    const number = document.getElementById('receiptNumber').value;
-    const orderNumber = document.getElementById('receiptOrderNumber').value;
+    const orderNumber = document.getElementById('receiptNumber').value; // Один номер для всего
     const hours = document.getElementById('receiptHours').value;
     const cost = parseFloat(document.getElementById('receiptCost').value);
     const discount = parseFloat(document.getElementById('receiptDiscount').value) || 0;
     const confirmDate = document.getElementById('receiptConfirmDate').value;
     const confirmTime = document.getElementById('receiptConfirmTime').value;
 
-    if (!number || !orderNumber || !hours || !cost || !confirmDate || !confirmTime) {
+    if (!orderNumber || !hours || !cost || !confirmDate || !confirmTime) {
         alert('Заполните все обязательные поля!');
         return;
     }
 
     const receipt = {
         id: Date.now(),
-        number, orderNumber, hours, cost, discount,
-        confirmDate, confirmTime,
+        orderNumber, // Теперь это и номер заказа, и номер квитанции
+        hours, 
+        cost, 
+        discount,
+        confirmDate, 
+        confirmTime,
         createdBy: currentUser,
         createdAt: new Date().toISOString()
     };
@@ -3262,40 +3264,35 @@ function addReceipt() {
         renderReceipts();
     }
 
-    ['receiptNumber','receiptOrderNumber','receiptHours','receiptCost','receiptDiscount','receiptConfirmDate','receiptConfirmTime'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('receiptNumber').value = '';
+    document.getElementById('receiptHours').value = '';
+    document.getElementById('receiptCost').value = '';
+    document.getElementById('receiptDiscount').value = '0';
+    document.getElementById('receiptConfirmDate').value = '';
+    document.getElementById('receiptConfirmTime').value = '';
 }
 
-function renderReceipts() {
-    const list = document.getElementById('receiptsList');
-    if (receipts.length === 0) {
-        list.innerHTML = '';
-        return;
-    }
-
-    const sorted = [...receipts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    list.innerHTML = sorted.map(r => {
-        const vat = (r.cost * 0.2).toFixed(2);
-        const subtotal = r.cost;
-        const total = (parseFloat(subtotal) + parseFloat(vat) - r.discount).toFixed(2);
-        
-        return `
-        <div class="compensation-item">
-            <h3>🧾 Чек #${r.number}</h3>
-            <p><strong>Заказ FunPay:</strong> #${r.orderNumber}</p>
-            <p><strong>Время аренды:</strong> ${r.hours} ч.</p>
-            <p><strong>Стоимость:</strong> ${r.cost} ₽</p>
-            <p><strong>Скидка:</strong> ${r.discount} ₽</p>
-            <p><strong>Итого:</strong> ${total} ₽</p>
-            <p><strong>Подтверждено:</strong> ${r.confirmDate} в ${r.confirmTime}</p>
-            <div class="responsible-tag">👤 Создал: ${r.createdBy}</div>
-            <button class="edit-btn" onclick="generateReceiptHTML(${r.id})" style="margin-top: 15px; width: auto; display: inline-block;">📥 Скачать чек</button>
-            <div class="button-group">
-                <button class="delete-btn" onclick="deleteReceipt(${r.id})">🗑️ Удалить</button>
-            </div>
+list.innerHTML = sorted.map(r => {
+    const vat = (r.cost * 0.2).toFixed(2);
+    const subtotal = r.cost;
+    const total = (parseFloat(subtotal) + parseFloat(vat) - r.discount).toFixed(2);
+    
+    return `
+    <div class="compensation-item">
+        <h3>🧾 Чек ${r.orderNumber}</h3>
+        <p><strong>Заказ FunPay:</strong> ${r.orderNumber}</p>
+        <p><strong>Время аренды:</strong> ${r.hours} ч.</p>
+        <p><strong>Стоимость:</strong> ${r.cost} ₽</p>
+        <p><strong>Скидка:</strong> ${r.discount} ₽</p>
+        <p><strong>Итого:</strong> ${total} ₽</p>
+        <p><strong>Подтверждено:</strong> ${r.confirmDate} в ${r.confirmTime}</p>
+        <div class="responsible-tag">👤 Создал: ${r.createdBy}</div>
+        <button class="edit-btn" onclick="generateReceiptHTML(${r.id})" style="margin-top: 15px; width: auto; display: inline-block;">📥 Скачать чек</button>
+        <div class="button-group">
+            <button class="delete-btn" onclick="deleteReceipt(${r.id})">🗑️ Удалить</button>
         </div>
-    `}).join('');
-}
+    </div>
+`}).join('');
 
 async function generateReceiptHTML(id) {
     const r = receipts.find(x => x.id === id);
@@ -3333,7 +3330,7 @@ async function generateReceiptHTML(id) {
     
     const lines = [
         '═══════════════════════════════════════',
-        `       🧾 КВИТАНЦИЯ № ${r.number}`,
+        `       🧾 КВИТАНЦИЯ № ${r.orderNumber}`,
         '═══════════════════════════════════════',
         `Дата: ${dateStr} | Время: ${timeStr} МСК`,
         'Сервис: RentMyWaifu Network 🌙',
@@ -3401,7 +3398,7 @@ async function generateReceiptHTML(id) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `Чек_${r.number}_${r.orderNumber}.png`;
+        link.download = `Чек_${r.orderNumber.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -3995,14 +3992,11 @@ function deleteReceipt(id) {
 <div id="receiptsTab" class="tab-content">
     <div class="card">
         <h2>🧾 Новый Чек</h2>
+        
         <div class="form-group">
-            <label>Номер квитанции *</label>
-            <input type="text" id="receiptNumber" placeholder="Например: 12345">
-        </div>
-        <div class="form-group">
-            <label>Номер заказа FunPay *</label>
-            <input type="text" id="receiptOrderNumber" placeholder="Например: 67890">
-        </div>
+    <label>Номер заказа FunPay / Номер квитанции *</label>
+    <input type="text" id="receiptNumber" placeholder="Например: #12345 или любой текст">
+</div>
         <div class="form-group">
             <label>Время аренды (часов) *</label>
             <input type="number" id="receiptHours" placeholder="Например: 5" min="1">
