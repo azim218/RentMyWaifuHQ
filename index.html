@@ -1460,6 +1460,7 @@ function getTabText(tabName) {
         'warnings': '📋 Предупреждения',
         'reports': '📋 Отчеты',
         'salaries': '💵 Зарплаты',
+        'receipts': '🧾 Чеки',
 'regulations': '📜 Регламент'
 
     };
@@ -1509,7 +1510,19 @@ database.ref('reports').on('value', (snapshot) => {
     reports = data ? Object.values(data) : [];
     renderReports();
 });
-
+    if (isFirebaseEnabled) {
+    database.ref('receipts').on('value', (snapshot) => {
+        const data = snapshot.val();
+        receipts = data ? Object.values(data) : [];
+        renderReceipts();
+    });
+} else {
+    const savedReceipts = localStorage.getItem('receipts-data');
+    if (savedReceipts) {
+        receipts = JSON.parse(savedReceipts);
+        renderReceipts();
+    }
+}
 // localStorage
 const savedWarnings = localStorage.getItem('warnings-data');
 if (savedWarnings) {
@@ -3213,6 +3226,204 @@ function downloadReportDoc(id) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
+// ========== ЧЕКИ ==========
+let receipts = [];
+
+function addReceipt() {
+    const number = document.getElementById('receiptNumber').value;
+    const orderNumber = document.getElementById('receiptOrderNumber').value;
+    const hours = document.getElementById('receiptHours').value;
+    const cost = parseFloat(document.getElementById('receiptCost').value);
+    const discount = parseFloat(document.getElementById('receiptDiscount').value) || 0;
+    const confirmDate = document.getElementById('receiptConfirmDate').value;
+    const confirmTime = document.getElementById('receiptConfirmTime').value;
+
+    if (!number || !orderNumber || !hours || !cost || !confirmDate || !confirmTime) {
+        alert('Заполните все обязательные поля!');
+        return;
+    }
+
+    const receipt = {
+        id: Date.now(),
+        number, orderNumber, hours, cost, discount,
+        confirmDate, confirmTime,
+        createdBy: currentUser,
+        createdAt: new Date().toISOString()
+    };
+
+    receipts.push(receipt);
+
+    if (isFirebaseEnabled) {
+        const receiptsObj = {};
+        receipts.forEach(r => { receiptsObj[r.id] = r; });
+        database.ref('receipts').set(receiptsObj);
+    } else {
+        localStorage.setItem('receipts-data', JSON.stringify(receipts));
+        renderReceipts();
+    }
+
+    ['receiptNumber','receiptOrderNumber','receiptHours','receiptCost','receiptDiscount','receiptConfirmDate','receiptConfirmTime'].forEach(id => document.getElementById(id).value = '');
+}
+
+function renderReceipts() {
+    const list = document.getElementById('receiptsList');
+    if (receipts.length === 0) {
+        list.innerHTML = '';
+        return;
+    }
+
+    const sorted = [...receipts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    list.innerHTML = sorted.map(r => {
+        const vat = (r.cost * 0.2).toFixed(2);
+        const subtotal = r.cost;
+        const total = (parseFloat(subtotal) + parseFloat(vat) - r.discount).toFixed(2);
+        
+        return `
+        <div class="compensation-item">
+            <h3>🧾 Чек #${r.number}</h3>
+            <p><strong>Заказ FunPay:</strong> #${r.orderNumber}</p>
+            <p><strong>Время аренды:</strong> ${r.hours} ч.</p>
+            <p><strong>Стоимость:</strong> ${r.cost} ₽</p>
+            <p><strong>Скидка:</strong> ${r.discount} ₽</p>
+            <p><strong>Итого:</strong> ${total} ₽</p>
+            <p><strong>Подтверждено:</strong> ${r.confirmDate} в ${r.confirmTime}</p>
+            <div class="responsible-tag">👤 Создал: ${r.createdBy}</div>
+            <button class="edit-btn" onclick="generateReceiptHTML(${r.id})" style="margin-top: 15px; width: auto; display: inline-block;">📥 Скачать чек</button>
+            <div class="button-group">
+                <button class="delete-btn" onclick="deleteReceipt(${r.id})">🗑️ Удалить</button>
+            </div>
+        </div>
+    `}).join('');
+}
+
+async function generateReceiptHTML(id) {
+    const r = receipts.find(x => x.id === id);
+    if (!r) return;
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ru-RU');
+    const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    
+    const vat = (r.cost * 0.2).toFixed(2);
+    const subtotal = r.cost.toFixed(2);
+    const total = (parseFloat(subtotal) + parseFloat(vat) - r.discount).toFixed(2);
+    
+    const deadlineDate = new Date(r.confirmDate.split('.').reverse().join('-'));
+    const confirmParts = r.confirmTime.split(':');
+    deadlineDate.setHours(parseInt(confirmParts[0]) + 2);
+    const deadlineStr = `${r.confirmDate} в ${String(deadlineDate.getHours()).padStart(2, '0')}:${confirmParts[1]} МСК`;
+
+    // Создаём canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 1400;
+    const ctx = canvas.getContext('2d');
+    
+    // Фон
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Шрифт
+    ctx.font = '14px "Courier New", monospace';
+    ctx.fillStyle = '#00ff00';
+    
+    let y = 30;
+    const lineHeight = 20;
+    
+    const lines = [
+        '═══════════════════════════════════════',
+        `       🧾 КВИТАНЦИЯ № ${r.number}`,
+        '═══════════════════════════════════════',
+        `Дата: ${dateStr} | Время: ${timeStr} МСК`,
+        'Сервис: RentMyWaifu Network 🌙',
+        `Заказ FunPay: #${r.orderNumber}`,
+        '───────────────────────────────────────',
+        '📌 ВАШ ЗАКАЗ:',
+        `Аренда аккаунта Roblox (${r.hours} час.)`,
+        `Стоимость ................................. ${subtotal} ₽`,
+        '───────────────────────────────────────',
+        '🎁 БЕСПЛАТНО В КОМПЛЕКТЕ:',
+        '✅ Сервисный пакет .................. 0.00 ₽',
+        '✅ Контроль качества и безопасность . 0.00 ₽',
+        '✅ Обслуживание менеджером .......... 0.00 ₽',
+        '✅ Техническая поддержка 24/7 ....... 0.00 ₽',
+        '✅ Электронная квитанция (чек) ...... 0.00 ₽',
+        '───────────────────────────────────────',
+        '💝 ЧАЕВЫЕ:',
+        'Чаевые (по желанию) .................. 0.00 ₽',
+        'Хотите поддержать сервис?',
+        'Напишите "чаевые" в чат заказа!',
+        '───────────────────────────────────────',
+        '🧮 РАСЧЁТ:',
+        `Промежуточный итог ................... ${subtotal} ₽`,
+        `НДС 20% (FunPay) ..................... ${vat} ₽`,
+        `Скидка ............................... ${r.discount.toFixed(2)} ₽`,
+        '═══════════════════════════════════════',
+        `💸 ИТОГО ОПЛАЧЕНО:            ${total} ₽`,
+        '═══════════════════════════════════════',
+        '✅ Услуга оказана полностью',
+        '✅ Покупатель подтвердил выполнение заказа',
+        `   Дата: ${r.confirmDate}`,
+        `   Время: ${r.confirmTime} МСК`,
+        '───────────────────────────────────────',
+        '⚠️ ВАЖНО:',
+        'Претензии к качеству услуги принимаются',
+        'в течение 2 часов с момента подтверждения',
+        'заказа.',
+        '───────────────────────────────────────',
+        '📋 ДОКУМЕНТЫ:',
+        'Правила аренды и база знаний:',
+        'https://drive.google.com/drive/folders/',
+        '1kZ08jL6mMDc4D_mfdrUkN-T_tROEjC1-',
+        'Техническая поддержка:',
+        'https://funpay.com/users/16448769/',
+        '───────────────────────────────────────',
+        '🌙 Спасибо за выбор RentMyWaifu!',
+        '💖 Мы ценим каждого клиента',
+        '🌈 Приходите к нам снова',
+        '✨ Пусть вайфу будет верной!',
+        '───────────────────────────────────────',
+        'RentMyWaifu Network © 2025',
+        'Сервис аренды аккаунтов Roblox',
+        '═══════════════════════════════════════',
+        '',
+        'https://funpay.com/users/6285734/'
+    ];
+    
+    lines.forEach(line => {
+        ctx.fillText(line, 20, y);
+        y += lineHeight;
+    });
+    
+    // Конвертируем canvas в изображение
+    canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Чек_${r.number}_${r.orderNumber}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert('Чек сохранён как PNG! Загрузите на Google Drive - изображение откроется везде красиво!');
+    });
+}
+function deleteReceipt(id) {
+    if (!confirm('Удалить чек?')) return;
+    
+    receipts = receipts.filter(x => x.id !== id);
+    
+    if (isFirebaseEnabled) {
+        const receiptsObj = {};
+        receipts.forEach(r => { receiptsObj[r.id] = r; });
+        database.ref('receipts').set(receiptsObj);
+    } else {
+        localStorage.setItem('receipts-data', JSON.stringify(receipts));
+        renderReceipts();
+    }
+}
 </script>
 </head>
 <body>
@@ -3256,6 +3467,7 @@ function downloadReportDoc(id) {
             <div class="nav-tab" onclick="switchTab('reports')">📋 Отчеты</div>
             <div class="nav-tab" onclick="switchTab('regulations')">📜 Регламент</div>
 <div class="nav-tab" onclick="switchTab('salaries')">💵 Зарплаты</div>
+<div class="nav-tab" onclick="switchTab('receipts')">🧾 Чеки</div>
         </div>
 
         <!-- Вкладка: Заказы -->
@@ -3778,6 +3990,41 @@ function downloadReportDoc(id) {
         <button onclick="addApplication()">📝 Создать заявление</button>
 
         <div id="applicationsList"></div>
+    </div>
+</div>
+<div id="receiptsTab" class="tab-content">
+    <div class="card">
+        <h2>🧾 Новый Чек</h2>
+        <div class="form-group">
+            <label>Номер квитанции *</label>
+            <input type="text" id="receiptNumber" placeholder="Например: 12345">
+        </div>
+        <div class="form-group">
+            <label>Номер заказа FunPay *</label>
+            <input type="text" id="receiptOrderNumber" placeholder="Например: 67890">
+        </div>
+        <div class="form-group">
+            <label>Время аренды (часов) *</label>
+            <input type="number" id="receiptHours" placeholder="Например: 5" min="1">
+        </div>
+        <div class="form-group">
+            <label>Стоимость (₽) *</label>
+            <input type="number" id="receiptCost" step="0.01" placeholder="Например: 3.50">
+        </div>
+        <div class="form-group">
+            <label>Скидка (₽)</label>
+            <input type="number" id="receiptDiscount" step="0.01" placeholder="0.00" value="0">
+        </div>
+        <div class="form-group">
+            <label>Дата подтверждения *</label>
+            <input type="text" id="receiptConfirmDate" placeholder="Например: 13.12.2025">
+        </div>
+        <div class="form-group">
+            <label>Время подтверждения *</label>
+            <input type="text" id="receiptConfirmTime" placeholder="Например: 19:45">
+        </div>
+        <button onclick="addReceipt()">🧾 Создать чек</button>
+        <div id="receiptsList"></div>
     </div>
 </div>
     <!-- Вкладка: Регламент -->
