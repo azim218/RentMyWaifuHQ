@@ -3229,8 +3229,8 @@ function downloadReportDoc(id) {
 // ========== ЧЕКИ ==========
 let receipts = [];
 function addReceipt() {
-    const orderNumber = document.getElementById('receiptNumber').value; // Один номер для всего
-    const hours = document.getElementById('receiptHours').value;
+    const orderNumber = document.getElementById('receiptNumber').value;
+    const hours = document.getElementById('receiptHours').value; // Теперь текст
     const cost = parseFloat(document.getElementById('receiptCost').value);
     const discount = parseFloat(document.getElementById('receiptDiscount').value) || 0;
     const confirmDate = document.getElementById('receiptConfirmDate').value;
@@ -3243,8 +3243,8 @@ function addReceipt() {
 
     const receipt = {
         id: Date.now(),
-        orderNumber, // Теперь это и номер заказа, и номер квитанции
-        hours, 
+        orderNumber,
+        hours, // Сохраняем как текст
         cost, 
         discount,
         confirmDate, 
@@ -3293,7 +3293,37 @@ list.innerHTML = sorted.map(r => {
         </div>
     </div>
 `}).join('');
+function renderReceipts() {
+    const list = document.getElementById('receiptsList');
+    if (receipts.length === 0) {
+        list.innerHTML = '';
+        return;
+    }
 
+    const sorted = [...receipts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    list.innerHTML = sorted.map(r => {
+        const vat = (r.cost * 0.2).toFixed(2);
+        const subtotal = r.cost;
+        const total = (parseFloat(subtotal) + parseFloat(vat) - r.discount).toFixed(2);
+        
+        return `
+        <div class="compensation-item">
+            <h3>🧾 Чек ${r.orderNumber}</h3>
+            <p><strong>Заказ FunPay:</strong> ${r.orderNumber}</p>
+            <p><strong>Время аренды:</strong> ${r.hours} ч.</p>
+            <p><strong>Стоимость:</strong> ${r.cost} ₽</p>
+            <p><strong>Скидка:</strong> ${r.discount} ₽</p>
+            <p><strong>Итого:</strong> ${total} ₽</p>
+            <p><strong>Подтверждено:</strong> ${r.confirmDate} в ${r.confirmTime}</p>
+            <div class="responsible-tag">👤 Создал: ${r.createdBy}</div>
+            <button class="edit-btn" onclick="generateReceiptHTML(${r.id})" style="margin-top: 15px; width: auto; display: inline-block;">📥 Скачать чек</button>
+            <div class="button-group">
+                <button class="delete-btn" onclick="deleteReceipt(${r.id})">🗑️ Удалить</button>
+            </div>
+        </div>
+    `}).join('');
+}
 async function generateReceiptHTML(id) {
     const r = receipts.find(x => x.id === id);
     if (!r) return;
@@ -3999,7 +4029,7 @@ function deleteReceipt(id) {
 </div>
         <div class="form-group">
             <label>Время аренды (часов) *</label>
-            <input type="number" id="receiptHours" placeholder="Например: 5" min="1">
+            <input type="text" id="receiptHours" placeholder="Например: 5" min="1">
         </div>
         <div class="form-group">
             <label>Стоимость (₽) *</label>
