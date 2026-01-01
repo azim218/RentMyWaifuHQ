@@ -1109,8 +1109,10 @@
 </div>
     
        <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyAfyX2uuTG77bQCFhWDtU5ZVOQI2l4Nfa4",
@@ -3462,6 +3464,269 @@ function deleteReceipt(id) {
         renderReceipts();
     }
 }
+   // =============================================================================
+// 🔥 ПАТЧ: ОБЪЕДИНЕНИЕ ЗАКАЗОВ БОТА С РУЧНЫМИ ЗАКАЗАМИ
+// =============================================================================
+// Замени код интеграции на этот (начиная с "// 🤖 ИНТЕГРАЦИЯ С БОТОМ")
+
+// 📋 ОБЪЕДИНЁННАЯ ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ВСЕХ ЗАКАЗОВ
+function renderAllOrders() {
+    const ordersList = document.getElementById('ordersList');
+    
+    // Объединяем заказы
+    let allOrders = [];
+    
+    // 1. Добавляем ручные заказы (orders)
+    allOrders = allOrders.concat(orders.map(o => ({
+        ...o,
+        source: 'manual',  // Метка что это ручной заказ
+        id: o.id,
+        accountName: o.accountName,
+        orderNumber: o.orderNumber,
+        customerName: o.customerName || '-',
+        orderTime: o.orderTime || '-',
+        orderEndTime: o.orderEndTime || '-',
+        skin: o.skin,
+        note: o.note || '-',
+        responsible: o.responsible,
+        createdAt: o.createdAt
+    })));
+    
+    // 2. Добавляем заказы от бота (из Firebase orders/)
+    if (window.botOrders) {
+        Object.entries(window.botOrders).forEach(([id, botOrder]) => {
+            allOrders.push({
+                ...botOrder,
+                source: 'bot',  // Метка что это от бота
+                id: botOrder.orderNumber || id,
+                accountName: botOrder.accountName,
+                orderNumber: botOrder.orderNumber,
+                customerName: botOrder.buyerName || '-',
+                orderTime: formatDateTime(botOrder.orderTime),
+                orderEndTime: formatDateTime(botOrder.endTime),
+                skin: botOrder.hasSkin || 'Не указан',
+                note: botOrder.note || '-',
+                responsible: '🤖 Бот',
+                createdAt: botOrder.createdAt
+            });
+        });
+    }
+    
+    // Если нет заказов
+    if (allOrders.length === 0) {
+        ordersList.innerHTML = '';
+        return;
+    }
+    
+    // Сортируем по времени создания (новые сверху)
+    allOrders.sort((a, b) => {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        return dateB - dateA;
+    });
+    
+    // Отображаем все заказы
+    ordersList.innerHTML = allOrders.map(order => {
+        // Определяем статус для заказов от бота
+        let statusBadge = '';
+        if (order.source === 'bot') {
+            const now = new Date();
+            const endTime = new Date(order.endTime || order.orderEndTime);
+            
+            if (order.status === 'refunded') {
+                statusBadge = '<span style="background: #ff6b6b; color: white; padding: 5px 15px; border-radius: 15px; font-weight: bold; display: inline-block; margin-top: 10px;">❌ Возврат</span>';
+            } else if (order.status === 'completed') {
+                statusBadge = '<span style="background: #51cf66; color: white; padding: 5px 15px; border-radius: 15px; font-weight: bold; display: inline-block; margin-top: 10px;">✅ Завершён</span>';
+            } else if (now > endTime) {
+                statusBadge = '<span style="background: #ffa94d; color: white; padding: 5px 15px; border-radius: 15px; font-weight: bold; display: inline-block; margin-top: 10px;">⏱️ Истёк</span>';
+            } else {
+                statusBadge = '<span style="background: #51cf66; color: white; padding: 5px 15px; border-radius: 15px; font-weight: bold; display: inline-block; margin-top: 10px;">🟢 Активен</span>';
+            }
+        }
+        
+        // Кнопки редактирования только для ручных заказов
+        const buttons = order.source === 'manual' ? `
+            <div class="button-group">
+                <button class="edit-btn" onclick="openEditOrderModal(${order.id})">✏️ Редактировать</button>
+                <button class="delete-btn" onclick="deleteOrder(${order.id})">🗑️ Удалить</button>
+            </div>
+        ` : '';
+        
+        return `
+            <div class="order-item">
+                <h3>🛍️ Заказ #${order.orderNumber}</h3>
+                <p><strong>Аккаунт:</strong> ${order.accountName}</p>
+                ${order.customerName && order.customerName !== '-' ? `<p><strong>Покупатель:</strong> ${order.customerName}</p>` : ''}
+                ${order.orderTime && order.orderTime !== '-' ? `<p><strong>Начало:</strong> ${order.orderTime}</p>` : ''}
+                ${order.orderEndTime && order.orderEndTime !== '-' ? `<p><strong>Окончание:</strong> ${order.orderEndTime}</p>` : ''}
+                <p><strong>Скин:</strong> ${order.skin || 'Не указан'}</p>
+                ${order.note && order.note !== '-' ? `<p><strong>Заметка:</strong> ${order.note}</p>` : ''}
+                ${statusBadge}
+                <div class="responsible-tag">👤 Ответственный: ${order.responsible}</div>
+                ${buttons}
+            </div>
+        `;
+    }).join('');
+}
+
+// 🛠️ ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ форматирования даты
+function formatDateTime(isoString) {
+    if (!isoString) return '-';
+    
+    try {
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return isoString;
+        
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        
+        return `${day}.${month} ${hours}:${minutes}`;
+    } catch (e) {
+        return isoString;
+    }
+}
+
+// =============================================================================
+// 🚀 АВТОМАТИЧЕСКАЯ СИНХРОНИЗАЦИЯ С БОТОМ
+// =============================================================================
+
+// Глобальная переменная для хранения заказов от бота
+window.botOrders = {};
+
+if (isFirebaseEnabled && database) {
+    console.log('🤖 Запускаю синхронизацию заказов с ботом...');
+    
+    // Слушаем заказы от бота
+    database.ref('orders').on('value', (snapshot) => {
+        const data = snapshot.val();
+        console.log('📋 Заказы от бота получены:', data ? Object.keys(data).length : 0);
+        
+        window.botOrders = data || {};
+        
+        // ОБНОВЛЯЕМ ОБЩИЙ СПИСОК ЗАКАЗОВ
+        renderAllOrders();
+    });
+    
+    // Уведомление о новом заказе от бота
+    let isFirstLoad = true;
+    database.ref('orders').on('child_added', (snapshot) => {
+        if (isFirstLoad) {
+            // Пропускаем уведомления при первой загрузке
+            const ordersCount = Object.keys(window.botOrders || {}).length;
+            if (ordersCount > 0) {
+                isFirstLoad = false;
+            }
+            return;
+        }
+        
+        const order = snapshot.val();
+        console.log('🆕 Новый заказ от бота:', order);
+        showNotification(`Новый заказ #${order.orderNumber} от ${order.buyerName}`);
+    });
+    
+    // Уведомление об изменении статуса
+    database.ref('orders').on('child_changed', (snapshot) => {
+        const order = snapshot.val();
+        console.log('🔄 Заказ обновлён:', order);
+        
+        if (order.status === 'completed') {
+            showNotification(`Заказ #${order.orderNumber} завершён`);
+        } else if (order.status === 'refunded') {
+            showNotification(`Заказ #${order.orderNumber} возвращён`);
+        }
+        
+        // Обновляем список
+        renderAllOrders();
+    });
+    
+    console.log('✅ Синхронизация заказов с ботом активна!');
+} else {
+    console.log('⚠️ Firebase не подключен, используются только ручные заказы');
+}
+
+// =============================================================================
+// 🎮 СИНХРОНИЗАЦИЯ СВОБОДНЫХ АККАУНТОВ
+// =============================================================================
+
+if (isFirebaseEnabled && database) {
+    console.log('🎮 Запускаю синхронизацию свободных аккаунтов...');
+    
+    // Слушаем свободные аккаунты от бота
+    database.ref('freeAccounts').on('value', (snapshot) => {
+        const data = snapshot.val();
+        console.log('🎮 Свободные аккаунты от бота получены:', data ? Object.keys(data).length : 0);
+        
+        if (data) {
+            // Добавляем аккаунты от бота к существующим
+            Object.entries(data).forEach(([name, botAccount]) => {
+                // Проверяем, нет ли уже такого аккаунта
+                const exists = freeAccounts.find(acc => 
+                    acc.name.toLowerCase() === (botAccount.accountName || name).toLowerCase()
+                );
+                
+                if (!exists) {
+                    // Добавляем новый аккаунт
+                    freeAccounts.push({
+                        id: Date.now() + Math.random(), // Уникальный ID
+                        name: botAccount.accountName || name,
+                        skin: 'Не указан',
+                        note: '🤖 Добавлен ботом',
+                        addedBy: '🤖 Бот',
+                        createdAt: botAccount.updatedAt || new Date().toISOString()
+                    });
+                }
+            });
+            
+            // Обновляем отображение
+            renderFreeAccounts();
+            updateAccountStats();
+        }
+    });
+    
+    console.log('✅ Синхронизация свободных аккаунтов активна!');
+}
+
+// 🔔 ФУНКЦИЯ ПОКАЗА УВЕДОМЛЕНИЙ
+function showNotification(message) {
+    // Браузерные уведомления (если разрешены)
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('RentMyWaifu 🎮', {
+            body: message,
+            icon: '/favicon.ico',
+            badge: '/favicon.ico'
+        });
+    }
+    
+    // Уведомление в консоли
+    console.log('🔔', message);
+}
+
+// 🔔 ЗАПРОС РАЗРЕШЕНИЯ НА УВЕДОМЛЕНИЯ
+function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                console.log('✅ Уведомления разрешены');
+                showNotification('Уведомления включены! Вы будете получать оповещения о новых заказах.');
+            }
+        });
+    }
+}
+
+console.log('✅ Интеграция заказов бота с ручными заказами загружена!');
+
+// =============================================================================
+// 🔧 ПЕРЕОПРЕДЕЛЕНИЕ ФУНКЦИИ renderOrders()
+// =============================================================================
+// Теперь renderOrders() будет вызывать renderAllOrders()
+const originalRenderOrders = window.renderOrders;
+window.renderOrders = function() {
+    renderAllOrders();
+};
+
+console.log('✅ Функция renderOrders() переопределена для объединения заказов!');
 </script>
 </head>
 <body>
@@ -4272,3 +4537,4 @@ function deleteReceipt(id) {
     </div>
 </div>
 </div>
+
