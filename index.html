@@ -2449,7 +2449,8 @@ function renderFreeAccounts() {
     
     // Получаем настройки фильтров
     const showOnlyFree = document.getElementById('showOnlyFree').checked;
-    const sortFreeFirst = document.getElementById('sortFreeFirst').checked;
+const sortFreeFirst = document.getElementById('sortFreeFirst').checked;
+const filterMode = document.querySelector('input[name="accountFilter"]:checked')?.value || 'all';
     
     // Фильтруем и сортируем аккаунты
     let filteredAccounts = [...freeAccounts];
@@ -2460,6 +2461,22 @@ function renderFreeAccounts() {
             return status.isFree;
         });
     }
+    filteredAccounts = filteredAccounts.filter(account => {
+    const accountText = (account.note || '').toLowerCase();
+    const relatedOrder = orders.find(order => 
+        order.accountName.toLowerCase().trim() === account.name.toLowerCase().trim()
+    );
+    const orderText = relatedOrder ? 
+        `${relatedOrder.note || ''}`.toLowerCase() : '';
+    
+    const isFrozen = accountText.includes('мороз') || orderText.includes('мороз') || orderText.includes('#заморозка');
+    const isBanned = accountText.includes('бан') || orderText.includes('бан');
+    
+    if (filterMode === 'frozen') return isFrozen;
+    if (filterMode === 'banned') return isBanned;
+    if (filterMode === 'normal') return !isFrozen && !isBanned;
+    return true;
+});
     
     if (sortFreeFirst) {
         filteredAccounts.sort((a, b) => {
@@ -3918,6 +3935,23 @@ console.log('✅ Функция renderOrders() переопределена дл
                         <input type="radio" id="sortFreeFirst" name="sortOrder" onchange="renderFreeAccounts()">
                         <label for="sortFreeFirst" style="margin: 0; cursor: pointer;">Показывать сначала свободные аккаунты</label>
                     </div>
+                    <div style="margin-top: 15px; font-weight: 700; color: #ff1493;">📋 Статус:</div>
+<div class="filter-option">
+    <input type="radio" id="filterAll" name="accountFilter" value="all" checked onchange="renderFreeAccounts()">
+    <label for="filterAll" style="margin: 0;">Все</label>
+</div>
+<div class="filter-option">
+    <input type="radio" id="filterNormal" name="accountFilter" value="normal" onchange="renderFreeAccounts()">
+    <label for="filterNormal" style="margin: 0;">✅ Норм</label>
+</div>
+<div class="filter-option">
+    <input type="radio" id="filterFrozen" name="accountFilter" value="frozen" onchange="renderFreeAccounts()">
+    <label for="filterFrozen" style="margin: 0;">❄️ Заморозка</label>
+</div>
+<div class="filter-option">
+    <input type="radio" id="filterBanned" name="accountFilter" value="banned" onchange="renderFreeAccounts()">
+    <label for="filterBanned" style="margin: 0;">🚫 Бан</label>
+</div>
                 </div>
             </div>
 
@@ -4537,4 +4571,5 @@ console.log('✅ Функция renderOrders() переопределена дл
     </div>
 </div>
 </div>
+
 
