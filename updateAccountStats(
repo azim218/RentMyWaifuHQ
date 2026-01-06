@@ -1143,6 +1143,15 @@ let database = null;
 let ordersRef = null;
 let isFirebaseEnabled = false;
 let warnings = [];
+let receipts = [];
+let botAccounts = {}; // ✅ АККАУНТЫ БОТА
+
+// ===== ФИЛЬТРЫ ЗАКАЗОВ =====
+let orderFilters = {
+    status: 'all', // all, active, completed, refunded, frozen
+    responsible: 'all', // all, bot, azim218, tiger, sanya
+    search: ''
+};
 let reports = [];
 
 function canAccessWarnings() {
@@ -1185,7 +1194,16 @@ function addWarning() {
     warnings.push(warning);
 
     if (isFirebaseEnabled) {
-        const warningsObj = {};
+    // ✅ ЗАГРУЖАЕМ АККАУНТЫ БОТА
+    database.ref('accounts').on('value', (snapshot) => {
+        const data = snapshot.val();
+        botAccounts = data || {};
+        console.log('🤖 Аккаунты бота загружены:', Object.keys(botAccounts));
+        renderFreeAccounts();
+        updateAccountStats();
+    });
+    
+    ordersRef.on('value', (snapshot) => {
         warnings.forEach(w => { warningsObj[w.id] = w; });
         database.ref('warnings').set(warningsObj);
     } else {
@@ -2375,7 +2393,54 @@ function deleteCompensation(id) {
 
 function checkAccountStatus(accountName) {
     const normalizedName = accountName.toLowerCase().trim();
+    
+    // 1. Проверяем в ручных заказах
     const busyOrder = orders.find(order => 
+        order.accountName.toLowerCase().trim() === normalizedName &&
+        order.status !== 'completed' &&
+        order.status !== 'refunded'
+    );
+    
+    if (busyOrder) {
+        return {
+            isFree: false,
+            orderNumber: busyOrder.orderNumber,
+            customerName: busyOrder.customerName,
+            orderTime: busyOrder.orderTime,
+            orderEndTime: busyOrder.orderEndTime
+        };
+    }
+    
+    // 2. Проверяем в заказах бота
+    if (window.botOrders) {
+        for (let order of Object.values(window.botOrders)) {
+            if (order.accountName && order.accountName.toLowerCase().trim() === normalizedName) {
+                if (order.status !== 'completed' && order.status !== 'refunded') {
+                    return {
+                        isFree: false,
+                        orderNumber: order.orderNumber,
+                        customerName: order.buyerName || 'Бот',
+                        orderTime: formatDateTime(order.orderTime),
+                        orderEndTime: formatDateTime(order.endTime)
+                    };
+                }
+            }
+        }
+    }
+    
+    // 3. Проверяем статус в аккаунтах бота
+    if (botAccounts[accountName] && botAccounts[accountName].status === 'busy') {
+        return {
+            isFree: false,
+            orderNumber: '-',
+            customerName: botAccounts[accountName].current_buyer || '-',
+            orderTime: '-',
+            orderEndTime: botAccounts[accountName].busy_until || '-'
+        };
+    }
+    
+    return { isFree: true };
+}
         order.accountName.toLowerCase().trim() === normalizedName
     );
     
@@ -2442,7 +2507,45 @@ function addFreeAccount() {
 
 function renderFreeAccounts() {
     const accountsList = document.getElementById('freeAccountsList');
-    if (freeAccounts.length === 0) {
+    
+    // ✅ ОБЪЕДИНЯЕМ АККАУНТЫ ИЗ ДВУХ ИСТОЧНИКОВ
+    let allAccounts = [];
+    
+    // 1. Аккаунты с сайта (freeAccounts)
+    allAccounts = allAccounts.concat(freeAccounts.map(acc => ({
+        ...acc,
+        source: 'manual',
+        name: acc.name,
+        skin: acc.skin || 'Не указан',
+        note: acc.note || '-',
+        addedBy: acc.addedBy
+    })));
+    
+    // 2. Аккаунты бота (botAccounts)
+    Object.entries(botAccounts).forEach(([username, data]) => {
+        // Проверяем есть ли уже такой аккаунт в ручных
+        const exists = freeAccounts.find(acc => 
+            acc.name.toLowerCase() === username.toLowerCase()
+        );
+        
+        if (!exists) {
+            allAccounts.push({
+                source: 'bot',
+                id: username,
+                name: username,
+                skin: 'Не указан',
+                note: '🤖 Аккаунт бота',
+                addedBy: '🤖 Бот'
+            });
+        }
+    });
+    
+    if (allAccounts.length === 0) {
+        accountsList.innerHTML = '<p style="text-align: center; color: #ff1493; font-size: 1.2rem; padding: 40px;">Нет аккаунтов</p>';
+        return;
+    }
+    
+    // ... остальной код остается без изменений
         accountsList.innerHTML = '';
         return;
     }
@@ -3489,7 +3592,9 @@ function deleteReceipt(id) {
 // 📋 ОБЪЕДИНЁННАЯ ФУНКЦИЯ ДЛЯ ОТОБРАЖЕНИЯ ВСЕХ ЗАКАЗОВ
 function renderAllOrders() {
     const ordersList = document.getElementById('ordersList');
-    
+function applyOrderFilters() {
+    renderAllOrders();
+}
     // Объединяем заказы
     let allOrders = [];
     
@@ -3528,7 +3633,35 @@ function renderAllOrders() {
             });
         });
     }
+    // ===== ПРИМЕНЯЕМ ФИЛЬТРЫ =====
     
+    // Фильтр по статусу
+    if (orderFilters.status !== 'all') {
+        allOrders = allOrders.filter(o => {
+            const status = (o.status || 'active').toLowerCase();
+            return status === orderFilters.status;
+        });
+    }
+    
+    // Фильтр по ответственному
+    if (orderFilters.responsible !== 'all') {
+        allOrders = allOrders.filter(o => {
+            const responsible = (o.responsible || '').toLowerCase();
+            return responsible.includes(orderFilters.responsible);
+        });
+    }
+    
+    // Поиск
+    if (orderFilters.search.trim()) {
+        const search = orderFilters.search.toLowerCase();
+        allOrders = allOrders.filter(o => {
+            return (
+                (o.orderNumber || '').toLowerCase().includes(search) ||
+                (o.customerName || '').toLowerCase().includes(search) ||
+                (o.accountName || '').toLowerCase().includes(search)
+            );
+        });
+    }
     // Если нет заказов
     if (allOrders.length === 0) {
         ordersList.innerHTML = '';
@@ -3919,23 +4052,38 @@ console.log('✅ Функция renderOrders() переопределена дл
                 </div>
             </div>
 
-            <!-- Фильтры -->
-            <div class="filters-section">
-                <h3>🔍 Фильтры</h3>
-                <div class="filter-options">
-                    <div class="filter-option">
-                        <input type="checkbox" id="showOnlyFree" checked onchange="renderFreeAccounts()">
-                        <label for="showOnlyFree" style="margin: 0; cursor: pointer;">Показывать только свободные аккаунты</label>
-                    </div>
-                    <div class="filter-option">
-                        <input type="radio" id="sortDefault" name="sortOrder" checked onchange="renderFreeAccounts()">
-                        <label for="sortDefault" style="margin: 0; cursor: pointer;">Сортировка по умолчанию</label>
-                    </div>
-                    <div class="filter-option">
-                        <input type="radio" id="sortFreeFirst" name="sortOrder" onchange="renderFreeAccounts()">
-                        <label for="sortFreeFirst" style="margin: 0; cursor: pointer;">Показывать сначала свободные аккаунты</label>
-                    </div>
-                    <div style="margin-top: 15px; font-weight: 700; color: #ff1493;">📋 Статус:</div>
+            <!-- Фильтры -->    
+           <!-- ФИЛЬТРЫ ДЛЯ ЗАКАЗОВ -->
+<div class="filters-section">
+    <h3>🔍 Фильтры заказов</h3>
+    <div class="filter-options">
+        <div class="filter-option">
+            <label>Статус:</label>
+            <select id="filterStatus" onchange="orderFilters.status = this.value; applyOrderFilters()">
+                <option value="all">Все</option>
+                <option value="active">🟢 Активные</option>
+                <option value="completed">✅ Завершённые</option>
+                <option value="refunded">❌ Возвраты</option>
+                <option value="frozen">❄️ Замороженные</option>
+            </select>
+        </div>
+        <div class="filter-option">
+            <label>Ответственный:</label>
+            <select id="filterResponsible" onchange="orderFilters.responsible = this.value; applyOrderFilters()">
+                <option value="all">Все</option>
+                <option value="бот">🤖 Бот</option>
+                <option value="azim218">Azim218</option>
+                <option value="tiger">Tiger</option>
+                <option value="sanya">sanya</option>
+            </select>
+        </div>
+        <div class="filter-option">
+            <label>Поиск:</label>
+            <input type="text" id="filterSearch" placeholder="Номер заказа, покупатель, аккаунт..." 
+                   onkeyup="orderFilters.search = this.value; applyOrderFilters()">
+        </div>
+    </div>
+</div>
 <div class="filter-option">
     <input type="radio" id="filterAll" name="accountFilter" value="all" checked onchange="renderFreeAccounts()">
     <label for="filterAll" style="margin: 0;">Все</label>
@@ -4571,5 +4719,6 @@ console.log('✅ Функция renderOrders() переопределена дл
     </div>
 </div>
 </div>
+
 
 
